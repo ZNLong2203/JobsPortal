@@ -10,7 +10,8 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const createdUser = this.userModel.create(createUserDto);
+    return createdUser;
   }
 
   findAll() {

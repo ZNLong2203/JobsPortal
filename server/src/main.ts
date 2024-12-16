@@ -1,8 +1,9 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import * as helmet from 'helmet';
 import * as compression from 'compression';
 import * as morgan from 'morgan';
@@ -11,6 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
+  const reflector = app.get(Reflector);
 
   app.use(helmet.default());
   app.use(compression());
@@ -22,6 +24,7 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalGuards(new JwtAuthGuard(reflector));
   app.setGlobalPrefix('api', { exclude: ['api'] });
 
   const documentOptions = new DocumentBuilder()
