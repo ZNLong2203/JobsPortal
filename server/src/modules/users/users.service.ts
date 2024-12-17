@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { hashSync, genSalt } from 'bcrypt';
 
 @Injectable()
@@ -13,19 +13,25 @@ export class UsersService {
   async createUser(createUserDto: CreateUserDto) {
     const salt = await genSalt(10);
     const hashedPassword = hashSync(createUserDto.password, salt);
-    const newUser = this.userModel.create({
+    const newUser = await this.userModel.create({
       ...createUserDto,
       password: hashedPassword,
     });
     return newUser;
   }
 
-  async findAll() {
-    return `This action returns all users`;
+  async findAllUser() {
+    const allUsers = await this.userModel.find();
+    return allUsers;
   }
 
-  async findUser(id: number) {
-    return `This action returns a #${id} user`;
+  async findUserById(id: number) {
+    if (!Types.ObjectId.isValid(id)) {
+      return null;
+    }
+
+    const user = await this.userModel.findById(id);
+    return user;
   }
 
   async findUserByEmail(email: string) {
@@ -34,11 +40,23 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user with ${updateUserDto}`;
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        ...updateUserDto,
+      },
+      {
+        new: true,
+      },
+    );
+    return updatedUser;
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} user`;
+  async deleteUser(id: number) {
+    await this.userModel.findByIdAndDelete(id);
+    return;
   }
 }
