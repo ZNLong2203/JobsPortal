@@ -5,6 +5,7 @@ import { UsersModule } from './modules/users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
+import * as mongooseDelete from 'mongoose-delete';
 
 @Module({
   imports: [
@@ -16,6 +17,13 @@ import { AuthModule } from './modules/auth/auth.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URL'),
+        connectionFactory: (connection) => {
+          connection.plugin(mongooseDelete, {
+            deletedAt: true,
+            overrideMethods: 'all',
+          });
+          return connection;
+        },
       }),
       inject: [ConfigService],
     }),
