@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import * as mongooseDelete from 'mongoose-delete';
+import { CompanyModule } from './modules/company/company.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import * as mongooseDelete from 'mongoose-delete';
     }),
     AuthModule,
     UsersModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,4 +9,10 @@ export class CreateCompanyDto {
 
   @IsNotEmpty()
   des: string;
+
+  @IsNotEmpty()
+  createdBy: {
+    _id: string;
+    email: string;
+  };
 }
