@@ -10,7 +10,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import ResponseDto from 'src/constants/response.dto';
+import { Message } from 'src/common/message';
 
 @Controller('users')
 export class UsersController {
@@ -24,13 +24,19 @@ export class UsersController {
   @Get()
   async findAllUser() {
     const allUsers = this.usersService.findAllUser();
-    return ResponseDto.success(allUsers, 'All users fetched successfully');
+    return {
+      message: Message.FETCH_ALL_USER_SUCCESS,
+      data: allUsers,
+    };
   }
 
   @Get('/:id')
   async findUserById(@Param('id') id: string) {
     const user = this.usersService.findUserById(+id);
-    return ResponseDto.success(user, 'User fetched successfully');
+    return {
+      message: Message.FETCH_USER_SUCCESS,
+      data: user,
+    };
   }
 
   @Patch('/:id')
@@ -39,12 +45,17 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const updatedUser = this.usersService.updateUser(+id, updateUserDto);
-    return ResponseDto.success(updatedUser, 'User updated successfully');
+    return {
+      message: Message.UPDATE_USER_SUCCESS,
+      data: updatedUser,
+    };
   }
 
   @Delete('/:id')
   async deleteUser(@Param('id') id: string) {
     await this.usersService.deleteUser(+id);
-    return ResponseDto.successWithoutData('User deleted successfully');
+    return {
+      message: Message.DELETE_USER_SUCCESS,
+    };
   }
 }

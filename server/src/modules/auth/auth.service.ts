@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { IJwtPayload } from './interfaces/jwt-payload.interface';
+import { Message } from 'src/common/message';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     if (user && compare(password, user.password)) {
       return true;
     }
-    return null;
+    throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
   }
 
   async register(user: any) {

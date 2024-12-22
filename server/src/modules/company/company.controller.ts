@@ -12,7 +12,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { User } from 'src/decorators/user.decorator';
-import ResponseDto from 'src/constants/response.dto';
+import { Message } from 'src/common/message';
 
 @Controller('company')
 export class CompanyController {
@@ -27,19 +27,28 @@ export class CompanyController {
       createCompanyDto,
       user,
     );
-    return ResponseDto.success(createdCompany, 'Company created successfully');
+    return {
+      message: Message.COMPANY_CREATED,
+      data: createdCompany,
+    };
   }
 
   @Get()
   async findAllCompany() {
     const allCompany = await this.companyService.findAllCompany();
-    return ResponseDto.success(allCompany, 'All company fetched successfully');
+    return {
+      message: Message.COMPANY_ALL_FETCHED,
+      data: allCompany,
+    };
   }
 
   @Get(':id')
   async findOneCompany(@Param('id') id: string) {
     const company = await this.companyService.findOneCompany(+id);
-    return ResponseDto.success(company, 'Company fetched successfully');
+    return {
+      message: Message.COMPANY_FETCHED,
+      data: company,
+    };
   }
 
   @Patch(':id')
@@ -48,12 +57,16 @@ export class CompanyController {
     @Body() updateCompanyDto: UpdateCompanyDto,
   ) {
     await this.companyService.updateCompany(+id, updateCompanyDto);
-    return ResponseDto.successWithoutData('Company updated successfully');
+    return {
+      message: Message.COMPANY_UPDATED,
+    };
   }
 
   @Delete(':id')
   async removeCompany(@Param('id') id: string, @User() user: IReqUser) {
     await this.companyService.removeCompany(+id, user);
-    return ResponseDto.successWithoutData('Company deleted successfully');
+    return {
+      message: Message.COMPANY_DELETED,
+    };
   }
 }

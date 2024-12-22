@@ -15,10 +15,7 @@ export class CompanyService {
   async createCompany(createCompanyDto: CreateCompanyDto, user: IReqUser) {
     const createdCompany = await this.companyModel.create({
       ...createCompanyDto,
-      createdBy: {
-        _id: user._id,
-        gmail: user.gmail,
-      },
+      createdBy: user._id,
     });
 
     return createdCompany;
@@ -54,7 +51,7 @@ export class CompanyService {
   async removeCompany(id: number, user: IReqUser) {
     const checkCompany = await this.companyModel.findById(id);
 
-    if (checkCompany.createdBy._id.toString() !== user._id) {
+    if (checkCompany.createdBy.toString() !== user._id) {
       throw new Error('You are not authorized to delete this company');
     }
 

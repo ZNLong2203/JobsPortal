@@ -1,4 +1,4 @@
-import { Message } from './message';
+import { Message } from '../message';
 import { PaginationDto } from './pagination.dto';
 
 export default class ResponseDto<T = null> {
