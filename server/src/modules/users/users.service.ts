@@ -28,7 +28,7 @@ export class UsersService {
 
   async findUserById(id: Types.ObjectId): Promise<User> {
     if (!Types.ObjectId.isValid(id)) {
-      return null;
+      throw new Error(Message.INVALID_ID);
     }
 
     const user = await this.userModel.findById(id);
