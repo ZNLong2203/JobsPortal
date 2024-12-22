@@ -19,12 +19,12 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
+    return await this.usersService.createUser(createUserDto);
   }
 
   @Get()
   async findAllUser() {
-    const allUsers = this.usersService.findAllUser();
+    const allUsers = await this.usersService.findAllUser();
     return {
       message: Message.USER_ALL_FETCHED,
       data: allUsers,
@@ -33,7 +33,7 @@ export class UsersController {
 
   @Get('/:id')
   async findUserById(@Param('id') id: Types.ObjectId) {
-    const user = this.usersService.findUserById(id);
+    const user = await this.usersService.findUserById(id);
     return {
       message: Message.USER_FETCHED,
       data: user,
@@ -45,10 +45,9 @@ export class UsersController {
     @Param('id') id: Types.ObjectId,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const updatedUser = this.usersService.updateUser(id, updateUserDto);
+    await this.usersService.updateUser(id, updateUserDto);
     return {
       message: Message.USER_UPDATED,
-      data: updatedUser,
     };
   }
 

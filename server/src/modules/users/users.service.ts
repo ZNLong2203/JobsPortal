@@ -36,7 +36,7 @@ export class UsersService {
   }
 
   async findUserByEmail(email: string): Promise<User> {
-    const user = this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email });
     if (!user) throw new Error(Message.USER_NOT_FOUND);
 
     return user;
@@ -45,8 +45,8 @@ export class UsersService {
   async updateUser(
     id: Types.ObjectId,
     updateUserDto: UpdateUserDto,
-  ): Promise<User> {
-    const updatedUser = await this.userModel.findByIdAndUpdate(
+  ): Promise<void> {
+    await this.userModel.findByIdAndUpdate(
       {
         _id: id,
       },
@@ -58,7 +58,7 @@ export class UsersService {
       },
     );
 
-    return updatedUser;
+    return;
   }
 
   async deleteUser(id: Types.ObjectId): Promise<void> {
