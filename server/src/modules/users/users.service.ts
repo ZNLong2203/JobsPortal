@@ -5,12 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model, Types } from 'mongoose';
 import { hashSync, genSalt } from 'bcrypt';
+import { Message } from 'src/common/message';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const salt = await genSalt(10);
     const hashedPassword = hashSync(createUserDto.password, salt);
     const newUser = await this.userModel.create({
@@ -20,12 +21,12 @@ export class UsersService {
     return newUser;
   }
 
-  async findAllUser() {
+  async findAllUser(): Promise<User[]> {
     const allUsers = await this.userModel.find();
     return allUsers;
   }
 
-  async findUserById(id: number) {
+  async findUserById(id: Types.ObjectId): Promise<User> {
     if (!Types.ObjectId.isValid(id)) {
       return null;
     }
@@ -34,13 +35,17 @@ export class UsersService {
     return user;
   }
 
-  async findUserByEmail(email: string) {
+  async findUserByEmail(email: string): Promise<User> {
     const user = this.userModel.findOne({ email });
-    if (!user) return null;
+    if (!user) throw new Error(Message.USER_NOT_FOUND);
+
     return user;
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+  async updateUser(
+    id: Types.ObjectId,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     const updatedUser = await this.userModel.findByIdAndUpdate(
       {
         _id: id,
@@ -52,10 +57,11 @@ export class UsersService {
         new: true,
       },
     );
+
     return updatedUser;
   }
 
-  async deleteUser(id: number) {
+  async deleteUser(id: Types.ObjectId): Promise<void> {
     await this.userModel.findByIdAndDelete(id);
     return;
   }

@@ -2,8 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
-import { IJwtPayload } from './interfaces/jwt-payload.interface';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Message } from 'src/common/message';
+import { LoginRequestDto } from './dto/login-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,34 +13,42 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findUserByEmail(username);
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findUserByEmail(email);
+
     if (user && compare(password, user.password)) {
-      return true;
+      return user;
     }
     throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
   }
 
-  async register(user: any) {
-    return this.usersService.createUser(user);
+  async register(createUser: CreateUserDto): Promise<void> {
+    await this.usersService.createUser(createUser);
+    return;
   }
 
-  async login(user: IJwtPayload) {
-    const { _id, name, gmail, role } = user;
+  async login(loginRequest: LoginRequestDto): Promise<any> {
+    const validateUser = await this.validateUser(
+      loginRequest.email,
+      loginRequest.password,
+    );
+
+    const { _id, name, email, role } = validateUser;
     const payload = {
       sub: 'auth',
       iss: 'from zkare',
       _id,
       name,
-      gmail,
+      email,
       role,
     };
+
     return {
       access_token: this.jwtService.sign(payload),
       userData: {
         _id,
         name,
-        gmail,
+        email,
         role,
       },
     };

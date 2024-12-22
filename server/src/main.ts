@@ -1,7 +1,7 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
@@ -24,10 +24,15 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
 
+  app.setGlobalPrefix('api', { exclude: ['api'] });
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
+
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalGuards(new JwtAuthGuard(reflector));
   app.useGlobalInterceptors(new ResponseInterceptor());
-  app.setGlobalPrefix('api', { exclude: ['api'] });
 
   const documentOptions = new DocumentBuilder()
     .setTitle('NestJS API')

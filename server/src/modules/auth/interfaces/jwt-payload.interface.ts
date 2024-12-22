@@ -1,7 +1,7 @@
 export interface IJwtPayload {
   _id: string;
   name: string;
-  gmail: string;
+  email: string;
   role: string;
   sub: string;
   iss: string;
