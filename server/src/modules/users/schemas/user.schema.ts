@@ -18,7 +18,16 @@ export class User {
   role: string;
 
   @Prop()
+  gender: string;
+
+  @Prop()
+  age: number;
+
+  @Prop()
   address: string;
+
+  @Prop()
+  createdBy: string;
 
   @Prop()
   createdAt: Date;

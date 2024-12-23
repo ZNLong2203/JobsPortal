@@ -1,11 +1,14 @@
 export class Message {
   // Common
   static readonly INVALID_ID = 'Invalid id';
+  static readonly INVALID_REQUEST = 'Invalid request';
+  static readonly EMAIL_ALREADY_EXISTS = 'Email already exists';
 
   // Auth
   static readonly INVALID_CREDENTIALS = 'Invalid credentials';
   static readonly REGISTER_SUCCESS = 'User registered successfully';
   static readonly LOGIN_SUCCESS = 'User logged in successfully';
+  static readonly LOGOUT_SUCCESS = 'User logged out successfully';
 
   // User
   static readonly USER_NOT_FOUND = 'User not found';

@@ -6,25 +6,43 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Message } from 'src/common/message';
 import { Types } from 'mongoose';
+import { User } from 'src/decorators/user.decorator';
+import { IReqUser } from '../auth/interfaces/req-user.interface';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.createUser(createUserDto);
+  async createUserByAdmin(
+    @Body() createUserDto: CreateUserDto,
+    @User() user: IReqUser,
+  ) {
+    return await this.usersService.createUserByAdmin(createUserDto, user);
   }
 
   @Get()
-  async findAllUser() {
-    const allUsers = await this.usersService.findAllUser();
+  async findAllUser(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query() query: any,
+  ) {
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const currentLimit = Math.max(Number(limit) || 10, 1);
+
+    const allUsers = await this.usersService.findAllUser(
+      currentPage,
+      currentLimit,
+      query,
+    );
+
     return {
       message: Message.USER_ALL_FETCHED,
       data: allUsers,
