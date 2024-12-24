@@ -27,4 +27,21 @@ export class Message {
   static readonly COMPANY_FETCHED = 'Company fetched successfully';
   static readonly COMPANY_UPDATED = 'Company updated successfully';
   static readonly COMPANY_DELETED = 'Company deleted successfully';
+
+  // Job
+  static readonly JOB_NOT_FOUND = 'Job not found';
+  static readonly JOB_NOT_YOURS = 'Job not yours';
+  static readonly JOB_CREATED = 'Job created successfully';
+  static readonly JOB_ALL_FETCHED = 'All job fetched successfully';
+  static readonly JOB_FETCHED = 'Job fetched successfully';
+  static readonly JOB_UPDATED = 'Job updated successfully';
+  static readonly JOB_DELETED = 'Job deleted successfully';
+
+  // File
+  static readonly FILE_UPLOADED = 'File uploaded successfully';
+  static readonly FILE_DELETED = 'File deleted successfully';
+  static readonly FILE_NOT_FOUND = 'File not found';
+  static readonly FILE_NOT_ALLOWED = 'File not allowed';
+  static readonly FILE_SIZE_EXCEEDED = 'File size exceeded';
+  static readonly FILE_TYPE_NOT_ALLOWED = 'File type not allowed';
 }
