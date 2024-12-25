@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { CompanyModule } from './modules/company/company.module';
 import { FilesModule } from './modules/files/files.module';
+import { ResumesModule } from './modules/resumes/resumes.module';
 import * as mongooseDelete from 'mongoose-delete';
 
 @Module({
@@ -35,6 +36,7 @@ import * as mongooseDelete from 'mongoose-delete';
     CompanyModule,
     JobsModule,
     FilesModule,
+    ResumesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

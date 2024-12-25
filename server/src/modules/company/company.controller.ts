@@ -15,6 +15,7 @@ import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { User } from 'src/decorators/user.decorator';
 import { Message } from 'src/common/message';
 import { Types } from 'mongoose';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('company')
 export class CompanyController {
@@ -35,6 +36,7 @@ export class CompanyController {
     };
   }
 
+  @Public()
   @Get()
   async findAllCompany(
     @Query('page') page: number = 1,
@@ -56,6 +58,7 @@ export class CompanyController {
     };
   }
 
+  @Public()
   @Get('/:id')
   async findOneCompany(@Param('id') id: Types.ObjectId) {
     const company = await this.companyService.findOneCompany(id);

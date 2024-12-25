@@ -13,6 +13,9 @@ export class Company {
   address: string;
 
   @Prop()
+  logo: string;
+
+  @Prop()
   des: string;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })

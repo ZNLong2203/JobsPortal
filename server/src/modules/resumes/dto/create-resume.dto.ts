@@ -1,15 +1,15 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateCompanyDto {
+export class CreateResumeDto {
   @IsNotEmpty()
-  name: string;
+  companyId: string;
 
   @IsNotEmpty()
-  address: string;
+  jobId: string;
 
   @IsNotEmpty()
-  logo: string;
+  url: string;
 
   @IsNotEmpty()
-  des: string;
+  status: string;
 }
