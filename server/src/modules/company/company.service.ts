@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
@@ -17,68 +21,89 @@ export class CompanyService {
     createCompanyDto: CreateCompanyDto,
     user: IReqUser,
   ): Promise<Company> {
-    const createdCompany = await this.companyModel.create({
-      ...createCompanyDto,
-      createdBy: user._id,
-    });
+    try {
+      const createdCompany = await this.companyModel.create({
+        ...createCompanyDto,
+        createdBy: user._id,
+      });
 
-    return createdCompany;
+      return createdCompany;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async findAllCompany(page: number, limit: number, query: any): Promise<any> {
-    const skip = (page - 1) * limit;
-    const [companies, totalDocuments] = await Promise.all([
-      this.companyModel.find(query).skip(skip).limit(limit),
-      this.companyModel.countDocuments(query),
-    ]);
+    try {
+      const skip = (page - 1) * limit;
+      const [companies, totalDocuments] = await Promise.all([
+        this.companyModel.find(query).skip(skip).limit(limit),
+        this.companyModel.countDocuments(query),
+      ]);
 
-    const totalPages = Math.ceil(totalDocuments / limit);
+      const totalPages = Math.ceil(totalDocuments / limit);
 
-    return {
-      companies,
-      metadata: {
-        total: totalDocuments,
-        page,
-        totalPages,
-        limit,
-      },
-    };
+      return {
+        companies,
+        metadata: {
+          total: totalDocuments,
+          page,
+          totalPages,
+          limit,
+        },
+      };
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
   async findOneCompany(id: Types.ObjectId): Promise<Company> {
-    const company = await this.companyModel.findById(id);
-    if (!company) throw new Error(Message.COMPANY_NOT_FOUND);
-    return company;
+    try {
+      const company = await this.companyModel.findById(id);
+      if (!company) throw new Error(Message.COMPANY_NOT_FOUND);
+
+      return company;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
   async updateCompany(
     id: Types.ObjectId,
     updateCompanyDto: UpdateCompanyDto,
   ): Promise<void> {
-    await this.companyModel.findByIdAndUpdate(
-      {
-        _id: id,
-      },
-      {
-        ...updateCompanyDto,
-      },
-      {
-        new: true,
-      },
-    );
+    try {
+      await this.companyModel.findByIdAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          ...updateCompanyDto,
+        },
+        {
+          new: true,
+        },
+      );
 
-    return;
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async removeCompany(id: Types.ObjectId, user: IReqUser): Promise<void> {
-    const checkCompany = await this.companyModel.findById(id);
+    try {
+      const checkCompany = await this.companyModel.findById(id);
 
-    if (checkCompany.createdBy.toString() !== user._id) {
-      throw new Error(Message.COMPANY_NOT_YOURS);
+      if (checkCompany.createdBy.toString() !== user._id) {
+        throw new Error(Message.COMPANY_NOT_YOURS);
+      }
+
+      await this.companyModel.findByIdAndDelete(id);
+
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
-
-    await this.companyModel.findByIdAndDelete(id);
-
-    return;
   }
 }

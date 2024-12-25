@@ -15,10 +15,14 @@ import { Message } from 'src/common/message';
 import { Types } from 'mongoose';
 import { User } from 'src/decorators/user.decorator';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
+import { ResumesService } from '../resumes/resumes.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly resumesService: ResumesService,
+  ) {}
 
   @Post()
   async createUserByAdmin(
@@ -46,6 +50,27 @@ export class UsersController {
     return {
       message: Message.USER_ALL_FETCHED,
       data: allUsers,
+    };
+  }
+
+  @Get('/:id/resumes')
+  async findAllResumesByUser(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @User() user: IReqUser,
+  ) {
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const currentLimit = Math.max(Number(limit) || 10, 1);
+
+    const allResumes = await this.resumesService.findAllResumeByUser(
+      currentPage,
+      currentLimit,
+      user,
+    );
+
+    return {
+      message: Message.RESUME_ALL_FETCHED,
+      data: allResumes,
     };
   }
 

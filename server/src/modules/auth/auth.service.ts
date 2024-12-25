@@ -31,60 +31,71 @@ export class AuthService {
   }
 
   async register(createUser: CreateUserDto): Promise<void> {
-    const checkUser = await this.usersService.findUserByEmail(createUser.email);
-    if (checkUser) {
-      throw new BadRequestException(Message.EMAIL_ALREADY_EXISTS);
-    }
+    try {
+      const checkUser = await this.usersService.findUserByEmail(
+        createUser.email,
+      );
+      if (checkUser) {
+        throw new BadRequestException(Message.EMAIL_ALREADY_EXISTS);
+      }
 
-    await this.usersService.createUser(createUser);
-    return;
+      await this.usersService.createUser(createUser);
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async login(loginRequest: LoginRequestDto, res: Response): Promise<any> {
-    const validateUser = await this.validateUser(
-      loginRequest.email,
-      loginRequest.password,
-    );
-    if (!validateUser) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    const { _id, name, email, role } = validateUser;
-    const payload = {
-      sub: 'auth',
-      iss: 'from zkare',
-      _id,
-      name,
-      email,
-      role,
-    };
-
-    const refreshExpire = this.configService.get<string>('JWT_REFRESH_EXPIRE');
-    if (!refreshExpire) {
-      throw new InternalServerErrorException(
-        'JWT_REFRESH_EXPIRE is not defined',
+    try {
+      const validateUser = await this.validateUser(
+        loginRequest.email,
+        loginRequest.password,
       );
-    }
+      if (!validateUser) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
 
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_TOKEN'),
-      expiresIn: refreshExpire,
-    });
-
-    res.clearCookie('refreshToken');
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-    });
-
-    return {
-      access_token: this.jwtService.sign(payload),
-      userData: {
+      const { _id, name, email, role } = validateUser;
+      const payload = {
+        sub: 'auth',
+        iss: 'from zkare',
         _id,
         name,
         email,
         role,
-      },
-    };
+      };
+
+      const refreshExpire =
+        this.configService.get<string>('JWT_REFRESH_EXPIRE');
+      if (!refreshExpire) {
+        throw new InternalServerErrorException(
+          'JWT_REFRESH_EXPIRE is not defined',
+        );
+      }
+
+      const refreshToken = this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN'),
+        expiresIn: refreshExpire,
+      });
+
+      res.clearCookie('refreshToken');
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+      });
+
+      return {
+        access_token: this.jwtService.sign(payload),
+        userData: {
+          _id,
+          name,
+          email,
+          role,
+        },
+      };
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
   }
 
   async newRefreshToken(refreshToken: string, res: Response): Promise<any> {

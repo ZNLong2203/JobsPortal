@@ -4,10 +4,13 @@ import {
   IsBoolean,
   IsDate,
   IsNotEmpty,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { IsEndDateAfterStartDate } from 'src/common/validators/IsEndDateAfterStartDate';
+import { Types } from 'mongoose';
+import { Company } from 'src/modules/company/schemas/company.schema';
 
 export class CreateJobDto {
   @IsNotEmpty()
@@ -20,7 +23,7 @@ export class CreateJobDto {
   skills: string[];
 
   @IsNotEmpty()
-  company: string;
+  companyId: Types.ObjectId | Company;
 
   @IsNotEmpty()
   salary: number;
@@ -31,7 +34,7 @@ export class CreateJobDto {
   @IsNotEmpty()
   level: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   des: string;
 
   @IsNotEmpty()

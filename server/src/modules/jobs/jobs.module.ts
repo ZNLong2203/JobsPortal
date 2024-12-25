@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { JobsController } from './jobs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JobSchema } from './schemas/job.schema';
+import { Job, JobSchema } from './schemas/job.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Job', schema: JobSchema }])],
+  imports: [MongooseModule.forFeature([{ name: Job.name, schema: JobSchema }])],
   controllers: [JobsController],
   providers: [JobsService],
 })

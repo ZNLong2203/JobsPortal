@@ -44,4 +44,16 @@ export class Message {
   static readonly FILE_NOT_ALLOWED = 'File not allowed';
   static readonly FILE_SIZE_EXCEEDED = 'File size exceeded';
   static readonly FILE_TYPE_NOT_ALLOWED = 'File type not allowed';
+
+  // Resume
+  static readonly RESUME_CREATED = 'Resume created successfully';
+  static readonly RESUME_ALL_FETCHED = 'All resume fetched successfully';
+  static readonly RESUME_FETCHED = 'Resume fetched successfully';
+  static readonly RESUME_UPDATED = 'Resume updated successfully';
+  static readonly RESUME_STATUS_UPDATED = 'Resume status updated successfully';
+  static readonly RESUME_DELETED = 'Resume deleted successfully';
+  static readonly RESUME_NOT_FOUND = 'Resume not found';
+  static readonly RESUME_NOT_ALLOWED = 'Resume not allowed';
+  static readonly RESUME_SIZE_EXCEEDED = 'Resume size exceeded';
+  static readonly RESUME_TYPE_NOT_ALLOWED = 'Resume type not allowed';
 }

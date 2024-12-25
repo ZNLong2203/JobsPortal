@@ -18,7 +18,7 @@ export class Company {
   @Prop()
   des: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   createdBy: Types.ObjectId | User;
 
   @Prop()

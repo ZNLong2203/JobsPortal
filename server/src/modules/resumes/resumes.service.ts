@@ -1,26 +1,175 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
+import { Model, Types } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Resume, ResumeDocument } from './schemas/resume.schema';
+import { IReqUser } from '../auth/interfaces/req-user.interface';
 
 @Injectable()
 export class ResumesService {
-  create(createResumeDto: CreateResumeDto) {
-    return 'This action adds a new resume';
+  constructor(
+    @InjectModel(Resume.name) private resumeModel: Model<ResumeDocument>,
+  ) {}
+
+  async createResume(
+    createResumeDto: CreateResumeDto,
+    user: IReqUser,
+  ): Promise<Resume> {
+    try {
+      const newResume = await this.resumeModel.create({
+        ...createResumeDto,
+        createdBy: user._id,
+      });
+
+      return newResume;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  findAll() {
-    return `This action returns all resumes`;
+  async findAllResume(page: number, limit: number, query: any): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+      const [resumes, totalDocuments] = await Promise.all([
+        this.resumeModel.find(query).skip(skip).limit(limit),
+        this.resumeModel.countDocuments(query),
+      ]);
+
+      const totalPages = Math.ceil(totalDocuments / limit);
+
+      return {
+        resumes,
+        metadata: {
+          total: totalDocuments,
+          page,
+          totalPages,
+          limit,
+        },
+      };
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} resume`;
+  async findAllResumeByUser(
+    page: number,
+    limit: number,
+    user: IReqUser,
+  ): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+      const [resumes, totalDocuments] = await Promise.all([
+        this.resumeModel
+          .find({
+            createdBy: user._id,
+          })
+          .skip(skip)
+          .limit(limit),
+        this.resumeModel.countDocuments({
+          createdBy: user._id,
+        }),
+      ]);
+
+      const totalPages = Math.ceil(totalDocuments / limit);
+
+      return {
+        resumes,
+        metadata: {
+          total: totalDocuments,
+          page,
+          totalPages,
+          limit,
+        },
+      };
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
-  update(id: number, updateResumeDto: UpdateResumeDto) {
-    return `This action updates a #${id} resume`;
+  async findOneResume(id: Types.ObjectId): Promise<Resume> {
+    try {
+      const resume = await this.resumeModel.findById(id);
+      if (!resume) throw new NotFoundException('Resume not found');
+
+      return resume;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} resume`;
+  async updateResume(
+    id: Types.ObjectId,
+    updateResumeDto: UpdateResumeDto,
+  ): Promise<void> {
+    try {
+      const updatedResume = await this.resumeModel.findByIdAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          $set: updateResumeDto,
+        },
+        {
+          new: true,
+        },
+      );
+
+      if (!updatedResume) throw new NotFoundException('Resume not found');
+
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateResumeStatus(
+    id: Types.ObjectId,
+    status: string,
+    user: IReqUser,
+  ): Promise<void> {
+    try {
+      const updatedResume = await this.resumeModel.updateOne(
+        {
+          _id: id,
+        },
+        {
+          $push: {
+            history: {
+              status,
+              updateAt: new Date(),
+              updatedBy: user._id,
+            },
+          },
+        },
+      );
+
+      if (!updatedResume) throw new NotFoundException('Resume not found');
+
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeResume(id: Types.ObjectId, user: IReqUser): Promise<void> {
+    try {
+      const checkResume = await this.resumeModel.findById(id);
+      if (!checkResume) throw new NotFoundException('Resume not found');
+
+      if (checkResume.createdBy.toString() !== user._id.toString()) {
+        throw new BadRequestException('Resume not yours');
+      }
+
+      await this.resumeModel.findByIdAndDelete(id);
+
+      return;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

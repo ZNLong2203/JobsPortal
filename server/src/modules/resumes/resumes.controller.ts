@@ -6,37 +6,94 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ResumesService } from './resumes.service';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
+import { Types } from 'mongoose';
+import { User } from 'src/decorators/user.decorator';
+import { IReqUser } from '../auth/interfaces/req-user.interface';
+import { Message } from 'src/common/message';
 
 @Controller('resumes')
 export class ResumesController {
   constructor(private readonly resumesService: ResumesService) {}
 
   @Post()
-  create(@Body() createResumeDto: CreateResumeDto) {
-    return this.resumesService.create(createResumeDto);
+  async createResume(
+    @Body() createResumeDto: CreateResumeDto,
+    @User() user: IReqUser,
+  ) {
+    const createdResume = this.resumesService.createResume(
+      createResumeDto,
+      user,
+    );
+
+    return {
+      message: Message.RESUME_CREATED,
+      data: createdResume,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.resumesService.findAll();
+  async findAllResume(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query() query: any,
+  ) {
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const currentLimit = Math.max(Number(limit) || 10, 1);
+
+    const allResumes = await this.resumesService.findAllResume(
+      currentPage,
+      currentLimit,
+      query,
+    );
+
+    return {
+      message: Message.RESUME_ALL_FETCHED,
+      data: allResumes,
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.resumesService.findOne(+id);
+  @Get('/:id')
+  async findOneResume(@Param('id') id: Types.ObjectId) {
+    const resume = await this.resumesService.findOneResume(id);
+    return {
+      message: Message.RESUME_FETCHED,
+      data: resume,
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateResumeDto: UpdateResumeDto) {
-    return this.resumesService.update(+id, updateResumeDto);
+  @Patch('/:id')
+  async updateResume(
+    @Param('id') id: Types.ObjectId,
+    @Body() updateResumeDto: UpdateResumeDto,
+  ) {
+    await this.resumesService.updateResume(id, updateResumeDto);
+    return {
+      message: Message.RESUME_UPDATED,
+    };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.resumesService.remove(+id);
+  @Patch('/:id/status')
+  async updateResumeStatus(
+    @Param('id') id: Types.ObjectId,
+    @Body('status') status: string,
+    @User() user: IReqUser,
+  ) {
+    await this.resumesService.updateResumeStatus(id, status, user);
+    return {
+      message: Message.RESUME_STATUS_UPDATED,
+    };
+  }
+
+  @Delete('/:id')
+  async removeResume(@Param('id') id: Types.ObjectId, @User() user: IReqUser) {
+    await this.resumesService.removeResume(id, user);
+    return {
+      message: Message.RESUME_DELETED,
+    };
   }
 }
