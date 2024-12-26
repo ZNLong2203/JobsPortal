@@ -1,13 +1,14 @@
 import './globals.css'
+import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
+import Header from '@/app/components/common/Header'
+import Footer from '@/app/components/common/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'Job Portal',
-  description: 'Find your dream job',
+export const metadata: Metadata = {
+  title: 'FindJobs - Your Career Starts Here',
+  description: 'Find your dream job with FindJobs. Browse thousands of job listings from top companies.',
 }
 
 export default function RootLayout({
@@ -18,13 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-grow container mx-auto px-4 py-8">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <Header />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   )

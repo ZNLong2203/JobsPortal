@@ -1,41 +1,46 @@
-import JobSearch from '@/components/common/JobSearch'
-import JobCard from '@/components/common/JobCard'
-import { ArrowRight } from 'lucide-react'
-
-const jobs = [
-  { id: 1, title: 'Software Engineer', company: 'Tech Co', location: 'San Francisco, CA', salary: '$100,000 - $150,000' },
-  { id: 2, title: 'Data Analyst', company: 'Data Inc', location: 'New York, NY', salary: '$80,000 - $120,000' },
-  { id: 3, title: 'Product Manager', company: 'Product Labs', location: 'Austin, TX', salary: '$90,000 - $140,000' },
-]
+import Link from 'next/link'
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { Search, Briefcase, Building2, ClapperboardIcon as ChalkboardTeacher, Code, Stethoscope, Utensils } from 'lucide-react'
 
 export default function Home() {
   return (
-    <div>
-      <section className="relative bg-gradient-to-br from-gray-900 to-gray-600 text-white py-20 mb-12">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Find Your Dream Job Today
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-100">
-            Discover thousands of job opportunities with top companies
-          </p>
-          <JobSearch />
+    <div className="bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-4xl font-bold text-center mb-8">Find Your Dream Job</h1>
+        <div className="max-w-3xl mx-auto mb-12">
+          <form className="flex space-x-4">
+            <Input type="text" placeholder="Job title, keywords, or company" className="flex-grow" />
+            <Input type="text" placeholder="City, state, or zip code" className="flex-grow" />
+            <Button type="submit" size="lg">
+              <Search className="mr-2 h-4 w-4" /> Search
+            </Button>
+          </form>
         </div>
-      </section>
-      <section className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Featured Jobs</h2>
-          <a href="/jobs" className="text-primary hover:underline flex items-center">
-            View all jobs <ArrowRight className="ml-2" size={20} />
-          </a>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <JobCategory icon={<Code />} title="Technology" jobCount={1234} />
+          <JobCategory icon={<Briefcase />} title="Business" jobCount={987} />
+          <JobCategory icon={<Building2 />} title="Finance" jobCount={765} />
+          <JobCategory icon={<ChalkboardTeacher />} title="Education" jobCount={543} />
+          <JobCategory icon={<Stethoscope />} title="Healthcare" jobCount={432} />
+          <JobCategory icon={<Utensils />} title="Hospitality" jobCount={321} />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
-      </section>
+      </div>
     </div>
+  )
+}
+
+function JobCategory({ icon, title, jobCount }: { icon: React.ReactNode, title: string, jobCount: number }) {
+  return (
+    <Link href={`/jobs?category=${title.toLowerCase()}`} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+      <div className="flex items-center mb-4">
+        <div className="bg-blue-100 p-3 rounded-full mr-4">
+          {icon}
+        </div>
+        <h3 className="text-xl font-semibold">{title}</h3>
+      </div>
+      <p className="text-gray-600">{jobCount} jobs available</p>
+    </Link>
   )
 }
 

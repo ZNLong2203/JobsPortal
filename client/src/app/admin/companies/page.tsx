@@ -1,88 +1,50 @@
-'use client'
+import { Button } from "@/app/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table"
+import Link from 'next/link'
 
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import AddCompanyDialog from './add-company-dialog'
-
-interface Company {
-  id: string
-  name: string
-  industry: string
-  location: string
-  createdAt: string
-}
-
-export default function CompaniesPage() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [companies, setCompanies] = useState<Company[]>([
-    {
-      id: '1',
-      name: 'Tech Corp',
-      industry: 'Technology',
-      location: 'San Francisco',
-      createdAt: '2023-01-01',
-    },
-    // Add more sample data as needed
-  ])
-
-  const handleAddCompany = (newCompany: Omit<Company, 'id' | 'createdAt'>) => {
-    // In a real app, you would make an API call here
-    const company: Company = {
-      ...newCompany,
-      id: Math.random().toString(),
-      createdAt: new Date().toISOString(),
-    }
-    setCompanies([...companies, company])
-    setIsDialogOpen(false)
-  }
+export default function ManageCompanies() {
+  // Mock data - replace with actual data fetching logic
+  const companies = [
+    { id: 1, name: 'TechCorp', industry: 'Technology', employees: 500 },
+    { id: 2, name: 'FinanceHub', industry: 'Finance', employees: 200 },
+    { id: 3, name: 'EduLearn', industry: 'Education', employees: 100 },
+  ]
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Companies</h1>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Company
-        </Button>
+        <h1 className="text-3xl font-bold">Manage Companies</h1>
+        <Link href="/admin/companies/add">
+          <Button>Add New Company</Button>
+        </Link>
       </div>
-
-      <div className="bg-white rounded-lg shadow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Industry</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Created At</TableHead>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Industry</TableHead>
+            <TableHead>Employees</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {companies.map((company) => (
+            <TableRow key={company.id}>
+              <TableCell>{company.id}</TableCell>
+              <TableCell>{company.name}</TableCell>
+              <TableCell>{company.industry}</TableCell>
+              <TableCell>{company.employees}</TableCell>
+              <TableCell>
+                <Link href={`/admin/companies/edit/${company.id}`}>
+                  <Button variant="outline" size="sm" className="mr-2">Edit</Button>
+                </Link>
+                <Button variant="destructive" size="sm">Delete</Button>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {companies.map((company) => (
-              <TableRow key={company.id}>
-                <TableCell className="font-medium">{company.name}</TableCell>
-                <TableCell>{company.industry}</TableCell>
-                <TableCell>{company.location}</TableCell>
-                <TableCell>{new Date(company.createdAt).toLocaleDateString()}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <AddCompanyDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={handleAddCompany}
-      />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }
