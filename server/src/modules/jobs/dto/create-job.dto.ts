@@ -14,6 +14,9 @@ import { Company } from 'src/modules/company/schemas/company.schema';
 
 export class CreateJobDto {
   @IsNotEmpty()
+  companyId: Types.ObjectId | Company;
+
+  @IsNotEmpty()
   name: string;
 
   @IsNotEmpty()
@@ -22,8 +25,8 @@ export class CreateJobDto {
   @ArrayMinSize(1)
   skills: string[];
 
-  @IsNotEmpty()
-  companyId: Types.ObjectId | Company;
+  @IsOptional()
+  location: string;
 
   @IsNotEmpty()
   salary: number;
