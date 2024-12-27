@@ -32,7 +32,7 @@ export class JobsService {
     try {
       const skip = (page - 1) * limit;
       const [jobs, totalDocuments] = await Promise.all([
-        this.jobModel.find(query).skip(skip).limit(limit).populate('companyId'),
+        this.jobModel.find(query).skip(skip).limit(limit).populate('company'),
         this.jobModel.countDocuments(query),
       ]);
 
@@ -54,7 +54,7 @@ export class JobsService {
 
   async findOneJob(id: Types.ObjectId): Promise<Job> {
     try {
-      const job = await this.jobModel.findById(id);
+      const job = await this.jobModel.findById(id).populate('company');
       if (!job) throw new BadRequestException(Message.JOB_NOT_FOUND);
 
       return job;

@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+import { Permission } from 'src/modules/permissions/schemas/permission.schema';
+import { Role } from 'src/modules/roles/schemas/role.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -14,8 +16,11 @@ export class User {
   @Prop()
   name: string;
 
-  @Prop()
-  role: string;
+  @Prop({ type: Types.ObjectId, ref: Role.name, default: 'member' })
+  role: Types.ObjectId | Role;
+
+  @Prop({ type: [Types.ObjectId], ref: Permission.name })
+  permissions: Types.ObjectId[] | Permission[];
 
   @Prop()
   gender: string;

@@ -36,8 +36,18 @@ export class ResumesService {
     try {
       const skip = (page - 1) * limit;
       const [resumes, totalDocuments] = await Promise.all([
-        this.resumeModel.find(query).skip(skip).limit(limit),
-        this.resumeModel.countDocuments(query),
+        this.resumeModel
+          .find(query)
+          .skip(skip)
+          .limit(limit)
+          .populate('user', '-password')
+          .populate('company')
+          .populate('job'),
+        this.resumeModel
+          .countDocuments(query)
+          .populate('user', '-password')
+          .populate('company')
+          .populate('job'),
       ]);
 
       const totalPages = Math.ceil(totalDocuments / limit);
@@ -69,10 +79,17 @@ export class ResumesService {
             createdBy: user._id,
           })
           .skip(skip)
-          .limit(limit),
-        this.resumeModel.countDocuments({
-          createdBy: user._id,
-        }),
+          .limit(limit)
+          .populate('user', '-password')
+          .populate('company')
+          .populate('job'),
+        this.resumeModel
+          .countDocuments({
+            createdBy: user._id,
+          })
+          .populate('user', '-password')
+          .populate('company')
+          .populate('job'),
       ]);
 
       const totalPages = Math.ceil(totalDocuments / limit);
@@ -93,7 +110,11 @@ export class ResumesService {
 
   async findOneResume(id: Types.ObjectId): Promise<Resume> {
     try {
-      const resume = await this.resumeModel.findById(id);
+      const resume = await this.resumeModel
+        .findById(id)
+        .populate('user', '-password')
+        .populate('company')
+        .populate('job');
       if (!resume) throw new NotFoundException('Resume not found');
 
       return resume;

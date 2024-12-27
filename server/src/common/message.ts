@@ -56,4 +56,23 @@ export class Message {
   static readonly RESUME_NOT_ALLOWED = 'Resume not allowed';
   static readonly RESUME_SIZE_EXCEEDED = 'Resume size exceeded';
   static readonly RESUME_TYPE_NOT_ALLOWED = 'Resume type not allowed';
+
+  // Permission
+  static readonly PERMISSION_CREATED = 'Permission created successfully';
+  static readonly PERMISSION_ALL_FETCHED =
+    'All permission fetched successfully';
+  static readonly PERMISSION_FETCHED = 'Permission fetched successfully';
+  static readonly PERMISSION_UPDATED = 'Permission updated successfully';
+  static readonly PERMISSION_DELETED = 'Permission deleted successfully';
+  static readonly PERMISSION_NOT_FOUND = 'Permission not found';
+  static readonly PERMISSION_NOT_ALLOWED = 'Permission not allowed';
+  static readonly PERMISSION_ALREADY_EXISTS = 'Permission already exists';
+
+  // Role
+  static readonly ROLE_CREATED = 'Role created successfully';
+  static readonly ROLE_ALL_FETCHED = 'All role fetched successfully';
+  static readonly ROLE_FETCHED = 'Role fetched successfully';
+  static readonly ROLE_UPDATED = 'Role updated successfully';
+  static readonly ROLE_DELETED = 'Role deleted successfully';
+  static readonly ROLE_NOT_FOUND = 'Role not found';
 }

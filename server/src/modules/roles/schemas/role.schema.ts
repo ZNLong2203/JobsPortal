@@ -28,3 +28,5 @@ export class Role {
   @Prop()
   updatedAt: Date;
 }
+
+export const RoleSchema = SchemaFactory.createForClass(Role);

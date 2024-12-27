@@ -11,7 +11,7 @@ import { Model, Types } from 'mongoose';
 import { hashSync, genSalt } from 'bcrypt';
 import { Message } from 'src/common/message';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
-import { IUser } from './interfaces/user.interface';
+// import { IUser } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -91,7 +91,7 @@ export class UsersService {
   }
 
   // This methods is use to return all user data for login
-  async findUserByEmail(email: string): Promise<IUser> {
+  async findUserByEmail(email: string): Promise<User> {
     try {
       const user = await this.userModel.findOne({ email });
       if (!user) throw new NotFoundException(Message.USER_NOT_FOUND);

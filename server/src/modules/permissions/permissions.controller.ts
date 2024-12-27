@@ -6,40 +6,83 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { Types } from 'mongoose';
+import { IReqUser } from '../auth/interfaces/req-user.interface';
+import { User } from 'src/decorators/user.decorator';
+import { Message } from 'src/common/message';
 
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
-  create(@Body() createPermissionDto: CreatePermissionDto) {
-    return this.permissionsService.create(createPermissionDto);
+  async createPermission(
+    @Body() createPermissionDto: CreatePermissionDto,
+    @User() user: IReqUser,
+  ) {
+    const createPermission = await this.permissionsService.createPermission(
+      createPermissionDto,
+      user,
+    );
+
+    return {
+      message: Message.PERMISSION_CREATED,
+      data: createPermission,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.permissionsService.findAll();
+  async findAllPermission(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query() query: any,
+  ) {
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const currentLimit = Math.max(Number(limit) || 10, 1);
+
+    const allPermissions = await this.permissionsService.findAllPermission(
+      currentPage,
+      currentLimit,
+      query,
+    );
+
+    return {
+      message: Message.PERMISSION_ALL_FETCHED,
+      data: allPermissions,
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.permissionsService.findOne(+id);
+  @Get('/:id')
+  async findOnePermission(@Param('id') id: Types.ObjectId) {
+    const permission = await this.permissionsService.findOnePermission(id);
+    return {
+      message: Message.PERMISSION_FETCHED,
+      data: permission,
+    };
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
+  @Patch('/:id')
+  async updatePermission(
+    @Param('id') id: Types.ObjectId,
     @Body() updatePermissionDto: UpdatePermissionDto,
   ) {
-    return this.permissionsService.update(+id, updatePermissionDto);
+    await this.permissionsService.updatePermission(id, updatePermissionDto);
+
+    return {
+      message: Message.PERMISSION_UPDATED,
+    };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.permissionsService.remove(+id);
+  @Delete('/:id')
+  async removePermission(@Param('id') id: Types.ObjectId) {
+    await this.permissionsService.removePermission(id);
+    return {
+      message: Message.PERMISSION_DELETED,
+    };
   }
 }

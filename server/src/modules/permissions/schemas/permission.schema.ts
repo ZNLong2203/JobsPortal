@@ -27,3 +27,5 @@ export class Permission {
   @Prop()
   updatedAt: Date;
 }
+
+export const PermissionSchema = SchemaFactory.createForClass(Permission);

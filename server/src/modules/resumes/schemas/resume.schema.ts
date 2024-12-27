@@ -9,13 +9,13 @@ export type ResumeDocument = HydratedDocument<Resume>;
 @Schema({ timestamps: true })
 export class Resume {
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
-  userId: Types.ObjectId | User;
+  user: Types.ObjectId | User;
 
   @Prop({ type: Types.ObjectId, ref: Company.name, required: true })
-  companyId: Types.ObjectId | Company;
+  company: Types.ObjectId | Company;
 
   @Prop({ type: Types.ObjectId, ref: Job.name, required: true })
-  jobId: Types.ObjectId | Job;
+  job: Types.ObjectId | Job;
 
   @Prop()
   url: string;
