@@ -25,14 +25,14 @@ export class ResumesController {
     @Body() createResumeDto: CreateResumeDto,
     @User() user: IReqUser,
   ) {
-    const createdResume = this.resumesService.createResume(
+    const newResume = await this.resumesService.createResume(
       createResumeDto,
       user,
     );
 
     return {
       message: Message.RESUME_CREATED,
-      data: createdResume,
+      data: newResume,
     };
   }
 

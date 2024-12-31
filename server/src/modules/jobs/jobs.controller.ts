@@ -23,7 +23,7 @@ export class JobsController {
 
   @Post()
   async createJob(@Body() createJobDto: CreateJobDto, @User() user: IReqUser) {
-    const newJob = this.jobsService.createJob(createJobDto, user);
+    const newJob = await this.jobsService.createJob(createJobDto, user);
     return {
       message: Message.JOB_CREATED,
       data: newJob,
@@ -53,7 +53,7 @@ export class JobsController {
   }
 
   @Public()
-  @Get(':id')
+  @Get('/:id')
   async findOneJob(@Param('id') id: Types.ObjectId) {
     const job = await this.jobsService.findOneJob(id);
     return {
@@ -62,7 +62,7 @@ export class JobsController {
     };
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   async updateJob(
     @Param('id') id: Types.ObjectId,
     @Body() updateJobDto: UpdateJobDto,
@@ -73,7 +73,7 @@ export class JobsController {
     };
   }
 
-  @Delete(':id')
+  @Delete('/:id')
   async removeJob(@Param('id') id: Types.ObjectId, @User() user: IReqUser) {
     await this.jobsService.removeJob(id, user);
     return {
