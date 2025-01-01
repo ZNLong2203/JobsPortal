@@ -32,7 +32,7 @@ export class AuthService {
 
   async register(createUser: CreateUserDto): Promise<void> {
     try {
-      const checkUser = await this.usersService.findUserByEmail(
+      const checkUser = await this.usersService.findUserByEmailForCheckExist(
         createUser.email,
       );
       if (checkUser) {
@@ -86,11 +86,12 @@ export class AuthService {
 
       return {
         access_token: this.jwtService.sign(payload),
-        userData: {
+        userInfo: {
           _id,
           name,
           email,
           role,
+          avatar: validateUser.avatar,
         },
       };
     } catch (error) {
@@ -124,11 +125,12 @@ export class AuthService {
 
       return {
         access_token: this.jwtService.sign(newPayload),
-        userData: {
+        userInfo: {
           _id,
           name,
           email,
           role,
+          avatar: user.avatar,
         },
       };
     } catch (error) {

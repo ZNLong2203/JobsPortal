@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Company } from 'src/modules/company/schemas/company.schema';
-import { User } from 'src/modules/users/schemas/user.schema';
 
 export type JobDocument = HydratedDocument<Job>;
 
@@ -40,8 +39,8 @@ export class Job {
   @Prop()
   isActive: boolean;
 
-  @Prop({ type: Types.ObjectId, ref: User.name })
-  createdBy: Types.ObjectId | User;
+  @Prop({ type: Types.ObjectId })
+  createdBy: Types.ObjectId;
 
   @Prop()
   createdAt: Date;

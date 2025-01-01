@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { User } from 'src/modules/users/schemas/user.schema';
 
 export type CompanyDocument = HydratedDocument<Company>;
 
@@ -18,8 +17,8 @@ export class Company {
   @Prop()
   des: string;
 
-  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
-  createdBy: Types.ObjectId | User;
+  @Prop({ type: Types.ObjectId, required: true })
+  createdBy: Types.ObjectId;
 
   @Prop()
   createdAt: Date;

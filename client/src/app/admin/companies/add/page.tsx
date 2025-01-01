@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { CompanyForm } from '@/app/components/common/CompanyForm'
+import { CompanyForm } from '@/components/common/CompanyForm'
 
 export default function AddCompany() {
   const router = useRouter()

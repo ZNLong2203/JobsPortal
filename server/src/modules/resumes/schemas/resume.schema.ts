@@ -30,8 +30,8 @@ export class Resume {
     updatedBy: Types.ObjectId;
   }[];
 
-  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
-  createdBy: Types.ObjectId | User;
+  @Prop({ type: Types.ObjectId, required: true })
+  createdBy: Types.ObjectId;
 
   @Prop()
   createdAt: Date;

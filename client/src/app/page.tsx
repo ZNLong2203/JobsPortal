@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Search, Briefcase, Building2, ClapperboardIcon as ChalkboardTeacher, Code, Stethoscope, Utensils } from 'lucide-react'
 
 export default function Home() {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { JobForm } from '@/app/components/common/JobForm'
+import { JobForm } from '@/components/common/JobForm'
 
 export default function AddJob() {
   const router = useRouter()

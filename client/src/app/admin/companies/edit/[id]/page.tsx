@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { CompanyForm } from '@/app/components/common/CompanyForm'
+import { CompanyForm } from '@/components/common/CompanyForm'
 import { useEffect, useState } from 'react'
 
 export default function EditCompany({ params }: { params: { id: string } }) {

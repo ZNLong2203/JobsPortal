@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { JobForm } from '@/app/components/common/JobForm'
+import { JobForm } from '@/components/common/JobForm'
 import { useEffect, useState } from 'react'
 
 export default function EditJob({ params }: { params: { id: string } }) {

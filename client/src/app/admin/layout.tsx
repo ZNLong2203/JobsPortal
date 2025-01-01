@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { LayoutDashboard, Users, Briefcase, FileText } from 'lucide-react'
 // import { cn } from "@/lib/utils"
-import { Button } from "@/app/components/ui/button"
+import { Button } from "@/components/ui/button"
 
 export default function AdminLayout({
   children,

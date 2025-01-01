@@ -19,8 +19,8 @@ export class Role {
   @Prop({ type: [Types.ObjectId], ref: Permission.name })
   permissions: Types.ObjectId[] | Permission[];
 
-  @Prop({ type: Types.ObjectId, ref: User.name })
-  createdBy: Types.ObjectId | User;
+  @Prop({ type: Types.ObjectId })
+  createdBy: Types.ObjectId;
 
   @Prop()
   createdAt: Date;
