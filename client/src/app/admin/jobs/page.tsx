@@ -1,53 +1,94 @@
+'use client'
+
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import Link from 'next/link'
+import { JobsTable } from '@/components/admin/JobsTable'
+import { JobFormModal } from '@/components/admin/JobFormModal'
+import { PlusIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Job, NewJob } from '@/types/job'
 
 export default function ManageJobs() {
-  // Mock data - replace with actual data fetching logic
-  const jobs = [
-    { id: 1, title: 'Software Engineer', company: 'TechCorp', location: 'San Francisco, CA', type: 'Full-time' },
-    { id: 2, title: 'Marketing Manager', company: 'BrandBoost', location: 'New York, NY', type: 'Full-time' },
-    { id: 3, title: 'Data Analyst', company: 'DataInsights', location: 'Chicago, IL', type: 'Contract' },
-  ]
+  const [jobs, setJobs] = useState<Job[]>([
+    { 
+      id: 1, 
+      title: 'Software Engineer', 
+      company: 'TechCorp', 
+      location: 'San Francisco, CA', 
+      type: 'Full-time', 
+      description: 'We are seeking a talented Software Engineer...' 
+    },
+    { 
+      id: 2, 
+      title: 'Marketing Manager', 
+      company: 'BrandBoost', 
+      location: 'New York, NY', 
+      type: 'Full-time', 
+      description: 'BrandBoost is looking for an experienced Marketing Manager...' 
+    },
+    { 
+      id: 3, 
+      title: 'Data Analyst', 
+      company: 'DataInsights', 
+      location: 'Chicago, IL', 
+      type: 'Contract', 
+      description: 'Join our data team to help derive meaningful insights...' 
+    },
+  ])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingJob, setEditingJob] = useState<Job | undefined>(undefined)
+
+  const handleAddJob = (newJob: NewJob) => {
+    const jobToAdd: Job = {
+      ...newJob,
+      id: jobs.length + 1
+    }
+    setJobs([...jobs, jobToAdd])
+    setIsModalOpen(false)
+  }
+
+  const handleEditJob = (updatedJob: NewJob) => {
+    if (!updatedJob.id) return
+    setJobs(jobs.map(job => 
+      job.id === updatedJob.id ? { ...updatedJob, id: job.id } : job
+    ))
+    setIsModalOpen(false)
+    setEditingJob(undefined)
+  }
+
+  const handleDeleteJob = (id: number) => {
+    setJobs(jobs.filter(job => job.id !== id))
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Manage Jobs</h1>
-        <Link href="/admin/jobs/add">
-          <Button>Add New Job</Button>
-        </Link>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Company</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {jobs.map((job) => (
-            <TableRow key={job.id}>
-              <TableCell>{job.id}</TableCell>
-              <TableCell>{job.title}</TableCell>
-              <TableCell>{job.company}</TableCell>
-              <TableCell>{job.location}</TableCell>
-              <TableCell>{job.type}</TableCell>
-              <TableCell>
-                <Link href={`/admin/jobs/edit/${job.id}`}>
-                  <Button variant="outline" size="sm" className="mr-2">Edit</Button>
-                </Link>
-                <Button variant="destructive" size="sm">Delete</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Manage Jobs</CardTitle>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <PlusIcon className="h-4 w-4 mr-2" />
+          Add New Job
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <JobsTable 
+          jobs={jobs} 
+          onEdit={(job) => {
+            setEditingJob(job)
+            setIsModalOpen(true)
+          }}
+          onDelete={handleDeleteJob}
+        />
+      </CardContent>
+      <JobFormModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingJob(undefined)
+        }}
+        onSubmit={editingJob ? handleEditJob : handleAddJob}
+        initialData={editingJob}
+      />
+    </Card>
   )
 }
 

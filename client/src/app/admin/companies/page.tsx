@@ -1,51 +1,74 @@
+'use client'
+
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import Link from 'next/link'
+import { CompaniesTable } from '@/components/admin/CompaniesTable'
+import { CompanyFormModal } from '@/components/admin/CompanyFormModal'
+import { PlusIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+export interface Company {
+  id: number;
+  name: string;
+  industry: string;
+  employees: number;
+}
 
 export default function ManageCompanies() {
-  // Mock data - replace with actual data fetching logic
-  const companies = [
+  const [companies, setCompanies] = useState<Company[]>([
     { id: 1, name: 'TechCorp', industry: 'Technology', employees: 500 },
     { id: 2, name: 'FinanceHub', industry: 'Finance', employees: 200 },
     { id: 3, name: 'EduLearn', industry: 'Education', employees: 100 },
-  ]
+  ])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingCompany, setEditingCompany] = useState<Company | undefined>(undefined)
+
+  const handleAddCompany = (newCompany: Omit<Company, 'id'>) => {
+    setCompanies([...companies, { ...newCompany, id: companies.length + 1 }])
+    setIsModalOpen(false)
+  }
+
+  const handleEditCompany = (updatedCompany: Company) => {
+    setCompanies(companies.map(company => 
+      company.id === updatedCompany.id ? updatedCompany : company
+    ))
+    setIsModalOpen(false)
+    setEditingCompany(undefined)
+  }
+
+  const handleDeleteCompany = (id: number) => {
+    setCompanies(companies.filter(company => company.id !== id))
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Manage Companies</h1>
-        <Link href="/admin/companies/add">
-          <Button>Add New Company</Button>
-        </Link>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Industry</TableHead>
-            <TableHead>Employees</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {companies.map((company) => (
-            <TableRow key={company.id}>
-              <TableCell>{company.id}</TableCell>
-              <TableCell>{company.name}</TableCell>
-              <TableCell>{company.industry}</TableCell>
-              <TableCell>{company.employees}</TableCell>
-              <TableCell>
-                <Link href={`/admin/companies/edit/${company.id}`}>
-                  <Button variant="outline" size="sm" className="mr-2">Edit</Button>
-                </Link>
-                <Button variant="destructive" size="sm">Delete</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Manage Companies</CardTitle>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <PlusIcon className="h-4 w-4 mr-2" />
+          Add New Company
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <CompaniesTable 
+          companies={companies} 
+          onEdit={(company) => {
+            setEditingCompany(company)
+            setIsModalOpen(true)
+          }}
+          onDelete={handleDeleteCompany}
+        />
+      </CardContent>
+      <CompanyFormModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingCompany(undefined)
+        }}
+        onSubmit={(company: Omit<Company, 'id'> | Company) => editingCompany ? handleEditCompany(company as Company) : handleAddCompany(company as Omit<Company, 'id'>)}
+        initialData={editingCompany}
+      />
+    </Card>
   )
 }
 

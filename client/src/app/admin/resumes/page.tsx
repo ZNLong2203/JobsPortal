@@ -1,45 +1,78 @@
+'use client'
+
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ResumesTable } from '@/components/admin/ResumesTable'
+import { ResumeFormModal } from '@/components/admin/ResumeFormModal'
+import { PlusIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Resume, NewResume } from '@/types/resume'
 
 export default function ManageResumes() {
-  // Mock data - replace with actual data fetching logic
-  const resumes = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', jobTitle: 'Software Engineer', submittedDate: '2023-06-15' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', jobTitle: 'Marketing Manager', submittedDate: '2023-06-14' },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', jobTitle: 'Data Analyst', submittedDate: '2023-06-13' },
-  ]
+  const [resumes, setResumes] = useState<Resume[]>([
+    { id: 1, name: 'John Doe', email: 'john@example.com', jobTitle: 'Software Engineer', submittedDate: '2023-06-15', resumeUrl: '/resumes/john-doe.pdf' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', jobTitle: 'Marketing Manager', submittedDate: '2023-06-14', resumeUrl: '/resumes/jane-smith.pdf' },
+    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', jobTitle: 'Data Analyst', submittedDate: '2023-06-13', resumeUrl: '/resumes/bob-johnson.pdf' },
+  ])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingResume, setEditingResume] = useState<Resume | undefined>(undefined)
+
+  const handleAddResume = (newResume: NewResume) => {
+    const resumeToAdd: Resume = {
+      ...newResume,
+      id: resumes.length + 1
+    }
+    setResumes([...resumes, resumeToAdd])
+    setIsModalOpen(false)
+  }
+
+  const handleEditResume = (updatedResume: NewResume) => {
+    if (!updatedResume.id) return
+    setResumes(resumes.map(resume => 
+      resume.id === updatedResume.id ? { ...updatedResume, id: resume.id } : resume
+    ))
+    setIsModalOpen(false)
+    setEditingResume(undefined)
+  }
+
+  const handleDeleteResume = (id: number) => {
+    setResumes(resumes.filter(resume => resume.id !== id))
+  }
+
+  const handleViewResume = (resumeUrl: string) => {
+    window.open(resumeUrl, '_blank')
+  }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Manage Resumes</h1>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Job Title</TableHead>
-            <TableHead>Submitted Date</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {resumes.map((resume) => (
-            <TableRow key={resume.id}>
-              <TableCell>{resume.id}</TableCell>
-              <TableCell>{resume.name}</TableCell>
-              <TableCell>{resume.email}</TableCell>
-              <TableCell>{resume.jobTitle}</TableCell>
-              <TableCell>{resume.submittedDate}</TableCell>
-              <TableCell>
-                <Button variant="outline" size="sm" className="mr-2">View</Button>
-                <Button variant="destructive" size="sm">Delete</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Manage Resumes</CardTitle>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <PlusIcon className="h-4 w-4 mr-2" />
+          Add New Resume
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <ResumesTable 
+          resumes={resumes} 
+          onEdit={(resume) => {
+            setEditingResume(resume)
+            setIsModalOpen(true)
+          }}
+          onDelete={handleDeleteResume}
+          onView={handleViewResume}
+        />
+      </CardContent>
+      <ResumeFormModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingResume(undefined)
+        }}
+        onSubmit={editingResume ? handleEditResume : handleAddResume}
+        initialData={editingResume}
+      />
+    </Card>
   )
 }
 
