@@ -9,13 +9,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-
-interface Company {
-  id?: number;
-  name: string;
-  industry: string;
-  employees: number;
-}
+import { Company } from '@/types/company'
 
 interface CompanyFormModalProps {
   isOpen: boolean;

@@ -20,15 +20,6 @@ import {
 } from "@/components/ui/tooltip"
 import { Job, NewJob } from '@/types/job'
 
-// interface Job {
-//   id?: number;
-//   title: string;
-//   company: string;
-//   location: string;
-//   type: string;
-//   description: string;
-// }
-
 interface JobFormModalProps {
   isOpen: boolean;
   onClose: () => void;

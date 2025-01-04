@@ -58,7 +58,7 @@ export function JobsTable({ jobs, onEdit, onDelete }: JobsTableProps) {
                   <PencilIcon className="h-4 w-4 mr-1" />
                   Edit
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => onDelete(job.id)}>
+                <Button variant="destructive" size="sm" onClick={() => onDelete(job.id!)}>
                   <TrashIcon className="h-4 w-4 mr-1" />
                   Delete
                 </Button>
