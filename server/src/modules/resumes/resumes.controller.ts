@@ -45,10 +45,12 @@ export class ResumesController {
     const currentPage = Math.max(Number(page) || 1, 1);
     const currentLimit = Math.max(Number(limit) || 10, 1);
 
+    const { page: _, limit: __, ...filterQuery } = query;
+
     const allResumes = await this.resumesService.findAllResume(
       currentPage,
       currentLimit,
-      query,
+      filterQuery,
     );
 
     return {

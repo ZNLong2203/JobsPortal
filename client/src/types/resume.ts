@@ -1,5 +1,5 @@
 export interface Resume {
-  id?: number;
+  _id?: string;
   name: string;
   email: string;
   jobTitle: string;
@@ -7,6 +7,6 @@ export interface Resume {
   resumeUrl: string;
 }
 
-export interface NewResume extends Omit<Resume, 'id'> {
-  id?: number;
+export interface NewResume extends Omit<Resume, '_id'> {
+  _id?: string;
 }

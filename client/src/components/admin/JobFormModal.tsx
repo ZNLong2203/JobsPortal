@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import {
   Dialog,
   DialogContent,
@@ -10,15 +12,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Bold, Italic, List, ListOrdered, HelpCircle } from 'lucide-react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { Job, NewJob } from '@/types/job'
+import { Company } from '@/types/company'
+import { useCompanies } from '@/hooks/useCompanies'
+import { HelpCircle, Bold, Italic, List, ListOrdered } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+
 
 interface JobFormModalProps {
   isOpen: boolean;
@@ -27,52 +26,42 @@ interface JobFormModalProps {
   initialData?: Job;
 }
 
-const jobDescriptionTemplates = [
-  {
-    title: "Basic Template",
-    content: `About the role:
-[Brief description of the role and its importance to the company]
-
-Responsibilities:
-• [Key responsibility 1]
-• [Key responsibility 2]
-• [Key responsibility 3]
-
-Requirements:
-• [Required skill or experience 1]
-• [Required skill or experience 2]
-• [Required skill or experience 3]
-
-Benefits:
-• [Benefit 1]
-• [Benefit 2]
-• [Benefit 3]`
-  },
-  {
-    title: "Detailed Template",
-    content: `About [Company Name]:
-[Brief company description and mission]
-
-Job Summary:
-We are seeking a [Job Title] to join our team...`
-  }
-]
-
 export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobFormModalProps) {
-  const [job, setJob] = useState<Job>({
-    title: '',
+  const [job, setJob] = useState<NewJob>({
+    name: '',
     company: '',
+    skills: [],
     location: '',
+    salary: 0,
+    quantity: 0,
+    level: '',
     type: '',
-    description: '',
+    des: '',
+    startDate: new Date(),
+    endDate: new Date(),
+    isActive: true,
   })
-  const [activeTab, setActiveTab] = useState('edit')
+
+  const { companies } = useCompanies()
 
   useEffect(() => {
     if (initialData) {
       setJob(initialData)
     } else {
-      setJob({ title: '', company: '', location: '', type: '', description: '' })
+      setJob({
+        name: '',
+        company: '',
+        skills: [],
+        location: '',
+        salary: 0,
+        quantity: 0,
+        level: '',
+        type: '',
+        des: '',
+        startDate: new Date(),
+        endDate: new Date(),
+        isActive: true,
+      })
     }
   }, [initialData])
 
@@ -82,12 +71,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
   }
 
   const insertTextAtCursor = (text: string) => {
-    const textarea = document.getElementById('description') as HTMLTextAreaElement
+    const textarea = document.getElementById('des') as HTMLTextAreaElement
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const currentValue = textarea.value
     const newValue = currentValue.substring(0, start) + text + currentValue.substring(end)
-    setJob({ ...job, description: newValue })
+    setJob({ ...job, des: newValue })
     setTimeout(() => {
       textarea.focus()
       textarea.setSelectionRange(start + text.length, start + text.length)
@@ -96,125 +85,172 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{initialData ? 'Edit Job' : 'Add New Job'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="edit">Edit Job</TabsTrigger>
-              <TabsTrigger value="templates">Templates</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="edit" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="title">Job Title</Label>
-                  <Input
-                    id="title"
-                    value={job.title}
-                    onChange={(e) => setJob({ ...job, title: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="company">Company</Label>
-                  <Input
-                    id="company"
-                    value={job.company}
-                    onChange={(e) => setJob({ ...job, company: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    value={job.location}
-                    onChange={(e) => setJob({ ...job, location: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="type">Job Type</Label>
-                  <Input
-                    id="type"
-                    value={job.type}
-                    onChange={(e) => setJob({ ...job, type: e.target.value })}
-                    required
-                  />
-                </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Job Title</Label>
+                <Input
+                  id="name"
+                  value={job.name}
+                  onChange={(e) => setJob({ ...job, name: e.target.value })}
+                  required
+                />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="description">Job Description</Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <HelpCircle className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Format your text using the toolbar below</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <div className="border rounded-md">
-                  <div className="flex items-center gap-1 p-1 border-b">
-                    <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('**Bold**')}>
-                      <Bold className="h-4 w-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('*Italic*')}>
-                      <Italic className="h-4 w-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('\n• ')}>
-                      <List className="h-4 w-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('\n1. ')}>
-                      <ListOrdered className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Textarea
-                    id="description"
-                    value={job.description}
-                    onChange={(e) => setJob({ ...job, description: e.target.value })}
-                    required
-                    className="min-h-[200px] border-0 rounded-none focus-visible:ring-0"
-                  />
-                </div>
+                <Label htmlFor="company">Company</Label>
+                <Select
+                  value={job.company.toString()}
+                  onValueChange={(value) => setJob({ ...job, company: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Array.isArray(companies) ? companies : companies.companies).map((company: Company) => (
+                      <SelectItem key={company._id} value={company._id ?? ''}>
+                        {company.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </TabsContent>
-
-            <TabsContent value="templates" className="space-y-4">
-              <div className="grid gap-4">
-                {jobDescriptionTemplates.map((template, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <h3 className="font-medium mb-2">{template.title}</h3>
-                    <pre className="text-sm bg-muted p-2 rounded mb-2 max-h-[200px] overflow-y-auto">
-                      {template.content}
-                    </pre>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setJob({ ...job, description: template.content })
-                        setActiveTab('edit')
-                      }}
-                    >
-                      Use Template
-                    </Button>
-                  </div>
-                ))}
+            </div>
+            <div>
+              <Label htmlFor="skills">Skills (comma-separated)</Label>
+              <Input
+                id="skills"
+                value={job.skills.join(', ')}
+                onChange={(e) => setJob({ ...job, skills: e.target.value.split(',').map(skill => skill.trim()) })}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  value={job.location}
+                  onChange={(e) => setJob({ ...job, location: e.target.value })}
+                  required
+                />
               </div>
-            </TabsContent>
-          </Tabs>
-
+              <div>
+                <Label htmlFor="salary">Salary</Label>
+                <Input
+                  id="salary"
+                  type="number"
+                  value={job.salary}
+                  onChange={(e) => setJob({ ...job, salary: Number(e.target.value) })}
+                  required
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  id="quantity"
+                  type="number"
+                  value={job.quantity}
+                  onChange={(e) => setJob({ ...job, quantity: Number(e.target.value) })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="level">Level</Label>
+                <Input
+                  id="level"
+                  value={job.level}
+                  onChange={(e) => setJob({ ...job, level: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="type">Job Type</Label>
+              <Input
+                id="type"
+                value={job.type}
+                onChange={(e) => setJob({ ...job, type: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label htmlFor="des">Job Description</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <HelpCircle className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Format your text using the toolbar below</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="border rounded-md">
+                <div className="flex items-center gap-1 p-1 border-b">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('**Bold**')}>
+                    <Bold className="h-4 w-4" />
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('*Italic*')}>
+                    <Italic className="h-4 w-4" />
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('\n• ')}>
+                    <List className="h-4 w-4" />
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor('\n1. ')}>
+                    <ListOrdered className="h-4 w-4" />
+                  </Button>
+                </div>
+                <Textarea
+                  id="des"
+                  value={job.des}
+                  onChange={(e) => setJob({ ...job, des: e.target.value })}
+                  required
+                  className="min-h-[200px] border-0 rounded-none focus-visible:ring-0"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startDate">Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={job.startDate.toISOString().split('T')[0]}
+                  onChange={(e) => setJob({ ...job, startDate: new Date(e.target.value) })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="endDate">End Date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={job.endDate.toISOString().split('T')[0]}
+                  onChange={(e) => setJob({ ...job, endDate: new Date(e.target.value) })}
+                  required
+                />
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isActive"
+                checked={job.isActive}
+                onCheckedChange={(checked) => setJob({ ...job, isActive: checked })}
+              />
+              <Label htmlFor="isActive">Active</Label>
+            </div>
+          </div>
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel

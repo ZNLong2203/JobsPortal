@@ -3,15 +3,21 @@ import axiosInstance from "@/lib/axios-customize";
 import { Company, NewCompany } from "@/types/company";
 import { Job, NewJob } from "@/types/job";
 import { Resume, NewResume } from "@/types/resume";
+import { PageData } from "@/types/pagedata";
 
 // Company
-export const getAllCompany = async (): Promise<any> => {
-  const res = await axiosInstance.get("/company");
-  return res.data.data;
+export const getAllCompany = async (page: number = 1, limit: number = 10): Promise<{ 
+  companies: Company[], 
+  metadata: PageData
+}> => {
+  const res = await axiosInstance.get('/company', {
+    params: { page, limit }
+  })
+  return res.data.data
 }
 
-export const getCompanyById = async (id: string): Promise<Company> => {
-  const res = await axiosInstance.get(`/company/${id}`);
+export const getCompanyById = async (_id: string): Promise<Company> => {
+  const res = await axiosInstance.get(`/company/${_id}`);
   return res.data.data;
 }
 
@@ -20,48 +26,58 @@ export const createCompany = async (company: NewCompany): Promise<Company> => {
   return res.data.data;
 }
 
-export const updateCompany = async (id: string, company: NewCompany): Promise<Company> => {
-  const res = await axiosInstance.patch(`/company/${id}`, company);
+export const updateCompany = async (company: Company): Promise<Company> => {
+  const res = await axiosInstance.patch(`/company/${company._id}`, company);
   return res.data.data;
 }
 
-export const deleteCompany = async (id: string): Promise<void> => {
-  await axiosInstance.delete(`/company/${id}`);
+export const deleteCompany = async (_id: string): Promise<void> => {
+  await axiosInstance.delete(`/company/${_id}`);
 }
 
 // Job
-export const getAllJob = async (): Promise<any> => {
-  const res = await axiosInstance.get("/job");
-  return res.data.data;
+export const getAllJob = async (page: number = 1, limit: number = 10): Promise<{ 
+  jobs: Job[], 
+  metadata: PageData
+}> => {
+  const res = await axiosInstance.get('/jobs', {
+    params: { page, limit }
+  })
+  return res.data.data
 }
 
-export const getJobById = async (id : string): Promise<Job> => {
-  const res = await axiosInstance.get(`/job/${id}`);
+export const getJobById = async (_id : string): Promise<Job> => {
+  const res = await axiosInstance.get(`/jobs/${_id}`);
   return res.data.data;
 }
 
 export const createJob = async (job: NewJob): Promise<Job> => {
-  const res = await axiosInstance.post("/job", job);
+  const res = await axiosInstance.post("/jobs", job);
   return res.data.data;
 }
 
-export const updateJob = async (id: string, job: NewJob): Promise<Job> => {
-  const res = await axiosInstance.patch(`/job/${id}`, job);
+export const updateJob = async (job: Job): Promise<Job> => {
+  const res = await axiosInstance.patch(`/jobs/${job._id}`, job);
   return res.data.data;
 }
 
-export const deleteJob = async (id: string): Promise<void> => {
-  await axiosInstance.delete(`/job/${id}`);
+export const deleteJob = async (_id: string): Promise<void> => {
+  await axiosInstance.delete(`/jobs/${_id}`);
 }
 
 // Resume
-export const getAllResume = async (): Promise<any> => {
-  const res = await axiosInstance.get("/resume");
-  return res.data.data;
+export const getAllResume = async (page: number = 1, limit: number = 10): Promise<{ 
+  resumes: Resume[], 
+  metadata: PageData
+}> => {
+  const res = await axiosInstance.get('/resume', {
+    params: { page, limit }
+  })
+  return res.data.data
 }
 
-export const getResumeById = async (id: string): Promise<Resume> => {
-  const res = await axiosInstance.get(`/resume/${id}`);
+export const getResumeById = async (_id: string): Promise<Resume> => {
+  const res = await axiosInstance.get(`/resume/${_id}`);
   return res.data.data;
 }
 
@@ -70,11 +86,11 @@ export const createResume = async (resume: NewResume): Promise<Resume> => {
   return res.data.data;
 }
 
-export const updateResume = async (id: string, resume: NewResume): Promise<Resume> => {
-  const res = await axiosInstance.patch(`/resume/${id}`, resume);
+export const updateResume = async (resume: Resume): Promise<Resume> => {
+  const res = await axiosInstance.patch(`/resume/${resume._id}`, resume);
   return res.data.data;
 }
 
-export const deleteResume = async (id: string): Promise<void> => {
-  await axiosInstance.delete(`/resume/${id}`);
+export const deleteResume = async (_id: string): Promise<void> => {
+  await axiosInstance.delete(`/resume/${_id}`);
 }

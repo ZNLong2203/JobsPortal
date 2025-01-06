@@ -37,6 +37,9 @@ export class CreateJobDto {
   @IsNotEmpty()
   level: string;
 
+  @IsNotEmpty()
+  type: string;
+
   @IsOptional()
   des: string;
 

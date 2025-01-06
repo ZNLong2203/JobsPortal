@@ -6,38 +6,69 @@ import { CompaniesTable } from '@/components/admin/CompaniesTable'
 import { CompanyFormModal } from '@/components/admin/CompanyFormModal'
 import { PlusIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-export interface Company {
-  id: number;
-  name: string;
-  industry: string;
-  employees: number;
-}
+import { useCompanies } from '@/hooks/useCompanies'
+import { Company, NewCompany } from '@/types/company'
+import { Pagination } from "@/components/common/Pagination"
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { ErrorMessage } from '@/components/common/isError'
+import toast from 'react-hot-toast'
 
 export default function ManageCompanies() {
-  const [companies, setCompanies] = useState<Company[]>([
-    { id: 1, name: 'TechCorp', industry: 'Technology', employees: 500 },
-    { id: 2, name: 'FinanceHub', industry: 'Finance', employees: 200 },
-    { id: 3, name: 'EduLearn', industry: 'Education', employees: 100 },
-  ])
+  const limit = 10
+  const [page, setPage] = useState(1)
+  const { companies: companiesData, isLoading, isError, error, createCompany, updateCompany, deleteCompany } = useCompanies(page, limit)
+  const companiesList = Array.isArray(companiesData) ? companiesData : companiesData?.companies ?? []
+  const metadata = Array.isArray(companiesData) ? null : companiesData?.metadata ?? null
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCompany, setEditingCompany] = useState<Company | undefined>(undefined)
 
-  const handleAddCompany = (newCompany: Omit<Company, 'id'>) => {
-    setCompanies([...companies, { ...newCompany, id: companies.length + 1 }])
-    setIsModalOpen(false)
-  }
-
+  const handleAddCompany = (newCompany: NewCompany) => {
+    createCompany(newCompany, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setEditingCompany(undefined);
+        toast.success('Company created successfully');
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to create company: ${error.message}`);
+      }
+    });
+  };
+  
   const handleEditCompany = (updatedCompany: Company) => {
-    setCompanies(companies.map(company => 
-      company.id === updatedCompany.id ? updatedCompany : company
-    ))
-    setIsModalOpen(false)
-    setEditingCompany(undefined)
+    updateCompany({ company: updatedCompany }, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setEditingCompany(undefined);
+        toast.success('Company updated successfully');
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to update company: ${error.message}`);
+      }
+    });
+  };
+
+  const handleDeleteCompany = (id: string) => {
+    deleteCompany(id, {
+      onSuccess: () => {
+        toast({ title: "Company deleted successfully" })
+      },
+      onError: (error: Error) => {
+        toast({ title: "Failed to delete company", description: error.message, variant: "destructive" })
+      }
+    })
   }
 
-  const handleDeleteCompany = (id: number) => {
-    setCompanies(companies.filter(company => company.id !== id))
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
+
+  if (isError) {
+    return <ErrorMessage message={error?.message || 'An error occurred'} />
   }
 
   return (
@@ -51,13 +82,25 @@ export default function ManageCompanies() {
       </CardHeader>
       <CardContent>
         <CompaniesTable 
-          companies={companies} 
+          companies={companiesList} 
           onEdit={(company) => {
             setEditingCompany(company)
             setIsModalOpen(true)
           }}
           onDelete={handleDeleteCompany}
         />
+        {metadata && (
+          <div className="mt-4 flex justify-between items-center">
+            <div className="text-sm text-gray-500">
+              Showing {companiesList.length} of {metadata.total} companies | Page {metadata.page} of {metadata.totalPages}
+            </div>
+            <Pagination
+              currentPage={metadata.page}
+              totalPages={metadata.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </CardContent>
       <CompanyFormModal
         isOpen={isModalOpen}
@@ -65,7 +108,7 @@ export default function ManageCompanies() {
           setIsModalOpen(false)
           setEditingCompany(undefined)
         }}
-        onSubmit={(company: Omit<Company, 'id'> | Company) => editingCompany ? handleEditCompany(company as Company) : handleAddCompany(company as Omit<Company, 'id'>)}
+        onSubmit={editingCompany ? handleEditCompany : handleAddCompany}
         initialData={editingCompany}
       />
     </Card>

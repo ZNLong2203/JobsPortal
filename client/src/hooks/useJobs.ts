@@ -2,36 +2,32 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllJob, getJobById, createJob, updateJob, deleteJob } from '@/constants/callapi';
 import { Job, NewJob } from '@/types/job';
 
-export function useJobs() {
+export function useJobs(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient();
 
   const allJobQuery = useQuery({
-    queryKey: ['jobs'],
-    queryFn: getAllJob,
+    queryKey: ['jobs', page, limit],
+    queryFn: () => getAllJob(page, limit),
   })
 
   const createJobMutation = useMutation({
     mutationFn: (job: NewJob) => createJob(job),
-    onSuccess: (newJob) => {
-      queryClient.setQueryData(['jobs'], (oldData: Job[] | undefined) => [...(oldData || []), newJob])
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
   })
 
   const updateJobMutation = useMutation({
-    mutationFn: ({ id, job }: { id: string; job: NewJob }) => updateJob(id, job),
-    onSuccess: (updatedJob) => {
-      queryClient.setQueryData(['jobs'], (oldData: Job[] | undefined) =>
-        oldData?.map(job => job.id === updatedJob.id ? updatedJob : job)
-      )
+    mutationFn: ({ job }: { job: Job }) => updateJob(job),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
   })
 
   const deleteJobMutation = useMutation({
-    mutationFn: (id: string) => deleteJob(id),
-    onSuccess: (deletedJobId) => {
-      queryClient.setQueryData(['jobs'], (oldData: Job[] | undefined) =>
-        oldData?.filter(job => job.id !== deletedJobId)
-      )
+    mutationFn: (_id: string) => deleteJob(_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
   })
 
@@ -46,9 +42,9 @@ export function useJobs() {
   }
 }
 
-export function useJob(id: string) {
+export function useJob(_id: string) {
   return useQuery({
-    queryKey: ['job', id],
-    queryFn: () => getJobById(id),
+    queryKey: ['job', _id],
+    queryFn: () => getJobById(_id),
   })
 }

@@ -2,36 +2,32 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllCompany, getCompanyById, createCompany, updateCompany, deleteCompany } from '@/constants/callapi';
 import { Company, NewCompany } from '@/types/company';
 
-export function useCompanies() {
+export function useCompanies(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient();
 
   const allCompanyQuery = useQuery({
-    queryKey: ['companies'],
-    queryFn: getAllCompany,
+    queryKey: ['companies', page, limit],
+    queryFn: () => getAllCompany(page, limit),
   })
 
   const createCompanyMutation = useMutation({
     mutationFn: (company: NewCompany) => createCompany(company),
-    onSuccess: (newCompany) => {
-      queryClient.setQueryData(['companies'], (oldData: Company[] | undefined) => [...(oldData || []), newCompany])
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] })
     },
   })
 
   const updateCompanyMutation = useMutation({
-    mutationFn: ({ id, company }: { id: string; company: NewCompany }) => updateCompany(id, company),
-    onSuccess: (updatedCompany) => {
-      queryClient.setQueryData(['companies'], (oldData: Company[] | undefined) =>
-        oldData?.map(company => company.id === updatedCompany.id ? updatedCompany : company)
-      )
+    mutationFn: ({ company }: { company: Company }) => updateCompany(company),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] })
     },
   })
 
   const deleteCompanyMutation = useMutation({
-    mutationFn: (id: string) => deleteCompany(id),
-    onSuccess: (deletedCompanyId) => {
-      queryClient.setQueryData(['companies'], (oldData: Company[] | undefined) =>
-        oldData?.filter(company => company.id !== deletedCompanyId)
-      )
+    mutationFn: (_id: string) => deleteCompany(_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] })
     },
   })
 
@@ -46,9 +42,9 @@ export function useCompanies() {
   }
 }
 
-export function useCompany(id: string) {
+export function useCompany(_id: string) {
   return useQuery({
-    queryKey: ['company', id],
-    queryFn: () => getCompanyById(id),
+    queryKey: ['company', _id],
+    queryFn: () => getCompanyById(_id),
   })
 }

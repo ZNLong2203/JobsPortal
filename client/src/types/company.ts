@@ -1,10 +1,13 @@
 export interface Company {
-  id?: number;
+  _id?: string;
   name: string;
+  address: string;
   industry: string;
   employees: number;
+  logo: string;
+  des: string;
 }
 
-export interface NewCompany extends Omit<Company, 'id'> {
-  id?: number;
+export interface NewCompany extends Omit<Company, '_id'> {
+  _id?: string;
 }

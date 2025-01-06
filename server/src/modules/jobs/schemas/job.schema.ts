@@ -28,6 +28,9 @@ export class Job {
   level: string;
 
   @Prop()
+  type: string
+
+  @Prop()
   des: string;
 
   @Prop()
