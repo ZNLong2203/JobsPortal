@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Resume, NewResume } from '@/types/resume'
+import { useUsers } from '@/hooks/useUsers'
+import { useCompanies } from '@/hooks/useCompanies'
+import { useJobs } from '@/hooks/useJobs'
 
 interface ResumeFormModalProps {
   isOpen: boolean;
@@ -20,18 +24,30 @@ interface ResumeFormModalProps {
 
 export function ResumeFormModal({ isOpen, onClose, onSubmit, initialData }: ResumeFormModalProps) {
   const [resume, setResume] = useState<NewResume>({
-    name: '',
-    email: '',
-    jobTitle: '',
-    submittedDate: '',
-    resumeUrl: '',
+    user: '',
+    company: '',
+    job: '',
+    url: '',
+    status: '',
   })
+
+  const { users } = useUsers()
+  const { companies } = useCompanies()
+  const companiesList = Array.isArray(companies) ? companies : companies?.companies || []
+  const { jobs } = useJobs()
+  const jobsList = Array.isArray(jobs) ? jobs : jobs?.jobs || []
 
   useEffect(() => {
     if (initialData) {
       setResume(initialData)
     } else {
-      setResume({ name: '', email: '', jobTitle: '', submittedDate: '', resumeUrl: '' })
+      setResume({
+        user: '',
+        company: '',
+        job: '',
+        url: '',
+        status: '',
+      })
     }
   }, [initialData])
 
@@ -49,49 +65,72 @@ export function ResumeFormModal({ isOpen, onClose, onSubmit, initialData }: Resu
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="user">User</Label>
+              <Select
+                value={resume.user.toString()}
+                onValueChange={(value) => setResume({ ...resume, user: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a user" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user._id} value={user._id}>
+                      {user.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="company">Company</Label>
+              <Select
+                value={resume.company.toString()}
+                onValueChange={(value) => setResume({ ...resume, company: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a company" />
+                </SelectTrigger>
+                <SelectContent>
+                  {companiesList.map((company) => (
+                    <SelectItem key={company._id} value={company._id || ''}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="job">Job</Label>
+              <Select
+                value={resume.job.toString()}
+                onValueChange={(value) => setResume({ ...resume, job: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a job" />
+                </SelectTrigger>
+                  {jobsList.map((job) => (
+                    <SelectItem key={job._id} value={job._id}>
+                      {job.name}
+                    </SelectItem>
+                  ))}
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="url">Resume URL</Label>
               <Input
-                id="name"
-                value={resume.name}
-                onChange={(e) => setResume({ ...resume, name: e.target.value })}
+                id="url"
+                value={resume.url}
+                onChange={(e) => setResume({ ...resume, url: e.target.value })}
                 required
               />
             </div>
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="status">Status</Label>
               <Input
-                id="email"
-                type="email"
-                value={resume.email}
-                onChange={(e) => setResume({ ...resume, email: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="jobTitle">Job Title</Label>
-              <Input
-                id="jobTitle"
-                value={resume.jobTitle}
-                onChange={(e) => setResume({ ...resume, jobTitle: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="submittedDate">Submitted Date</Label>
-              <Input
-                id="submittedDate"
-                type="date"
-                value={resume.submittedDate}
-                onChange={(e) => setResume({ ...resume, submittedDate: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="resumeUrl">Resume URL</Label>
-              <Input
-                id="resumeUrl"
-                value={resume.resumeUrl}
-                onChange={(e) => setResume({ ...resume, resumeUrl: e.target.value })}
+                id="status"
+                value={resume.status}
+                onChange={(e) => setResume({ ...resume, status: e.target.value })}
                 required
               />
             </div>

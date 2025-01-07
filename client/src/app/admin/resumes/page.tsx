@@ -6,41 +6,69 @@ import { ResumesTable } from '@/components/admin/ResumesTable'
 import { ResumeFormModal } from '@/components/admin/ResumeFormModal'
 import { PlusIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useResumes } from '@/hooks/useResumes'
 import { Resume, NewResume } from '@/types/resume'
+import toast from 'react-hot-toast'
+import { Pagination } from "@/components/common/Pagination"
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { ErrorMessage } from '@/components/common/isError'
 
 export default function ManageResumes() {
-  const [resumes, setResumes] = useState<Resume[]>([
-    { id: 1, name: 'John Doe', email: 'john@example.com', jobTitle: 'Software Engineer', submittedDate: '2023-06-15', resumeUrl: '/resumes/john-doe.pdf' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', jobTitle: 'Marketing Manager', submittedDate: '2023-06-14', resumeUrl: '/resumes/jane-smith.pdf' },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', jobTitle: 'Data Analyst', submittedDate: '2023-06-13', resumeUrl: '/resumes/bob-johnson.pdf' },
-  ])
+  const limit = 10
+  const [page, setPage] = useState(1)
+  const { resumes: resumesData, isLoading, isError, error, createResume, updateResume, deleteResume } = useResumes(page, limit)
+  const resumesList = Array.isArray(resumesData) ? resumesData : resumesData?.resumes ?? []
+  const metadata = Array.isArray(resumesData) ? null : resumesData?.metadata ?? null
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingResume, setEditingResume] = useState<Resume | undefined>(undefined)
 
   const handleAddResume = (newResume: NewResume) => {
-    const resumeToAdd: Resume = {
-      ...newResume,
-      id: resumes.length + 1
-    }
-    setResumes([...resumes, resumeToAdd])
-    setIsModalOpen(false)
+    createResume(newResume, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setEditingResume(undefined);
+        toast.success('Resume created successfully');
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to create resume: ${error.message}`);
+      }
+    });
+  };
+  
+  const handleEditResume = (updatedResume: Resume) => {
+    updateResume({ resume: updatedResume }, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setEditingResume(undefined);
+        toast.success('Resume updated successfully');
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to update resume: ${error.message}`);
+      }
+    });
+  };
+
+  const handleDeleteResume = (id: string) => {
+    deleteResume(id, {
+      onSuccess: () => {
+        toast.success("Resume deleted successfully");
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to delete resume: ${error.message}`);
+      }
+    })
   }
 
-  const handleEditResume = (updatedResume: NewResume) => {
-    if (!updatedResume.id) return
-    setResumes(resumes.map(resume => 
-      resume.id === updatedResume.id ? { ...updatedResume, id: resume.id } : resume
-    ))
-    setIsModalOpen(false)
-    setEditingResume(undefined)
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
   }
 
-  const handleDeleteResume = (id: number) => {
-    setResumes(resumes.filter(resume => resume.id !== id))
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
-  const handleViewResume = (resumeUrl: string) => {
-    window.open(resumeUrl, '_blank')
+  if (isError) {
+    return <ErrorMessage message={error?.message || 'An error occurred'} />
   }
 
   return (
@@ -54,14 +82,25 @@ export default function ManageResumes() {
       </CardHeader>
       <CardContent>
         <ResumesTable 
-          resumes={resumes} 
+          resumes={resumesList} 
           onEdit={(resume) => {
             setEditingResume(resume)
             setIsModalOpen(true)
           }}
           onDelete={handleDeleteResume}
-          onView={handleViewResume}
         />
+        {metadata && (
+          <div className="mt-4 flex justify-between items-center">
+            <div className="text-sm text-gray-500">
+              Showing {resumesList.length} of {metadata.total} resumes | Page {metadata.page} of {metadata.totalPages}
+            </div>
+            <Pagination
+              currentPage={metadata.page}
+              totalPages={metadata.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </CardContent>
       <ResumeFormModal
         isOpen={isModalOpen}
