@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axiosInstance from "@/lib/axios-customize";
 import { Company, NewCompany } from "@/types/company";
 import { Job, NewJob } from "@/types/job";
 import { Resume, NewResume } from "@/types/resume";
 import { User, NewUser } from "@/types/user";
 import { PageData } from "@/types/pagedata";
+import { Role } from "@/types/role";
 
 // Users
 export const getUsers = async (page: number = 1, limit: number = 10): Promise<{ 
@@ -129,4 +129,34 @@ export const updateResume = async (resume: Resume): Promise<Resume> => {
 
 export const deleteResume = async (_id: string): Promise<void> => {
   await axiosInstance.delete(`/resumes/${_id}`);
+}
+
+// Role
+export const getAllRole = async (page: number = 1, limit: number = 10): Promise<{
+  roles: Role[],
+  metadata: PageData
+}> => {
+  const res = await axiosInstance.get('/roles', {
+    params: { page, limit }
+  })
+  return res.data.data
+}
+
+export const getRoleById = async (_id: string): Promise<Role> => {
+  const res = await axiosInstance.get(`/roles/${_id}`);
+  return res.data.data;
+}
+
+export const createRole = async (role: Role): Promise<Role> => {
+  const res = await axiosInstance.post("/roles", role);
+  return res.data.data;
+}
+
+export const updateRole = async (role: Role): Promise<Role> => {
+  const res = await axiosInstance.patch(`/roles/${role._id}`, role);
+  return res.data.data;
+}
+
+export const deleteRole = async (_id: string): Promise<void> => {
+  await axiosInstance.delete(`/roles/${_id}`);
 }

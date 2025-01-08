@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { LayoutDashboard, Users, Briefcase, FileText } from 'lucide-react'
-// import { cn } from "@/lib/utils"
+import { LayoutDashboard, Users, Briefcase, FileText, ShieldCheck, Key, UserCog, Settings } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
 export default function AdminLayout({
@@ -37,6 +36,30 @@ export default function AdminLayout({
             <Button variant="ghost" className="w-full justify-start">
               <FileText className="mr-2 h-4 w-4" />
               Resumes
+            </Button>
+          </Link>
+          <Link href="/admin/roles">
+            <Button variant="ghost" className="w-full justify-start">
+              <ShieldCheck className="mr-2 h-4 w-4" />
+              Roles
+            </Button>
+          </Link>
+          <Link href="/admin/permissions">
+            <Button variant="ghost" className="w-full justify-start">
+              <Key className="mr-2 h-4 w-4" />
+              Permissions
+            </Button>
+          </Link>
+          <Link href="/admin/users">
+            <Button variant="ghost" className="w-full justify-start">
+              <UserCog className="mr-2 h-4 w-4" />
+              Users
+            </Button>
+          </Link>
+          <Link href="/admin/settings">
+            <Button variant="ghost" className="w-full justify-start">
+              <Settings className="mr-2 h-4 w-4" />
+              Admin Settings
             </Button>
           </Link>
         </nav>
