@@ -12,12 +12,15 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Role, NewRole } from '@/types/role'
+import { Permission } from '@/types/permission'
+import { usePermissions } from '@/hooks/usePermissions'
+import { MultiSelect } from "@/components/ui/multi-select"
 
 interface RoleFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (role: NewRole) => void;
-  initialData?: Role;
+  initialData?: Role | null;
 }
 
 export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFormModalProps) {
@@ -27,6 +30,8 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
     isActive: true,
     permissions: [],
   })
+
+  const { permissions } = usePermissions()
 
   useEffect(() => {
     if (initialData) {
@@ -81,12 +86,12 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
               <Label htmlFor="isActive">Active</Label>
             </div>
             <div>
-              <Label htmlFor="permissions">Permissions (comma-separated)</Label>
-              <Input
-                id="permissions"
-                value={role.permissions.join(', ')}
-                onChange={(e) => setRole({ ...role, permissions: e.target.value.split(',').map(p => p.trim()) })}
-                required
+              <Label htmlFor="permissions">Permissions</Label>
+              <MultiSelect
+                options={permissions.map(p => ({ label: p.name, value: p._id! }))}
+                selected={role.permissions}
+                onChange={(selected) => setRole({ ...role, permissions: selected })}
+                placeholder="Select permissions"
               />
             </div>
           </div>

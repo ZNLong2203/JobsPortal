@@ -5,6 +5,7 @@ import { Resume, NewResume } from "@/types/resume";
 import { User, NewUser } from "@/types/user";
 import { PageData } from "@/types/pagedata";
 import { Role } from "@/types/role";
+import { NewPermission, Permission } from "@/types/permission";
 
 // Users
 export const getUsers = async (page: number = 1, limit: number = 10): Promise<{ 
@@ -159,4 +160,39 @@ export const updateRole = async (role: Role): Promise<Role> => {
 
 export const deleteRole = async (_id: string): Promise<void> => {
   await axiosInstance.delete(`/roles/${_id}`);
+}
+
+// Permissions
+export const getAllPermission = async (page: number = 1, limit: number = 10): Promise<{ 
+  permissions: Permission[], 
+  metadata: { 
+    total: number, 
+    page: number, 
+    totalPages: number, 
+    limit: number 
+  } 
+}> => {
+  const response = await axiosInstance.get('/permissions', {
+    params: { page, limit }
+  })
+  return response.data.data
+}
+
+export const getPermissionById = async (id: string): Promise<Permission> => {
+  const response = await axiosInstance.get(`/permissions/${id}`)
+  return response.data.data
+}
+
+export const createPermission = async (permission: NewPermission): Promise<Permission> => {
+  const response = await axiosInstance.post('/permissions', permission)
+  return response.data.data
+}
+
+export const updatePermission = async (permission: Permission): Promise<Permission> => {
+  const response = await axiosInstance.put(`/permissions/${permission._id}`, permission)
+  return response.data.data
+}
+
+export const deletePermission = async (id: string): Promise<void> => {
+  await axiosInstance.delete(`/permissions/${id}`)
 }

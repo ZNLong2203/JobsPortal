@@ -14,10 +14,10 @@ import { Company } from 'src/modules/company/schemas/company.schema';
 
 export class CreateJobDto {
   @IsNotEmpty()
-  companyId: Types.ObjectId | Company;
+  name: string;
 
   @IsNotEmpty()
-  name: string;
+  company: Types.ObjectId | Company;
 
   @IsNotEmpty()
   @IsArray()

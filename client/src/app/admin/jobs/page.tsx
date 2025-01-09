@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useJobs } from '@/hooks/useJobs'
 import { Job, NewJob } from '@/types/job'
 import toast from 'react-hot-toast'
+import moment from 'moment'
 import { Pagination } from "@/components/common/Pagination"
 import { LoadingSpinner } from '@/components/common/IsLoading'
 import { ErrorMessage } from '@/components/common/isError'
@@ -23,6 +24,10 @@ export default function ManageJobs() {
   const [editingJob, setEditingJob] = useState<Job | undefined>(undefined)
 
   const handleAddJob = (newJob: NewJob) => {
+    newJob.startDate = moment(newJob.startDate).toDate();
+    newJob.endDate = moment(newJob.endDate).toDate();
+    
+    console.log(newJob)
     createJob(newJob, {
       onSuccess: () => {
         setIsModalOpen(false);

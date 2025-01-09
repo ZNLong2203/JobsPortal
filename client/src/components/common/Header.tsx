@@ -26,6 +26,11 @@ export default function Header() {
             <Link href="/career-advice" className="text-gray-700 hover:text-blue-600">Career Advice</Link>
           </nav>
           <div className="flex items-center space-x-4">
+            {userInfo && userInfo.role === 'admin' && (
+              <Link href="/admin">
+                <Button variant="outline">Admin</Button>
+              </Link>
+            )}
             {isAuthenticated && userInfo ? (
               <UserMenu user={userInfo} onLogout={handleLogout} />
             ) : (
