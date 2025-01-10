@@ -71,6 +71,7 @@
 
   body {
     @apply bg-background text-foreground;
+    background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
     font-family: 'Poppins', sans-serif;
   }
 }

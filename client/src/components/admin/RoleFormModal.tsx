@@ -12,15 +12,17 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Role, NewRole } from '@/types/role'
-import { Permission } from '@/types/permission'
 import { usePermissions } from '@/hooks/usePermissions'
 import { MultiSelect } from "@/components/ui/multi-select"
+import { Permission } from '@/types/permission'
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { ErrorMessage } from '@/components/common/IsError'
 
 interface RoleFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (role: NewRole) => void;
-  initialData?: Role | null;
+  initialData?: Role;
 }
 
 export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFormModalProps) {
@@ -31,7 +33,7 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
     permissions: [],
   })
 
-  const { permissions } = usePermissions()
+  const { permissions, isLoading, isError, error } = usePermissions()
 
   useEffect(() => {
     if (initialData) {
@@ -50,6 +52,13 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
     e.preventDefault()
     onSubmit(role)
   }
+
+  const permissionOptions = Array.isArray(permissions)
+    ? permissions.map((p: Permission) => ({ 
+        label: p.name, 
+        value: p._id || '' 
+      }))
+    : []
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -87,19 +96,25 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
             </div>
             <div>
               <Label htmlFor="permissions">Permissions</Label>
-              <MultiSelect
-                options={permissions.map(p => ({ label: p.name, value: p._id! }))}
-                selected={role.permissions}
-                onChange={(selected) => setRole({ ...role, permissions: selected })}
-                placeholder="Select permissions"
-              />
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : isError ? (
+                <ErrorMessage message={error instanceof Error ? error.message : 'Failed to load permissions'} />
+              ) : (
+                <MultiSelect
+                  options={permissionOptions}
+                  selected={role.permissions}
+                  onChange={(selected) => setRole({ ...role, permissions: selected })}
+                  placeholder="Select permissions"
+                />
+              )}
             </div>
           </div>
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={isLoading || isError}>
               {initialData ? 'Update' : 'Add'} Role
             </Button>
           </DialogFooter>

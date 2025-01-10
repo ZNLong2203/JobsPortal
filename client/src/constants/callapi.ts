@@ -34,7 +34,7 @@ export const createUser = async (user: NewUser): Promise<User> => {
 }
 
 export const updateUser = async (user: User): Promise<User> => {
-  const res = await axiosInstance.put(`/users/${user._id}`, user)
+  const res = await axiosInstance.patch(`/users/${user._id}`, user)
   return res.data.data
 }
 
@@ -189,7 +189,7 @@ export const createPermission = async (permission: NewPermission): Promise<Permi
 }
 
 export const updatePermission = async (permission: Permission): Promise<Permission> => {
-  const response = await axiosInstance.put(`/permissions/${permission._id}`, permission)
+  const response = await axiosInstance.patch(`/permissions/${permission._id}`, permission)
   return response.data.data
 }
 

@@ -11,7 +11,7 @@ import { Resume, NewResume } from '@/types/resume'
 import toast from 'react-hot-toast'
 import { Pagination } from "@/components/common/Pagination"
 import { LoadingSpinner } from '@/components/common/IsLoading'
-import { ErrorMessage } from '@/components/common/isError'
+import { ErrorMessage } from '@/components/common/IsError'
 
 export default function ManageResumes() {
   const limit = 10

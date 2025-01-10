@@ -11,12 +11,14 @@ import { Role, NewRole } from '@/types/role'
 import toast from 'react-hot-toast'
 import { Pagination } from "@/components/common/Pagination"
 import { LoadingSpinner } from '@/components/common/IsLoading'
-import { ErrorMessage } from '@/components/common/isError'
+import { ErrorMessage } from '@/components/common/IsError'
 
 export default function ManageRoles() {
   const limit = 10
   const [page, setPage] = useState(1)
-  const { roles, metadata, isLoading, isError, error, createRole, updateRole, deleteRole } = useRoles(page, limit)
+  const { roles: rolesData, isLoading, isError, error, createRole, updateRole, deleteRole } = useRoles(page, limit)
+  const rolesList = Array.isArray(rolesData) ? rolesData : rolesData?.roles ?? []
+  const metadata = Array.isArray(rolesData) ? null : rolesData?.metadata ?? null
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingRole, setEditingRole] = useState<Role | undefined>(undefined)
 
@@ -34,7 +36,7 @@ export default function ManageRoles() {
   };
   
   const handleEditRole = (updatedRole: Role) => {
-    updateRole(updatedRole, {
+    updateRole({ role: updatedRole }, {
       onSuccess: () => {
         setIsModalOpen(false);
         setEditingRole(undefined);
@@ -80,7 +82,7 @@ export default function ManageRoles() {
       </CardHeader>
       <CardContent>
         <RolesTable 
-          roles={roles} 
+          roles={rolesList} 
           onEdit={(role) => {
             setEditingRole(role)
             setIsModalOpen(true)
@@ -90,7 +92,7 @@ export default function ManageRoles() {
         {metadata && (
           <div className="mt-4 flex justify-between items-center">
             <div className="text-sm text-gray-500">
-              Showing {roles.length} of {metadata.total} roles | Page {metadata.page} of {metadata.totalPages}
+              Showing {rolesList.length} of {metadata.total} roles | Page {metadata.page} of {metadata.totalPages}
             </div>
             <Pagination
               currentPage={metadata.page}
@@ -106,7 +108,7 @@ export default function ManageRoles() {
           setIsModalOpen(false)
           setEditingRole(undefined)
         }}
-        onSubmit={editingRole ? handleEditRole : handleAddRole}
+        onSubmit={(role: NewRole) => editingRole ? handleEditRole({ ...role, _id: editingRole._id } as Role) : handleAddRole(role)}
         initialData={editingRole}
       />
     </Card>

@@ -10,25 +10,33 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Permission } from '@/types/permission'
+import { Permission, NewPermission } from '@/types/permission'
 
 interface PermissionFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (permission: Permission) => void;
-  initialData?: Permission | null;
+  onSubmit: (permission: NewPermission) => void;
+  initialData?: Permission;
 }
 
 export function PermissionFormModal({ isOpen, onClose, onSubmit, initialData }: PermissionFormModalProps) {
-  const [permission, setPermission] = useState<Permission>(
-    initialData || { name: '', apiPath: '', method: 'GET', module: '' }
-  )
+  const [permission, setPermission] = useState<NewPermission>({
+    name: '',
+    apiPath: '',
+    method: 'GET',
+    module: '',
+  })
 
   useEffect(() => {
     if (initialData) {
       setPermission(initialData)
     } else {
-      setPermission({ name: '', apiPath: '', method: 'GET', module: '' })
+      setPermission({
+        name: '',
+        apiPath: '',
+        method: 'GET',
+        module: '',
+      })
     }
   }, [initialData])
 
@@ -39,44 +47,38 @@ export function PermissionFormModal({ isOpen, onClose, onSubmit, initialData }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{initialData ? 'Edit Permission' : 'Add New Permission'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name">Permission Name</Label>
               <Input
                 id="name"
                 value={permission.name}
                 onChange={(e) => setPermission({ ...permission, name: e.target.value })}
-                className="col-span-3"
+                required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="apiPath" className="text-right">
-                API Path
-              </Label>
+            <div>
+              <Label htmlFor="apiPath">API Path</Label>
               <Input
                 id="apiPath"
                 value={permission.apiPath}
                 onChange={(e) => setPermission({ ...permission, apiPath: e.target.value })}
-                className="col-span-3"
+                required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="method" className="text-right">
-                Method
-              </Label>
+            <div>
+              <Label htmlFor="method">Method</Label>
               <Select
                 value={permission.method}
                 onValueChange={(value) => setPermission({ ...permission, method: value })}
               >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select method" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a method" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="GET">GET</SelectItem>
@@ -86,20 +88,23 @@ export function PermissionFormModal({ isOpen, onClose, onSubmit, initialData }: 
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="module" className="text-right">
-                Module
-              </Label>
+            <div>
+              <Label htmlFor="module">Module</Label>
               <Input
                 id="module"
                 value={permission.module}
                 onChange={(e) => setPermission({ ...permission, module: e.target.value })}
-                className="col-span-3"
+                required
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button type="submit">{initialData ? 'Update' : 'Add'} Permission</Button>
+          <DialogFooter className="mt-6">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              {initialData ? 'Update' : 'Add'} Permission
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

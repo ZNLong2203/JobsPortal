@@ -109,11 +109,13 @@ export function ResumeFormModal({ isOpen, onClose, onSubmit, initialData }: Resu
                 <SelectTrigger>
                   <SelectValue placeholder="Select a job" />
                 </SelectTrigger>
+                <SelectContent>
                   {jobsList.map((job) => (
                     <SelectItem key={job._id} value={job._id}>
                       {job.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
               </Select>
             </div>
             <div>

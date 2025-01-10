@@ -1,41 +1,41 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getAllPermission, getPermissionById, createPermission, updatePermission, deletePermission } from '@/constants/callapi'
+import { NewPermission } from '@/types/permission'
 
 export function usePermissions(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient()
 
-  const permissionsQuery = useQuery({
+  const allPermissionQuery = useQuery({
     queryKey: ['permissions', page, limit],
     queryFn: () => getAllPermission(page, limit),
   })
 
   const createPermissionMutation = useMutation({
-    mutationFn: createPermission,
+    mutationFn: (permission: NewPermission) => createPermission(permission),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['permissions']})
     },
   })
 
   const updatePermissionMutation = useMutation({
-    mutationFn: updatePermission,
+    mutationFn: ({ permission }: { permission: NewPermission }) => updatePermission(permission),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['permissions']})
     },
   })
 
   const deletePermissionMutation = useMutation({
-    mutationFn: deletePermission,
+    mutationFn: (_id: string) => deletePermission(_id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['permissions']})
     },
   })
 
   return {
-    permissions: permissionsQuery.data?.permissions ?? [],
-    metadata: permissionsQuery.data?.metadata,
-    isLoading: permissionsQuery.isLoading,
-    isError: permissionsQuery.isError,
-    error: permissionsQuery.error,
+    permissions: allPermissionQuery.data ?? [],
+    isLoading: allPermissionQuery.isLoading,
+    isError: allPermissionQuery.isError,
+    error: allPermissionQuery.error,
     createPermission: createPermissionMutation.mutate,
     updatePermission: updatePermissionMutation.mutate,
     deletePermission: deletePermissionMutation.mutate,

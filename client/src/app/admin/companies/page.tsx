@@ -10,7 +10,7 @@ import { useCompanies } from '@/hooks/useCompanies'
 import { Company, NewCompany } from '@/types/company'
 import { Pagination } from "@/components/common/Pagination"
 import { LoadingSpinner } from '@/components/common/IsLoading'
-import { ErrorMessage } from '@/components/common/isError'
+import { ErrorMessage } from '@/components/common/IsError'
 import toast from 'react-hot-toast'
 
 export default function ManageCompanies() {

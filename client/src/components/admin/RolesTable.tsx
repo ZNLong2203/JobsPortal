@@ -32,7 +32,7 @@ export function RolesTable({ roles, onEdit, onDelete }: RolesTableProps) {
                 {role.isActive ? "Active" : "Inactive"}
               </Badge>
             </TableCell>
-            <TableCell>{role.permissions.join(', ')}</TableCell>
+            <TableCell>{role.permissions.length} permissions</TableCell>
             <TableCell>
               <Button variant="outline" size="sm" className="mr-2" onClick={() => onEdit(role)}>
                 <PencilIcon className="h-4 w-4 mr-1" />

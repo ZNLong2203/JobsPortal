@@ -2,61 +2,59 @@
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import toast from 'react-hot-toast'
-import { PlusIcon, SearchIcon } from 'lucide-react'
 import { PermissionsTable } from '@/components/admin/PermissionsTable'
 import { PermissionFormModal } from '@/components/admin/PermissionFormModal'
+import { PlusIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { usePermissions } from '@/hooks/usePermissions'
-import { Permission } from '@/types/permission'
+import { Permission, NewPermission } from '@/types/permission'
+import toast from 'react-hot-toast'
 import { Pagination } from "@/components/common/Pagination"
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { ErrorMessage } from '@/components/common/IsError'
 
-export default function PermissionsPage() {
+export default function ManagePermissions() {
   const limit = 10
   const [page, setPage] = useState(1)
-  const { permissions, metadata, isLoading, isError, error, createPermission, updatePermission, deletePermission } = usePermissions(page, limit)
+  const { permissions: permissionsData, isLoading, isError, error, createPermission, updatePermission, deletePermission } = usePermissions(page, limit)
+  const permissionsList = Array.isArray(permissionsData) ? permissionsData : permissionsData?.permissions ?? []
+  const metadata = Array.isArray(permissionsData) ? null : permissionsData?.metadata ?? null
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingPermission, setEditingPermission] = useState<Permission | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [editingPermission, setEditingPermission] = useState<Permission | undefined>(undefined)
 
-  const filteredPermissions = permissions.filter(permission =>
-    permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    permission.module.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const handleAddPermission = (newPermission: Permission) => {
+  const handleAddPermission = (newPermission: NewPermission) => {
     createPermission(newPermission, {
       onSuccess: () => {
-        setIsModalOpen(false)
-        toast.success('Permission created successfully')
+        setIsModalOpen(false);
+        setEditingPermission(undefined);
+        toast.success('Permission created successfully');
       },
       onError: (error: Error) => {
-        toast.error(`Failed to create permission: ${error.message}`)
+        toast.error(`Failed to create permission: ${error.message}`);
       }
-    })
-  }
-
+    });
+  };
+  
   const handleEditPermission = (updatedPermission: Permission) => {
-    updatePermission(updatedPermission, {
+    updatePermission({ permission: updatedPermission }, {
       onSuccess: () => {
-        setIsModalOpen(false)
-        setEditingPermission(null)
-        toast.success('Permission updated successfully')
+        setIsModalOpen(false);
+        setEditingPermission(undefined);
+        toast.success('Permission updated successfully');
       },
       onError: (error: Error) => {
-        toast.error(`Failed to update permission: ${error.message}`)
+        toast.error(`Failed to update permission: ${error.message}`);
       }
-    })
-  }
+    });
+  };
 
   const handleDeletePermission = (id: string) => {
     deletePermission(id, {
       onSuccess: () => {
-        toast.success("Permission deleted successfully")  
+        toast.success("Permission deleted successfully");
       },
       onError: (error: Error) => {
-        toast.error(`Failed to delete permission: ${error.message}`)
+        toast.error(`Failed to delete permission: ${error.message}`);
       }
     })
   }
@@ -66,11 +64,11 @@ export default function PermissionsPage() {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <LoadingSpinner />
   }
 
   if (isError) {
-    return <div>Error: {error instanceof Error ? error.message : 'Unknown error'}</div>
+    return <ErrorMessage message={error?.message || 'An error occurred'} />
   }
 
   return (
@@ -83,20 +81,8 @@ export default function PermissionsPage() {
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center space-x-2 mb-4">
-          <Input
-            placeholder="Search permissions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-          <Button variant="outline">
-            <SearchIcon className="h-4 w-4 mr-2" />
-            Search
-          </Button>
-        </div>
         <PermissionsTable 
-          permissions={filteredPermissions} 
+          permissions={permissionsList} 
           onEdit={(permission) => {
             setEditingPermission(permission)
             setIsModalOpen(true)
@@ -106,7 +92,7 @@ export default function PermissionsPage() {
         {metadata && (
           <div className="mt-4 flex justify-between items-center">
             <div className="text-sm text-gray-500">
-              Showing {filteredPermissions.length} of {metadata.total} permissions | Page {metadata.page} of {metadata.totalPages}
+              Showing {permissionsList.length} of {metadata.total} permissions | Page {metadata.page} of {metadata.totalPages}
             </div>
             <Pagination
               currentPage={metadata.page}
@@ -120,12 +106,11 @@ export default function PermissionsPage() {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false)
-          setEditingPermission(null)
+          setEditingPermission(undefined)
         }}
-        onSubmit={editingPermission ? handleEditPermission : handleAddPermission}
+        onSubmit={(permission: NewPermission) => editingPermission ? handleEditPermission({ ...permission, _id: editingPermission._id } as Permission) : handleAddPermission(permission)}
         initialData={editingPermission}
       />
     </Card>
   )
 }
-

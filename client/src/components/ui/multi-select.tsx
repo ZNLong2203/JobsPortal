@@ -1,6 +1,5 @@
 import * as React from "react"
 import { Check, ChevronsUpDown } from 'lucide-react'
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -38,11 +37,14 @@ export function MultiSelect({
   const [open, setOpen] = React.useState(false)
 
   const handleSelect = (value: string) => {
-    const updatedSelected = selected.includes(value)
+    const updatedSelected = selected?.includes(value)
       ? selected.filter((item) => item !== value)
-      : [...selected, value]
+      : [...(selected || []), value]
     onChange(updatedSelected)
   }
+
+  const safeOptions = options || []
+  const safeSelected = selected || []
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,11 +55,11 @@ export function MultiSelect({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {selected.length > 0 ? (
+          {safeSelected.length > 0 ? (
             <div className="flex flex-wrap gap-1">
-              {selected.map((value) => (
+              {safeSelected.map((value) => (
                 <Badge key={value} variant="secondary">
-                  {options.find((option) => option.value === value)?.label}
+                  {safeOptions.find((option) => option.value === value)?.label || value}
                 </Badge>
               ))}
             </div>
@@ -72,7 +74,7 @@ export function MultiSelect({
           <CommandInput placeholder="Search..." />
           <CommandEmpty>No item found.</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">
-            {options.map((option) => (
+            {safeOptions.map((option) => (
               <CommandItem
                 key={option.value}
                 onSelect={() => handleSelect(option.value)}
@@ -80,7 +82,7 @@ export function MultiSelect({
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    selected.includes(option.value) ? "opacity-100" : "opacity-0"
+                    safeSelected.includes(option.value) ? "opacity-100" : "opacity-0"
                   )}
                 />
                 {option.label}
