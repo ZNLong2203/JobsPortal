@@ -42,10 +42,10 @@ export function usePermissions(page: number = 1, limit: number = 10) {
   }
 }
 
-export function usePermission(id: string) {
+export function usePermission(_id: string) {
   return useQuery({
-    queryKey: ['permission', id],
-    queryFn: () => getPermissionById(id),
+    queryKey: ['permission', _id],
+    queryFn: () => getPermissionById(_id),
   })
 }
 

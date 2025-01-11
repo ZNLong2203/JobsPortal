@@ -42,10 +42,10 @@ export function useRoles(page: number = 1, limit: number = 10) {
   }
 }
 
-export function useRole(id: string) {
+export function useRole(_id: string) {
   return useQuery({
-    queryKey: ['role', id],
-    queryFn: () => getRoleById(id),
+    queryKey: ['role', _id],
+    queryFn: () => getRoleById(_id),
   })
 }
 

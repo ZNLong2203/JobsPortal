@@ -41,10 +41,12 @@ export class UsersController {
     const currentPage = Math.max(Number(page) || 1, 1);
     const currentLimit = Math.max(Number(limit) || 10, 1);
 
+    const { page: _, limit: __, ...filterQuery } = query;
+
     const allUsers = await this.usersService.findAllUser(
       currentPage,
       currentLimit,
-      query,
+      filterQuery,
     );
 
     return {

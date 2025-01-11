@@ -10,12 +10,7 @@ import { NewPermission, Permission } from "@/types/permission";
 // Users
 export const getUsers = async (page: number = 1, limit: number = 10): Promise<{ 
   users: User[], 
-  metadata: { 
-    total: number, 
-    page: number, 
-    totalPages: number, 
-    limit: number 
-  } 
+  metadata: PageData
 }> => {
   const res = await axiosInstance.get('/users', {
     params: { page, limit }
@@ -23,8 +18,8 @@ export const getUsers = async (page: number = 1, limit: number = 10): Promise<{
   return res.data.data
 }
 
-export const getUser = async (id: string): Promise<User> => {
-  const res = await axiosInstance.get(`/users/${id}`)
+export const getUser = async (_id: string): Promise<User> => {
+  const res = await axiosInstance.get(`/users/${_id}`)
   return res.data.data
 }
 
@@ -38,8 +33,8 @@ export const updateUser = async (user: User): Promise<User> => {
   return res.data.data
 }
 
-export const deleteUser = async (id: string): Promise<void> => {
-  await axiosInstance.delete(`/users/${id}`)
+export const deleteUser = async (_id: string): Promise<void> => {
+  await axiosInstance.delete(`/users/${_id}`)
 }
 
 // Company
@@ -178,8 +173,8 @@ export const getAllPermission = async (page: number = 1, limit: number = 10): Pr
   return response.data.data
 }
 
-export const getPermissionById = async (id: string): Promise<Permission> => {
-  const response = await axiosInstance.get(`/permissions/${id}`)
+export const getPermissionById = async (_id: string): Promise<Permission> => {
+  const response = await axiosInstance.get(`/permissions/${_id}`)
   return response.data.data
 }
 
@@ -193,6 +188,6 @@ export const updatePermission = async (permission: Permission): Promise<Permissi
   return response.data.data
 }
 
-export const deletePermission = async (id: string): Promise<void> => {
-  await axiosInstance.delete(`/permissions/${id}`)
+export const deletePermission = async (_id: string): Promise<void> => {
+  await axiosInstance.delete(`/permissions/${_id}`)
 }
