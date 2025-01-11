@@ -1,0 +1,56 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:lastest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVER_ID: 1
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:lastest
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+      
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    environment:
+      - REDIS_PASSWORD=admin
+  
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server  
+  
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "2222:2222"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=admin
+    depends_on:
+      - redis
+
+volumes:
+  redis-data:
+    driver: local
