@@ -9,7 +9,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
         <h1 className="text-5xl font-extrabold text-gray-900 mb-6">Find Your Dream Job Today</h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Connect with top employers, explore exciting opportunities, and take the next step in your career journey with FindJobs.
+          Connect with top employers, explore exciting opportunities, and take the next step in your career journey with JobsPortal.
         </p>
         <div className="flex justify-center gap-4">
           <Button size="lg" asChild>
@@ -72,7 +72,7 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow-xl p-8 text-center">
           <h2 className="text-3xl font-bold mb-4 text-gray-900">Ready to Start Your Journey?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto text-gray-600">
-            Join thousands of professionals who have found their perfect career match with FindJobs.
+            Join thousands of professionals who have found their perfect career match with JobsPortal.
           </p>
           <Button size="lg" asChild>
             <Link href="/auth/register">Get Started Today</Link>

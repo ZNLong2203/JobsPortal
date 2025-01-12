@@ -18,7 +18,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-blue-600">FindJobs</Link>
+            <Link href="/" className="text-2xl font-bold text-blue-600">JobsPortal</Link>
           </div>
           <nav className="hidden md:flex space-x-8">
             <Link href="/jobs" className="text-gray-700 hover:text-blue-600">Find Jobs</Link>
@@ -29,6 +29,11 @@ export default function Header() {
             {userInfo && userInfo.role === 'admin' && (
               <Link href="/admin">
                 <Button variant="outline">Admin</Button>
+              </Link>
+            )}
+            {userInfo && userInfo.role === 'hr' && (
+              <Link href="/hr">
+                <Button variant="outline">HR</Button>
               </Link>
             )}
             {isAuthenticated && userInfo ? (

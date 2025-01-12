@@ -39,7 +39,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-gray-200 pt-8 text-center">
-          <p className="text-gray-500">&copy; 2023 FindJobs. All rights reserved.</p>
+          <p className="text-gray-500">&copy; 2025 JobsPortal. All rights reserved.</p>
         </div>
       </div>
     </footer>
