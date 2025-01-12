@@ -46,13 +46,13 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/profile">
+          <Link href="/user/profile">
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/resume-history">
+          <Link href="/user/resume-history">
             <FileText className="mr-2 h-4 w-4" />
             <span>Resume History</span>
           </Link>
