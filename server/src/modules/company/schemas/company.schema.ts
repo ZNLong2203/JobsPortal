@@ -17,7 +17,10 @@ export class Company {
   @Prop()
   employees: number;
 
-  @Prop({ default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl3KRLQ-4_EdCiWdQ5WVmZBhS4HCHiTxV71A&s" })
+  @Prop({
+    default:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl3KRLQ-4_EdCiWdQ5WVmZBhS4HCHiTxV71A&s',
+  })
   logo: string;
 
   @Prop()

@@ -16,8 +16,11 @@ export class User {
   @Prop()
   name: string;
 
-  @Prop({ default: 'https://icons.iconarchive.com/icons/papirus-team/papirus-status/512/avatar-default-icon.png' })
-  avatar: string
+  @Prop({
+    default:
+      'https://icons.iconarchive.com/icons/papirus-team/papirus-status/512/avatar-default-icon.png',
+  })
+  avatar: string;
 
   @Prop({ type: Types.ObjectId, ref: Role.name, default: 'member' })
   role: Types.ObjectId | Role;
