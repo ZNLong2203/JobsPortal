@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import ChatBox from '@/components/common/ChatBox';
 import ClientWrapper from '@/components/ClientWrapper';
 import { Providers } from './providers';
 
@@ -27,6 +28,7 @@ export default function RootLayout({
               <Header />
               <main className="flex-grow">{children}</main>
               <Footer />
+              <ChatBox />
             </div>
           </ClientWrapper>
         </Providers>
