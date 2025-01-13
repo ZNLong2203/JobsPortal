@@ -11,7 +11,8 @@ import { FilesModule } from './modules/files/files.module';
 import { ResumesModule } from './modules/resumes/resumes.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { RolesModule } from './modules/roles/roles.module';
-import { RedisModule } from './modules/redis/redis.module';
+import { RedisModule } from './integrations/redis/redis.module';
+import { GeminiModule } from './integrations/gemini/gemini.module';
 import * as mongooseDelete from 'mongoose-delete';
 
 @Module({
@@ -42,7 +43,8 @@ import * as mongooseDelete from 'mongoose-delete';
     ResumesModule,
     PermissionsModule,
     RolesModule,
-    RedisModule,
+    // RedisModule,
+    GeminiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
