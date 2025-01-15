@@ -1,25 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Building, Mail, Phone, MapPin, Globe, Users, Calendar } from 'lucide-react'
+import { Company } from '@/types/company'
+import { useCompany, useCompanies } from '@/hooks/useCompanies'
+import { ErrorMessage } from '@/components/common/IsError'
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import toast from 'react-hot-toast'
+import Image from 'next/image'
 
 export default function CompanyInformation() {
-  const [company, setCompany] = useState({
-    name: 'TechCorp Solutions',
-    industry: 'Information Technology',
-    description: 'TechCorp Solutions is a leading provider of innovative software solutions for businesses of all sizes.',
-    foundedYear: '2005',
-    employees: '500-1000',
-    website: 'https://techcorp.example.com',
-    email: 'info@techcorp.example.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Tech Street, San Francisco, CA 94105, USA',
+  const companyId = "677be5f93348df6068c32e67";
+  const { data: companyData, isLoading, isError, error } = useCompany(companyId)
+  const { updateCompany } = useCompanies()
+
+  const [company, setCompany] = useState<Company>({
+    name: '',
+    industry: '',
+    des: '',
+    employees: 0,
+    address: '',
+    logo: '',
   })
+
+  useEffect(() => {
+    if (companyData) {
+      setCompany(companyData)
+    }
+  }, [companyData])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setCompany({
@@ -30,11 +44,18 @@ export default function CompanyInformation() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the updated company information to your backend
-    console.log('Updated company information:', company)
-    // Show a success message to the user
-    alert('Company information updated successfully!')
+    updateCompany({ company }, {
+      onSuccess: () => {
+        toast.success('Company information updated successfully')
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to update company information: ${error.message}`)
+      }
+    })
   }
+
+  if (isLoading) return <LoadingSpinner />
+  if (isError) return <ErrorMessage message={error?.message || 'Error loading company'} />
 
   return (
     <div className="container mx-auto py-8">
@@ -68,11 +89,11 @@ export default function CompanyInformation() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Company Description</Label>
+                <Label htmlFor="des">Company Description</Label>
                 <Textarea
-                  id="description"
+                  id="des"
                   name="description"
-                  value={company.description}
+                  value={company.des}
                   onChange={handleInputChange}
                   required
                 />
@@ -85,7 +106,7 @@ export default function CompanyInformation() {
               <CardTitle>Additional Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="foundedYear">Founded Year</Label>
                 <Input
                   id="foundedYear"
@@ -94,7 +115,7 @@ export default function CompanyInformation() {
                   onChange={handleInputChange}
                   required
                 />
-              </div>
+              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="employees">Number of Employees</Label>
                 <Input
@@ -106,13 +127,13 @@ export default function CompanyInformation() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="website">Website</Label>
-                <Input
-                  id="website"
-                  name="website"
-                  value={company.website}
-                  onChange={handleInputChange}
-                  required
+                <Label htmlFor="website">Logo</Label>
+                <Image 
+                  src={company.logo}
+                  alt={company.name}
+                  width={100}
+                  height={100}
+                  className="rounded-lg"
                 />
               </div>
             </CardContent>
@@ -123,7 +144,7 @@ export default function CompanyInformation() {
               <CardTitle>Contact Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -133,17 +154,7 @@ export default function CompanyInformation() {
                   onChange={handleInputChange}
                   required
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={company.phone}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="address">Address</Label>
                 <Textarea
@@ -162,22 +173,14 @@ export default function CompanyInformation() {
               <CardTitle>Company Overview</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <Building className="h-5 w-5 text-gray-500" />
                 <span>{company.name}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Globe className="h-5 w-5 text-gray-500" />
-                <span>{company.website}</span>
-              </div>
-              <div className="flex items-center space-x-2">
                 <Mail className="h-5 w-5 text-gray-500" />
                 <span>{company.email}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="h-5 w-5 text-gray-500" />
-                <span>{company.phone}</span>
-              </div>
+              </div> */}
               <div className="flex items-center space-x-2">
                 <MapPin className="h-5 w-5 text-gray-500" />
                 <span>{company.address}</span>
@@ -186,10 +189,10 @@ export default function CompanyInformation() {
                 <Users className="h-5 w-5 text-gray-500" />
                 <span>{company.employees} employees</span>
               </div>
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <span>Founded in {company.foundedYear}</span>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </div>

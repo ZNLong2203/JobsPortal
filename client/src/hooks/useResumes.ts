@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllResume, getResumeById, createResume, updateResume, deleteResume } from '@/constants/callapi';
+import { getAllResume, getResumeById, createResume, updateResume, deleteResume } from '@/redux/api/resumeApi';
 import { Resume, NewResume } from '@/types/resume';
 
 export const useResumes = (page: number = 1, limit: number = 10) => {

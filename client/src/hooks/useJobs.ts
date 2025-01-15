@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllJob, getJobById, createJob, updateJob, deleteJob } from '@/constants/callapi';
+import { getAllJob, getJobById, createJob, updateJob, deleteJob } from '@/redux/api/jobApi';
 import { Job, NewJob } from '@/types/job';
 
 export function useJobs(page: number = 1, limit: number = 10) {

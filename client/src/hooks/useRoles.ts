@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getAllRole, getRoleById, createRole, updateRole, deleteRole } from '@/constants/callapi'
+import { getAllRole, getRoleById, createRole, updateRole, deleteRole } from '@/redux/api/roleApi'
 import { NewRole, Role } from '@/types/role'
 
 export function useRoles(page: number = 1, limit: number = 10) {

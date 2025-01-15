@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getAllPermission, getPermissionById, createPermission, updatePermission, deletePermission } from '@/constants/callapi'
+import { getAllPermission, getPermissionById, createPermission, updatePermission, deletePermission } from '@/redux/api/permissionApi'
 import { NewPermission } from '@/types/permission'
 
 export function usePermissions(page: number = 1, limit: number = 10) {

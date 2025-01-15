@@ -2,12 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import axios from 'axios'
 import toast from 'react-hot-toast'
-import { API } from '@/constants/api'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { registerApi } from '@/redux/api/authApi'
 import Link from 'next/link'
 import { Logo } from '@/components/common/Logo'
 import { User } from 'lucide-react'
@@ -27,11 +26,7 @@ export default function Register() {
         return
       }
 
-      await axios.post(API.REGISTER, {
-        name,
-        email,
-        password
-      })
+      await registerApi(name, email, password)
 
       router.push('/auth/login')
       toast.success("Account created successfully")

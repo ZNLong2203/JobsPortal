@@ -1,8 +1,6 @@
 'use client'
 
-import axios from 'axios'
 import toast from 'react-hot-toast'
-import { API } from '@/constants/api'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
@@ -11,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import Link from 'next/link'
 import { useDispatch } from 'react-redux'
 import { login } from '@/redux/slice/authSlice'
+import { loginApi } from '@/redux/api/authApi'
 import { Logo } from '@/components/common/Logo'
 import { Lock } from 'lucide-react'
 
@@ -24,16 +23,12 @@ export default function Login() {
     try {
       e.preventDefault()
 
-      const res = await axios.post(`${API.LOGIN}`, {
-        username: email,
-        password
-      });
+      const res = await loginApi(email, password)
 
-      console.log(res.data)
       dispatch(
         login({
-          userInfo: res.data.data.userInfo,
-          token: res.data.data.access_token,
+          userInfo: res.userInfo,
+          token: res.access_token,
         })
       )
 

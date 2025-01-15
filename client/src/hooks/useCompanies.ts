@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllCompany, getCompanyById, createCompany, updateCompany, deleteCompany } from '@/constants/callapi';
+import { getAllCompany, getCompanyById, createCompany, updateCompany, deleteCompany } from '@/redux/api/companyApi';
 import { Company, NewCompany } from '@/types/company';
 
 export function useCompanies(page: number = 1, limit: number = 10) {
