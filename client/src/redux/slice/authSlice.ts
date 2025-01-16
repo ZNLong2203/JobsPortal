@@ -4,17 +4,18 @@ interface AuthState {
   userInfo: {
     name: string;
     email: string;
-    avatar?: string;
     role: string;
+    company: string;
+    avatar?: string;
   } | null;
   token: string | null;
   isAuthenticated: boolean;
 }
 
-const initialState: AuthState  = {
-  userInfo: null, 
-  token: null,    
-  isAuthenticated: false, 
+const initialState: AuthState = {
+  userInfo: JSON.parse(localStorage.getItem('userInfo') || 'null'),
+  token: localStorage.getItem('token') || null,
+  isAuthenticated: !!localStorage.getItem('token'),
 };
 
 const authSlice = createSlice({
@@ -35,11 +36,22 @@ const authSlice = createSlice({
       localStorage.removeItem('userInfo');
       localStorage.removeItem('token');
     },
+    setAuthStateFromStorage: (state) => {
+      const storedUserInfo = localStorage.getItem('userInfo');
+      const storedToken = localStorage.getItem('token');
+      if (storedUserInfo && storedToken) {
+        state.userInfo = JSON.parse(storedUserInfo);
+        state.token = storedToken;
+        state.isAuthenticated = true;
+      }
+    },
   },
 });
 
 export const { 
   login, 
-  logout 
+  logout,
+  setAuthStateFromStorage
 } = authSlice.actions;
+
 export default authSlice.reducer;

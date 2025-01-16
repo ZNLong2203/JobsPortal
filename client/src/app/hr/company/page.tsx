@@ -9,15 +9,17 @@ import { Label } from "@/components/ui/label"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Building, Mail, Phone, MapPin, Globe, Users, Calendar } from 'lucide-react'
 import { Company } from '@/types/company'
+import { useSelector } from 'react-redux'
 import { useCompany, useCompanies } from '@/hooks/useCompanies'
 import { ErrorMessage } from '@/components/common/IsError'
 import { LoadingSpinner } from '@/components/common/IsLoading'
 import toast from 'react-hot-toast'
 import Image from 'next/image'
+import { RootState } from '@/redux/store'
 
 export default function CompanyInformation() {
-  const companyId = "677be5f93348df6068c32e67";
-  const { data: companyData, isLoading, isError, error } = useCompany(companyId)
+  const { userInfo } = useSelector((state: RootState) => state.auth)
+  const { data: companyData, isLoading, isError, error } = useCompany(userInfo?.company || '')
   const { updateCompany } = useCompanies()
 
   const [company, setCompany] = useState<Company>({

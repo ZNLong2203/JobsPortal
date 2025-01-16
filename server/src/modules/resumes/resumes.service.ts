@@ -42,7 +42,8 @@ export class ResumesService {
           .limit(limit)
           .populate('user', '-password')
           .populate('company')
-          .populate('job'),
+          .populate('job')
+          .sort({ createdAt: -1 }),
         this.resumeModel
           .countDocuments(query)
           .populate('user', '-password')

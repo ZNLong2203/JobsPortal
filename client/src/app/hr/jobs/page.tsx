@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,24 +14,73 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Search, Plus, Edit, Trash2 } from 'lucide-react'
+import { useJobs } from '@/hooks/useJobs'
+import { Job } from '@/types/job'
+import toast from 'react-hot-toast'
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { ErrorMessage } from '@/components/common/IsError'
+import { JobFormModal } from '@/components/admin/JobFormModal'
 
 export default function JobManagement() {
-  const [jobs] = useState([
-    { id: 1, title: 'Senior Developer', department: 'Engineering', location: 'Remote', applicants: 23, status: 'Open' },
-    { id: 2, title: 'UX Designer', department: 'Design', location: 'New York', applicants: 15, status: 'Open' },
-    { id: 3, title: 'Product Manager', department: 'Product', location: 'San Francisco', applicants: 18, status: 'Closed' },
-    { id: 4, title: 'Marketing Specialist', department: 'Marketing', location: 'London', applicants: 7, status: 'Open' },
-    { id: 5, title: 'Data Analyst', department: 'Data Science', location: 'Berlin', applicants: 12, status: 'Open' },
-  ])
+  const page = 1
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingJob, setEditingJob] = useState<Job | null>(null)
+
+  const { jobs, isLoading, isError, error, createJob, updateJob, deleteJob } = useJobs(page)
+
+  const filteredJobs = (jobs && 'jobs' in jobs ? jobs.jobs : []).filter(job => 
+    job.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (typeof job.company !== 'string' && job.company.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
+
+  const handleCreateJob = (newJob: Omit<Job, '_id'>) => {
+    createJob(newJob, {
+      onSuccess: () => {
+        toast.success('Job created successfully')
+        setIsModalOpen(false)
+      },
+      onError: (error) => {
+        toast.error(`Failed to create job: ${error.message}`)
+      }
+    })
+  }
+
+  const handleUpdateJob = (updatedJob: Job) => {
+    updateJob({ job: updatedJob }, {
+      onSuccess: () => {
+        toast.success('Job updated successfully')
+        setIsModalOpen(false)
+        setEditingJob(null)
+      },
+      onError: (error) => {
+        toast.error(`Failed to update job: ${error.message}`)
+      }
+    })
+  }
+
+  const handleDeleteJob = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this job?")) {
+      deleteJob(id, {
+        onSuccess: () => {
+          toast.success("Job deleted successfully")
+        },
+        onError: (error) => {
+          toast.error(`Failed to delete job: ${error.message}`)
+        }
+      })
+    }
+  }
+
+  if (isLoading) return <LoadingSpinner />
+  if (isError) return <ErrorMessage message={error?.message || "An error occurred while fetching jobs"} />
 
   return (
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Job Management</h1>
-        <Button asChild>
-          <Link href="/hr/jobs/new">
-            <Plus className="mr-2 h-4 w-4" /> Post New Job
-          </Link>
+        <Button onClick={() => setIsModalOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Post New Job
         </Button>
       </div>
 
@@ -40,7 +88,11 @@ export default function JobManagement() {
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <div className="flex-1">
-              <Input placeholder="Search jobs..." />
+              <Input 
+                placeholder="Search jobs..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             <Button variant="outline">
               <Search className="mr-2 h-4 w-4" /> Search
@@ -58,31 +110,34 @@ export default function JobManagement() {
             <TableHeader>
               <TableRow>
                 <TableHead>Job Title</TableHead>
-                <TableHead>Department</TableHead>
+                <TableHead>Company</TableHead>
                 <TableHead>Location</TableHead>
-                <TableHead>Applicants</TableHead>
+                <TableHead>Salary</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {jobs.map((job) => (
-                <TableRow key={job.id}>
-                  <TableCell className="font-medium">{job.title}</TableCell>
-                  <TableCell>{job.department}</TableCell>
+              {filteredJobs.map((job) => (
+                <TableRow key={job._id}>
+                  <TableCell className="font-medium">{job.name}</TableCell>
+                  <TableCell>{typeof job.company === 'string' ? job.company : job.company.name}</TableCell>
                   <TableCell>{job.location}</TableCell>
-                  <TableCell>{job.applicants}</TableCell>
+                  <TableCell>${job.salary}</TableCell>
                   <TableCell>
-                    <Badge variant={job.status === 'Open' ? 'default' : 'secondary'}>
-                      {job.status}
+                    <Badge variant={job.isActive ? 'default' : 'secondary'}>
+                      {job.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setEditingJob(job)
+                        setIsModalOpen(true)
+                      }}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => handleDeleteJob(job._id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -93,6 +148,22 @@ export default function JobManagement() {
           </Table>
         </CardContent>
       </Card>
+
+      <JobFormModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingJob(null)
+        }}
+        onSubmit={(job) => {
+          if (editingJob) {
+            handleUpdateJob({ ...job, _id: editingJob._id } as Job)
+          } else {
+            handleCreateJob(job)
+          }
+        }}
+        initialData={editingJob || undefined}
+      />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { Company } from 'src/modules/company/schemas/company.schema';
 import { Permission } from 'src/modules/permissions/schemas/permission.schema';
 import { Role } from 'src/modules/roles/schemas/role.schema';
 
@@ -28,6 +29,9 @@ export class User {
   @Prop({ type: [Types.ObjectId], ref: Permission.name })
   permissions: Types.ObjectId[] | Permission[];
 
+  @Prop({ type: Types.ObjectId, ref: Company.name })
+  company: Types.ObjectId | Company;
+  
   @Prop()
   gender: string;
 
@@ -36,6 +40,7 @@ export class User {
 
   @Prop()
   address: string;
+
 
   @Prop({ type: Types.ObjectId })
   createdBy: Types.ObjectId;

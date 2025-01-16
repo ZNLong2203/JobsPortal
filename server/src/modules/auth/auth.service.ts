@@ -56,7 +56,7 @@ export class AuthService {
         throw new UnauthorizedException('Invalid email or password');
       }
 
-      const { _id, name, email, role } = validateUser;
+      const { _id, name, email, role, company } = validateUser;
       const payload = {
         sub: 'auth',
         iss: 'from zkare',
@@ -64,6 +64,7 @@ export class AuthService {
         name,
         email,
         role,
+        company,
       };
 
       const refreshExpire =
@@ -91,6 +92,7 @@ export class AuthService {
           name,
           email,
           role,
+          company,
           avatar: validateUser.avatar,
         },
       };
@@ -108,7 +110,7 @@ export class AuthService {
         throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
       }
 
-      const { _id, name, email, role } = user;
+      const { _id, name, email, role, company } = user;
       const newPayload = {
         sub: 'auth',
         iss: 'from zkare',
@@ -116,6 +118,7 @@ export class AuthService {
         name,
         email,
         role,
+        company,
       };
 
       res.clearCookie('refreshToken');
@@ -130,6 +133,7 @@ export class AuthService {
           name,
           email,
           role,
+          company,
           avatar: user.avatar,
         },
       };
