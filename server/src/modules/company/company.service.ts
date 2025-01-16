@@ -68,6 +68,15 @@ export class CompanyService {
     }
   }
 
+  async getTotalCompanies(): Promise<number> {
+    try {
+      const totalCompanies = await this.companyModel.countDocuments();
+      return totalCompanies;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async updateCompany(
     id: Types.ObjectId,
     updateCompanyDto: UpdateCompanyDto,

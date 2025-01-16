@@ -63,6 +63,15 @@ export class JobsService {
     }
   }
 
+  async getTotalJobs(): Promise<number> {
+    try {
+      const totalJobs = await this.jobModel.countDocuments();
+      return totalJobs;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async updateJob(
     id: Types.ObjectId,
     updateJobDto: UpdateJobDto,

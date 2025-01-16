@@ -124,6 +124,15 @@ export class ResumesService {
     }
   }
 
+  async getTotalResumes(): Promise<number> {
+    try {
+      const totalResumes = await this.resumeModel.countDocuments();
+      return totalResumes;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async updateResume(
     id: Types.ObjectId,
     updateResumeDto: UpdateResumeDto,

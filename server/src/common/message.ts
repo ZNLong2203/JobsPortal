@@ -75,4 +75,8 @@ export class Message {
   static readonly ROLE_UPDATED = 'Role updated successfully';
   static readonly ROLE_DELETED = 'Role deleted successfully';
   static readonly ROLE_NOT_FOUND = 'Role not found';
+
+  // Statistics
+  static readonly STATISTICS_ADMIN_FETCHED = 'Admin statistics fetched successfully';
+  static readonly STATISTICS_COMPANY_FETCHED = 'Company statistics fetched successfully';
 }

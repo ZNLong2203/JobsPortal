@@ -114,6 +114,15 @@ export class UsersService {
     }
   }
 
+  async getTotalUsers(): Promise<number> {
+    try {
+      const totalUsers = await this.userModel.countDocuments();
+      return totalUsers;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async updateUser(
     id: Types.ObjectId,
     updateUserDto: UpdateUserDto,
