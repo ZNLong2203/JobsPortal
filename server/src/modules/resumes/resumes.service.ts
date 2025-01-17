@@ -124,12 +124,43 @@ export class ResumesService {
     }
   }
 
-  async getTotalResumes(): Promise<number> {
+  async getTotalResumes(query?: string): Promise<number> {
     try {
-      const totalResumes = await this.resumeModel.countDocuments();
+      const queryData = query ? { title: { $regex: query, $options: 'i' } } : {};
+      const totalResumes = await this.resumeModel.countDocuments(queryData);
       return totalResumes;
     } catch (error) {
       throw new NotFoundException(error.message);
+    }
+  }
+
+  async getResumeStatusByMonth(query?: string): Promise<any> {
+    try {
+      const queryData = query ? { title: { $regex: query, $options: 'i' } } : {};
+      const resumes = await this.resumeModel.aggregate([
+        {
+          $match: queryData,
+        },
+        {
+          $group: {
+            _id: {
+              month: { $month: '$createdAt' },
+              year: { $year: '$createdAt' },
+            },
+            total: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            '_id.year': 1,
+            '_id.month': 1,
+          },
+        },
+      ]);
+
+      return resumes;
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
   }
 

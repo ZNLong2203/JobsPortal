@@ -28,6 +28,9 @@ export class Job {
   level: string;
 
   @Prop()
+  category: string;
+
+  @Prop({ enum: ['full-time', 'part-time', 'remote', 'internship'], default: 'full-time' })
   type: string;
 
   @Prop()

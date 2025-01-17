@@ -35,6 +35,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
     salary: 0,
     quantity: 0,
     level: '',
+    category: '',
     type: '',
     des: '',
     startDate: new Date(),
@@ -56,6 +57,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
         salary: 0,
         quantity: 0,
         level: '',
+        category: '',
         type: '',
         des: '',
         startDate: new Date(),
@@ -170,6 +172,15 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                   required
                 />
               </div>
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Input
+                id="category"
+                value={job.category}
+                onChange={(e) => setJob({ ...job, category: e.target.value })}
+                required
+              />
             </div>
             <div>
               <Label htmlFor="type">Job Type</Label>

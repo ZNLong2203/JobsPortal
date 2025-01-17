@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { CompanyService } from '../company/company.service';
 import { UsersService } from '../users/users.service';
 import { JobsService } from '../jobs/jobs.service';
 import { ResumesService } from '../resumes/resumes.service';
+import { IReqUser } from '../auth/interfaces/req-user.interface';
 
 @Injectable()
 export class StatisticsService {
@@ -19,12 +20,32 @@ export class StatisticsService {
       const totalCompanies = await this.companyService.getTotalCompanies();
       const totalJobs = await this.jobsService.getTotalJobs();
       const totalResumes = await this.resumeService.getTotalResumes();
+      const jobsAppliedByMonth = await this.jobsService.getJobsAppliedByMonth();
+      const jobsDistributionByCategory = await this.jobsService.getJobsDistributionByCategory();
 
       return {
         totalUsers,
         totalCompanies,
         totalJobs,
         totalResumes,
+        jobsAppliedByMonth,
+        jobsDistributionByCategory,
+      };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  async getCompanyStatistics(user: IReqUser): Promise<any> {
+    try {
+      const totalJobs = await this.jobsService.getTotalJobs(user.company);
+      const totalResumes = await this.resumeService.getTotalResumes(user.company);
+      const ResumeStatusByMonth = await this.resumeService.getResumeStatusByMonth(user.company);
+
+      return {
+        totalJobs,
+        totalResumes,
+        ResumeStatusByMonth,
       };
     } catch (error) {
       throw new Error(error.message);

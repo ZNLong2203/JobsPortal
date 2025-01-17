@@ -19,3 +19,7 @@ export const loginApi = async (username: string, password: string): Promise<Auth
   return response.data.data
 }
 
+export const logoutApi = async (): Promise<void> => {
+  await axiosInstance.post('/auth/logout')
+}
+

@@ -20,7 +20,7 @@ export class Resume {
   @Prop()
   url: string;
 
-  @Prop()
+  @Prop({ enum: ['pending', 'approved', 'rejected'], default: 'pending' })
   status: string;
 
   @Prop({ type: Types.Array })

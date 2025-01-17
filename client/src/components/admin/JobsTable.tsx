@@ -19,6 +19,7 @@ export function JobsTable({ jobs, onEdit, onDelete }: JobsTableProps) {
           <TableHead>Location</TableHead>
           <TableHead>Salary</TableHead>
           <TableHead>Level</TableHead>
+          <TableHead>Category</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Actions</TableHead>
@@ -32,6 +33,7 @@ export function JobsTable({ jobs, onEdit, onDelete }: JobsTableProps) {
             <TableCell>{job.location}</TableCell>
             <TableCell>${job.salary}</TableCell>
             <TableCell>{job.level}</TableCell>
+            <TableCell>{job.category}</TableCell>
             <TableCell>{job.type}</TableCell>
             <TableCell>{job.isActive ? 'Active' : 'Inactive'}</TableCell>
             <TableCell>

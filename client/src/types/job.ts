@@ -9,6 +9,7 @@ export interface Job {
   salary: number;
   quantity: number;
   level: string;
+  category: string;
   type: string;
   des: string;
   startDate: Date;

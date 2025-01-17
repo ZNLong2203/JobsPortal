@@ -3,4 +3,5 @@ export interface IReqUser {
   name: string;
   email: string;
   role: string;
+  company: string;
 }

@@ -63,15 +63,81 @@ export class JobsService {
     }
   }
 
-  async getTotalJobs(): Promise<number> {
+  async getTotalJobs(query?: string): Promise<number> {
     try {
-      const totalJobs = await this.jobModel.countDocuments();
+      const queryData = query ? { title: { $regex: query, $options: 'i' } } : {};
+      const totalJobs = await this.jobModel.countDocuments(queryData);
       return totalJobs;
     } catch (error) {
       throw new NotFoundException(error.message);
     }
   }
 
+  async getJobsAppliedByMonth(): Promise<any> {
+    try {
+      const jobsAppliedByMonth = await this.jobModel.aggregate([
+        {
+          $addFields: {
+            createdAt: { $toDate: "$createdAt" }
+          }
+        },
+        {
+          $match: {
+            createdAt: { $exists: true }
+          }
+        },
+        {
+          $project: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' }
+          }
+        },
+        {
+          $group: {
+            _id: { year: '$year', month: '$month' },
+            total: { $sum: 1 }
+          }
+        },
+        {
+          $sort: {
+            _id: 1
+          }
+        }
+      ]);
+
+      const jobsAppliedByMonthFormatted = jobsAppliedByMonth.map((item) => ({
+        year: item._id.year,
+        month: item._id.month,
+        total: item.total
+      }));
+
+      return jobsAppliedByMonthFormatted;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async getJobsDistributionByCategory(): Promise<any> {
+    try {
+      const jobsDistributionByCategory = await this.jobModel.aggregate([
+        {
+          $group: {
+            _id: '$category',
+            total: { $sum: 1 },
+          }
+        },
+        {
+          $sort: {
+            total: -1,
+          },
+        },
+      ])
+
+      return jobsDistributionByCategory;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
   async updateJob(
     id: Types.ObjectId,
     updateJobDto: UpdateJobDto,

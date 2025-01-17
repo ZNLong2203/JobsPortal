@@ -5,12 +5,21 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'; 
 import { Button } from "@/components/ui/button"
 import { UserMenu } from './UserMenu'
+import { logoutApi } from '@/redux/api/authApi';
+import { useDispatch } from 'react-redux';
+import { logout } from '@/redux/slice/authSlice';
 
 export default function Header() {
+  const dispatch = useDispatch();
   const { isAuthenticated, userInfo } = useSelector((state: RootState) => state.auth);
 
-  const handleLogout = () => {
-    // Implement logout logic here
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+      dispatch(logout());
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   }
 
   return (
