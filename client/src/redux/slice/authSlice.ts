@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { safeStorage } from '@/utils/safeStorage';
 
 interface AuthState {
   userInfo: {
@@ -13,9 +14,9 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  userInfo: JSON.parse(localStorage.getItem('userInfo') || 'null'),
-  token: localStorage.getItem('token') || null,
-  isAuthenticated: !!localStorage.getItem('token'),
+  userInfo: null,
+  token: null,
+  isAuthenticated: false
 };
 
 const authSlice = createSlice({
@@ -26,32 +27,18 @@ const authSlice = createSlice({
       state.userInfo = action.payload.userInfo;
       state.token = action.payload.token;
       state.isAuthenticated = true;
-      localStorage.setItem('userInfo', JSON.stringify(action.payload.userInfo));
-      localStorage.setItem('token', action.payload.token);
+      safeStorage.setItem('userInfo', JSON.stringify(action.payload.userInfo));
+      safeStorage.setItem('token', action.payload.token);
     },
     logout: (state) => {
       state.userInfo = null;
       state.token = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('token');
-    },
-    setAuthStateFromStorage: (state) => {
-      const storedUserInfo = localStorage.getItem('userInfo');
-      const storedToken = localStorage.getItem('token');
-      if (storedUserInfo && storedToken) {
-        state.userInfo = JSON.parse(storedUserInfo);
-        state.token = storedToken;
-        state.isAuthenticated = true;
-      }
+      safeStorage.removeItem('userInfo');
+      safeStorage.removeItem('token');
     },
   },
 });
 
-export const { 
-  login, 
-  logout,
-  setAuthStateFromStorage
-} = authSlice.actions;
-
+export const { login, logout } = authSlice.actions;
 export default authSlice.reducer;

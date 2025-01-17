@@ -7,7 +7,7 @@ import { ResumesService } from '../resumes/resumes.service';
 @Injectable()
 export class StatisticsService {
   constructor(
-    private readonly companyService: CompanyService, 
+    private readonly companyService: CompanyService,
     private readonly jobsService: JobsService,
     private readonly resumeService: ResumesService,
     private readonly userService: UsersService,

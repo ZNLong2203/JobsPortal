@@ -1,4 +1,8 @@
-import { ChatSession, GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
+import {
+  ChatSession,
+  GenerativeModel,
+  GoogleGenerativeAI,
+} from '@google/generative-ai';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GetAIMessageDTO } from './dto/get-ai-response.dto';
@@ -18,7 +22,7 @@ export class GeminiService {
     this.googleAI = new GoogleGenerativeAI(geminiApiKey);
     this.model = this.googleAI.getGenerativeModel({
       model: geminiModel,
-    })
+    });
   }
 
   private getChatSession(sessionId?: string) {
@@ -33,7 +37,7 @@ export class GeminiService {
     return {
       sessionId: sessionIdToUse,
       chat: result,
-    }
+    };
   }
 
   async generateMessage(data: GetAIMessageDTO): Promise<any> {
@@ -45,9 +49,9 @@ export class GeminiService {
       return {
         result: result.response.text(),
         sessionId,
-      }
+      };
     } catch (error) {
-      this.logger.error("Error generating message", error);
+      this.logger.error('Error generating message', error);
     }
   }
 }

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { GeminiService } from './gemini.service';
 import { GetAIMessageDTO } from './dto/get-ai-response.dto';
 import { Public } from 'src/decorators/public.decorator';

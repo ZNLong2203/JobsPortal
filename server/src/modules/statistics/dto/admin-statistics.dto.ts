@@ -8,5 +8,5 @@ export class AdminStatisticsDto {
     pending: number;
     accepted: number;
     rejected: number;
-  }
+  };
 }

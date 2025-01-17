@@ -4,8 +4,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Briefcase, FileText, Building, BarChart2, Users, UserPlus, DollarSign } from 'lucide-react'
+import { Briefcase, FileText, Building, Users, UserPlus, DollarSign, Calendar, Award, Smile } from 'lucide-react'
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
 
 // Mock data for the charts
@@ -34,7 +33,7 @@ export default function HRDashboard() {
   const [turnoverRate, setTurnoverRate] = useState(2.5)
 
   return (
-    <div className="container mx-auto py-8">
+    <>
       <h1 className="text-3xl font-bold mb-8">HR Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -124,27 +123,32 @@ export default function HRDashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle>Team Overview</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button asChild>
-            <Link href="/hr/jobs/new">
-              <Briefcase className="mr-2 h-4 w-4" /> Post New Job
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/hr/company/edit">
-              <Building className="mr-2 h-4 w-4" /> Edit Company Info
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/hr/reports">
-              <BarChart2 className="mr-2 h-4 w-4" /> View Detailed Reports
-            </Link>
-          </Button>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <TeamOverviewCard
+              title="Upcoming Birthdays"
+              value="3"
+              description="This week"
+              icon={<Calendar className="h-8 w-8 text-blue-500" />}
+            />
+            <TeamOverviewCard
+              title="Work Anniversaries"
+              value="2"
+              description="Next month"
+              icon={<Award className="h-8 w-8 text-green-500" />}
+            />
+            <TeamOverviewCard
+              title="Team Satisfaction"
+              value="4.2"
+              description="Out of 5"
+              icon={<Smile className="h-8 w-8 text-yellow-500" />}
+            />
+          </div>
         </CardContent>
       </Card>
-    </div>
+    </>
   )
 }
 
@@ -176,6 +180,19 @@ function MetricCard({ title, value, icon }: { title: string; value: string | num
         <div className="bg-blue-100 p-3 rounded-full">{icon}</div>
       </CardContent>
     </Card>
+  )
+}
+
+function TeamOverviewCard({ title, value, description, icon }: { title: string; value: string; description: string; icon: React.ReactNode }) {
+  return (
+    <div className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
+      <div className="flex-shrink-0">{icon}</div>
+      <div>
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="text-2xl font-bold">{value}</p>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
+    </div>
   )
 }
 

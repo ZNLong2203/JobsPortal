@@ -31,7 +31,7 @@ export class User {
 
   @Prop({ type: Types.ObjectId, ref: Company.name })
   company: Types.ObjectId | Company;
-  
+
   @Prop()
   gender: string;
 
@@ -40,7 +40,6 @@ export class User {
 
   @Prop()
   address: string;
-
 
   @Prop({ type: Types.ObjectId })
   createdBy: Types.ObjectId;
