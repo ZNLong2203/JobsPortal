@@ -1,4 +1,4 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CompanyService } from '../company/company.service';
 import { UsersService } from '../users/users.service';
 import { JobsService } from '../jobs/jobs.service';
@@ -21,7 +21,8 @@ export class StatisticsService {
       const totalJobs = await this.jobsService.getTotalJobs();
       const totalResumes = await this.resumeService.getTotalResumes();
       const jobsAppliedByMonth = await this.jobsService.getJobsAppliedByMonth();
-      const jobsDistributionByCategory = await this.jobsService.getJobsDistributionByCategory();
+      const jobsDistributionByCategory =
+        await this.jobsService.getJobsDistributionByCategory();
 
       return {
         totalUsers,
@@ -39,8 +40,11 @@ export class StatisticsService {
   async getCompanyStatistics(user: IReqUser): Promise<any> {
     try {
       const totalJobs = await this.jobsService.getTotalJobs(user.company);
-      const totalResumes = await this.resumeService.getTotalResumes(user.company);
-      const ResumeStatusByMonth = await this.resumeService.getResumeStatusByMonth(user.company);
+      const totalResumes = await this.resumeService.getTotalResumes(
+        user.company,
+      );
+      const ResumeStatusByMonth =
+        await this.resumeService.getResumeStatusByMonth(user.company);
 
       return {
         totalJobs,

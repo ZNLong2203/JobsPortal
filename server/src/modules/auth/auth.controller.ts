@@ -32,7 +32,6 @@ export class AuthController {
   @Post('/login')
   async login(@Request() req: any, @Res({ passthrough: true }) res: Response) {
     const loginUser = await this.authService.login(req.user, res);
-    console.log(loginUser);
 
     return {
       message: Message.LOGIN_SUCCESS,

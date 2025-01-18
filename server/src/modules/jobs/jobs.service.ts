@@ -65,7 +65,9 @@ export class JobsService {
 
   async getTotalJobs(query?: string): Promise<number> {
     try {
-      const queryData = query ? { title: { $regex: query, $options: 'i' } } : {};
+      const queryData = query
+        ? { title: { $regex: query, $options: 'i' } }
+        : {};
       const totalJobs = await this.jobModel.countDocuments(queryData);
       return totalJobs;
     } catch (error) {
@@ -78,37 +80,37 @@ export class JobsService {
       const jobsAppliedByMonth = await this.jobModel.aggregate([
         {
           $addFields: {
-            createdAt: { $toDate: "$createdAt" }
-          }
+            createdAt: { $toDate: '$createdAt' },
+          },
         },
         {
           $match: {
-            createdAt: { $exists: true }
-          }
+            createdAt: { $exists: true },
+          },
         },
         {
           $project: {
             year: { $year: '$createdAt' },
-            month: { $month: '$createdAt' }
-          }
+            month: { $month: '$createdAt' },
+          },
         },
         {
           $group: {
             _id: { year: '$year', month: '$month' },
-            total: { $sum: 1 }
-          }
+            total: { $sum: 1 },
+          },
         },
         {
           $sort: {
-            _id: 1
-          }
-        }
+            _id: 1,
+          },
+        },
       ]);
 
       const jobsAppliedByMonthFormatted = jobsAppliedByMonth.map((item) => ({
         year: item._id.year,
         month: item._id.month,
-        total: item.total
+        total: item.total,
       }));
 
       return jobsAppliedByMonthFormatted;
@@ -124,14 +126,14 @@ export class JobsService {
           $group: {
             _id: '$category',
             total: { $sum: 1 },
-          }
+          },
         },
         {
           $sort: {
             total: -1,
           },
         },
-      ])
+      ]);
 
       return jobsDistributionByCategory;
     } catch (error) {

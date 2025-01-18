@@ -10,8 +10,8 @@ import { compare } from 'bcrypt';
 import { Response } from 'express';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Message } from 'src/common/message';
-import { LoginRequestDto } from './dto/login-request.dto';
 import { ConfigService } from '@nestjs/config';
+import { IUser } from '../users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -23,8 +23,9 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findUserByEmail(email);
+    const checkPassword = await compare(password, user.password);
 
-    if (user && compare(password, user.password)) {
+    if (user && checkPassword) {
       return user;
     }
     throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
@@ -46,17 +47,9 @@ export class AuthService {
     }
   }
 
-  async login(loginRequest: LoginRequestDto, res: Response): Promise<any> {
+  async login(user: IUser, res: Response): Promise<any> {
     try {
-      const validateUser = await this.validateUser(
-        loginRequest.email,
-        loginRequest.password,
-      );
-      if (!validateUser) {
-        throw new UnauthorizedException('Invalid email or password');
-      }
-
-      const { _id, name, email, role, company } = validateUser;
+      const { _id, name, email, role, company } = user;
       const payload = {
         sub: 'auth',
         iss: 'from zkare',
@@ -93,7 +86,7 @@ export class AuthService {
           email,
           role,
           company,
-          avatar: validateUser.avatar,
+          avatar: user.avatar,
         },
       };
     } catch (error) {

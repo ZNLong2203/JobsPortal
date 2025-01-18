@@ -30,7 +30,10 @@ export class Job {
   @Prop()
   category: string;
 
-  @Prop({ enum: ['full-time', 'part-time', 'remote', 'internship'], default: 'full-time' })
+  @Prop({
+    enum: ['full-time', 'part-time', 'remote', 'internship'],
+    default: 'full-time',
+  })
   type: string;
 
   @Prop()

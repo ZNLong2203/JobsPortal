@@ -126,7 +126,9 @@ export class ResumesService {
 
   async getTotalResumes(query?: string): Promise<number> {
     try {
-      const queryData = query ? { title: { $regex: query, $options: 'i' } } : {};
+      const queryData = query
+        ? { title: { $regex: query, $options: 'i' } }
+        : {};
       const totalResumes = await this.resumeModel.countDocuments(queryData);
       return totalResumes;
     } catch (error) {
@@ -136,7 +138,9 @@ export class ResumesService {
 
   async getResumeStatusByMonth(query?: string): Promise<any> {
     try {
-      const queryData = query ? { title: { $regex: query, $options: 'i' } } : {};
+      const queryData = query
+        ? { title: { $regex: query, $options: 'i' } }
+        : {};
       const resumes = await this.resumeModel.aggregate([
         {
           $match: queryData,
