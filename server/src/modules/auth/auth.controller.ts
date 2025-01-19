@@ -40,7 +40,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('/refresh')
+  @Post('/refresh-token')
   async newRefreshToken(
     @Request() req: any,
     @Res({ passthrough: true }) res: Response,

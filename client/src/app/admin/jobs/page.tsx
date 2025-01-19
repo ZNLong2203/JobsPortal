@@ -68,6 +68,11 @@ export default function ManageJobs() {
     setPage(newPage)
   }
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingJob(undefined)
+  }
+
   if (isLoading) {
     return <LoadingSpinner />
   }
@@ -109,10 +114,7 @@ export default function ManageJobs() {
       </CardContent>
       <JobFormModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setEditingJob(undefined)
-        }}
+        onClose={handleCloseModal}
         onSubmit={(job: NewJob) => editingJob ? handleEditJob({ ...job, _id: editingJob._id } as Job) : handleAddJob(job)}
         initialData={editingJob}
       />

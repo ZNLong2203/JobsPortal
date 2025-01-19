@@ -17,6 +17,7 @@ import { Company } from '@/types/company'
 import { useCompanies } from '@/hooks/useCompanies'
 import { HelpCircle, Bold, Italic, List, ListOrdered } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import moment from 'moment'
 
 
 interface JobFormModalProps {
@@ -38,38 +39,51 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
     category: '',
     type: '',
     des: '',
-    startDate: new Date(),
-    endDate: new Date(),
+    startDate: moment().format('YYYY-MM-DD'),
+    endDate: moment().format('YYYY-MM-DD'),
     isActive: true,
   })
 
   const { companies } = useCompanies()
 
+  const resetForm = () => {
+    setJob({
+      name: '',
+      company: '',
+      skills: [],
+      location: '',
+      salary: 0,
+      quantity: 0,
+      level: '',
+      category: '',
+      type: '',
+      des: '',
+      startDate: moment().format('YYYY-MM-DD'),
+      endDate: moment().format('YYYY-MM-DD'),
+      isActive: true,
+    })
+  }
+
   useEffect(() => {
-    if (initialData) {
-      setJob(initialData)
-    } else {
+    if (!isOpen) {
+      resetForm()
+    }
+    if (isOpen && initialData) {
       setJob({
-        name: '',
-        company: '',
-        skills: [],
-        location: '',
-        salary: 0,
-        quantity: 0,
-        level: '',
-        category: '',
-        type: '',
-        des: '',
-        startDate: new Date(),
-        endDate: new Date(),
-        isActive: true,
+        ...initialData,
+        startDate: moment(initialData.startDate).format('YYYY-MM-DD'),
+        endDate: moment(initialData.endDate).format('YYYY-MM-DD'),
       })
     }
-  }, [initialData])
+  }, [isOpen, initialData])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(job)
+    onSubmit({
+      ...job,
+      startDate: moment(job.startDate).format('YYYY-MM-DD'),
+      endDate: moment(job.endDate).format('YYYY-MM-DD'),
+    })
   }
 
   const insertTextAtCursor = (text: string) => {
@@ -237,8 +251,8 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 <Input
                   id="startDate"
                   type="date"
-                  value={job.startDate.toISOString().split('T')[0]}
-                  onChange={(e) => setJob({ ...job, startDate: new Date(e.target.value) })}
+                  value={moment(job.startDate).format('YYYY-MM-DD')}
+                  onChange={(e) => setJob({ ...job, endDate: e.target.value })}
                   required
                 />
               </div>
@@ -247,8 +261,8 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 <Input
                   id="endDate"
                   type="date"
-                  value={job.endDate.toISOString().split('T')[0]}
-                  onChange={(e) => setJob({ ...job, endDate: new Date(e.target.value) })}
+                  value={moment(job.endDate).format('YYYY-MM-DD')}
+                  onChange={(e) => setJob({ ...job, endDate: e.target.value })}
                   required
                 />
               </div>

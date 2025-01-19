@@ -26,7 +26,7 @@ export class GeminiService {
   }
 
   private getChatSession(sessionId?: string) {
-    let sessionIdToUse = sessionId ?? v4();
+    const sessionIdToUse = sessionId ?? v4();
 
     let result = this.chatSessions[sessionIdToUse];
     if (!result) {

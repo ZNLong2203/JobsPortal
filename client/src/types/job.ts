@@ -12,8 +12,8 @@ export interface Job {
   category: string;
   type: string;
   des: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string | Date;
+  endDate: string | Date;
   isActive: boolean;
 }
 

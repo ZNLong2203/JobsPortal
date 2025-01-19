@@ -32,6 +32,7 @@ export function ResumeFormModal({ isOpen, onClose, onSubmit, initialData }: Resu
   })
 
   const { users } = useUsers()
+  const usersList = Array.isArray(users) ? users : users?.users || []
   const { companies } = useCompanies()
   const companiesList = Array.isArray(companies) ? companies : companies?.companies || []
   const { jobs } = useJobs()
@@ -74,7 +75,7 @@ export function ResumeFormModal({ isOpen, onClose, onSubmit, initialData }: Resu
                   <SelectValue placeholder="Select a user" />
                 </SelectTrigger>
                 <SelectContent>
-                  {users.map((user) => (
+                  {usersList.map((user) => (
                     <SelectItem key={user._id} value={user._id}>
                       {user.name}
                     </SelectItem>

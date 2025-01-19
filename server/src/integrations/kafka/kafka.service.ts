@@ -1,6 +1,6 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Kafka, Producer, Consumer } from 'kafkajs';
+import { ConfigService } from '@nestjs/config';
 import { kafkaConfig } from '../../configs/kafka.config';
 
 @Injectable()
@@ -10,9 +10,10 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   private consumer: Consumer;
 
   constructor(private readonly configService: ConfigService) {
-    this.kafka = new Kafka(kafkaConfig(configService));
+    const config = kafkaConfig(this.configService);
+    this.kafka = new Kafka(config);
     this.producer = this.kafka.producer();
-    this.consumer = this.kafka.consumer({ groupId: configService.get('KAFKA_GROUP_ID') });
+    this.consumer = this.kafka.consumer({ groupId: config.groupId });
   }
 
   async onModuleInit() {
@@ -24,13 +25,21 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async connect() {
-    try {
-      await this.producer.connect();
-      await this.consumer.connect();
-      console.log('KafkaService: Connected to Kafka');
-    } catch (error) {
-      console.error('KafkaService: Failed to connect', error);
-      throw error;
+    let attempts = 3;
+    while (attempts > 0) {
+      try {
+        await this.producer.connect();
+        await this.consumer.connect();
+        console.log('KafkaService: Connected to Kafka');
+        break;
+      } catch (error) {
+        attempts--;
+        console.error(
+          `KafkaService: Connection failed. Retries left: ${attempts}`,
+          error,
+        );
+        if (attempts === 0) throw error;
+      }
     }
   }
 
@@ -44,36 +53,15 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async produce(topic: string, message: any) {
-    try {
-      await this.producer.send({
-        topic,
-        messages: [{ value: JSON.stringify(message) }],
-      });
-    } catch (error) {
-      console.error(`KafkaService: Failed to produce message to ${topic}`, error);
-      throw error;
-    }
-  }
-
-  async consume(topic: string, callback: (message: any) => Promise<void>) {
-    try {
-      await this.consumer.subscribe({ topic });
-      await this.consumer.run({
-        eachMessage: async ({ message }) => {
-          const value = message.value?.toString();
-          if (value) {
-            await callback(JSON.parse(value));
-          }
-        },
-      });
-    } catch (error) {
-      console.error(`KafkaService: Failed to consume from ${topic}`, error);
-      throw error;
-    }
-  }
-
   getKafka() {
     return this.kafka;
+  }
+
+  getProducer() {
+    return this.producer;
+  }
+
+  getConsumerGroupId() {
+    return kafkaConfig(this.configService).groupId;
   }
 }
