@@ -16,7 +16,9 @@ import { Types } from 'mongoose';
 import { User } from 'src/decorators/user.decorator';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { ResumesService } from '../resumes/resumes.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(

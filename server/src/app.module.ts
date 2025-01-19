@@ -15,6 +15,7 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
 // import { RedisModule } from './integrations/redis/redis.module';
 import { GeminiModule } from './integrations/gemini/gemini.module';
 // import { KafkaModule } from './integrations/kafka/kafka.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 import * as mongooseDelete from 'mongoose-delete';
 
 @Module({
@@ -23,6 +24,10 @@ import * as mongooseDelete from 'mongoose-delete';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 10,
+    }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

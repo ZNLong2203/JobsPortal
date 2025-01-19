@@ -12,7 +12,9 @@ import { Message } from 'src/common/message';
 import { Roles } from 'src/decorators/role.decorator';
 import { User } from 'src/decorators/user.decorator';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('statistics')
 @Controller('statistics')
 export class StatisticsController {
   constructor(private readonly statisticsService: StatisticsService) {}

@@ -12,6 +12,16 @@ export const getAllJob = async (page: number = 1, limit: number = 10): Promise<{
   return res.data.data
 }
 
+export const getJobsByCompany = async (company: string, page: number = 1, limit: number = 10): Promise<{
+  jobs: Job[],
+  metadata: PageData
+}> => {
+  const res = await axiosInstance.get(`/jobs`, {
+    params: { company, page, limit }
+  })
+  return res.data.data;
+}
+
 export const getJobById = async (_id : string): Promise<Job> => {
   const res = await axiosInstance.get(`/jobs/${_id}`);
   return res.data.data;

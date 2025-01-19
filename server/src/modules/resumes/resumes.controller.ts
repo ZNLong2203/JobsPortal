@@ -15,7 +15,9 @@ import { Types } from 'mongoose';
 import { User } from 'src/decorators/user.decorator';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { Message } from 'src/common/message';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('resumes')
 @Controller('resumes')
 export class ResumesController {
   constructor(private readonly resumesService: ResumesService) {}

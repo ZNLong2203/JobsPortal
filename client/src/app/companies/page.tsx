@@ -1,30 +1,32 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchIcon, Briefcase, Users, MapPin } from 'lucide-react'
-
-// Mock data for companies
-const companies = [
-  { id: 1, name: "TechCorp", logo: "/placeholder.svg?height=100&width=100", industry: "Technology", employees: "1000-5000", location: "San Francisco, CA" },
-  { id: 2, name: "FinanceHub", logo: "/placeholder.svg?height=100&width=100", industry: "Finance", employees: "500-1000", location: "New York, NY" },
-  { id: 3, name: "GreenEnergy", logo: "/placeholder.svg?height=100&width=100", industry: "Energy", employees: "100-500", location: "Austin, TX" },
-  { id: 4, name: "HealthPlus", logo: "/placeholder.svg?height=100&width=100", industry: "Healthcare", employees: "5000+", location: "Boston, MA" },
-  { id: 5, name: "EduTech", logo: "/placeholder.svg?height=100&width=100", industry: "Education", employees: "100-500", location: "Seattle, WA" },
-  { id: 6, name: "RetailGiant", logo: "/placeholder.svg?height=100&width=100", industry: "Retail", employees: "10000+", location: "Chicago, IL" },
-]
+import { useCompanies } from '@/hooks/useCompanies'
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { ErrorMessage } from '@/components/common/IsError'
+import { Pagination } from "@/components/common/Pagination"
 
 export default function CompaniesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [industryFilter, setIndustryFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const { companies: companiesData, isLoading, isError, error } = useCompanies(page)
+  const companiesList = Array.isArray(companiesData) ? companiesData : companiesData?.companies ?? []
+  const metadata = Array.isArray(companiesData) ? null : companiesData?.metadata ?? null
 
-  const filteredCompanies = companies.filter(company => 
+  const filteredCompanies = companiesList?.filter(company => 
     company.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (industryFilter === 'all' || company.industry === industryFilter)
-  )
+  ) || []
+
+  if (isLoading) return <LoadingSpinner />
+  if (isError) return <ErrorMessage message={error?.message || 'An error occurred'} />
 
   return (
     <div className="container mx-auto py-8">
@@ -47,7 +49,6 @@ export default function CompaniesPage() {
             <SelectItem value="all">All Industries</SelectItem>
             <SelectItem value="Technology">Technology</SelectItem>
             <SelectItem value="Finance">Finance</SelectItem>
-            <SelectItem value="Energy">Energy</SelectItem>
             <SelectItem value="Healthcare">Healthcare</SelectItem>
             <SelectItem value="Education">Education</SelectItem>
             <SelectItem value="Retail">Retail</SelectItem>
@@ -60,9 +61,9 @@ export default function CompaniesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCompanies.map(company => (
-          <Card key={company.id} className="flex flex-col">
+          <Card key={company._id}>
             <CardHeader className="flex flex-row items-center gap-4">
-              <img src={company.logo} alt={`${company.name} logo`} className="w-16 h-16 object-contain" />
+              <img src={company.logo || "/placeholder.svg"} alt={`${company.name} logo`} className="w-16 h-16 object-contain" />
               <CardTitle>{company.name}</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow">
@@ -76,15 +77,27 @@ export default function CompaniesPage() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <MapPin className="h-4 w-4" />
-                <span>{company.location}</span>
+                <span>{company.address}</span>
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full">View Company</Button>
+              <Button variant="outline" className="w-full" asChild>
+                <Link href={`/companies/${company._id}`}>View Company</Link>
+              </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
+
+      {metadata && (
+        <div className="mt-8 flex justify-center">
+          <Pagination
+            currentPage={metadata?.page}
+            totalPages={metadata?.totalPages}
+            onPageChange={setPage}
+          />
+        </div>
+      )}
     </div>
   )
 }

@@ -16,7 +16,9 @@ import { Types } from 'mongoose';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { User } from 'src/decorators/user.decorator';
 import { Public } from 'src/decorators/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('jobs')
 @Controller('jobs')
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}

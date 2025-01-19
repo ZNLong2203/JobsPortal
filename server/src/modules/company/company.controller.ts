@@ -16,7 +16,9 @@ import { User } from 'src/decorators/user.decorator';
 import { Message } from 'src/common/message';
 import { Types } from 'mongoose';
 import { Public } from 'src/decorators/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('company')
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}

@@ -32,7 +32,7 @@ export class JobsService {
     try {
       const skip = (page - 1) * limit;
       const [jobs, totalDocuments] = await Promise.all([
-        this.jobModel.find(query).skip(skip).limit(limit).populate('company'),
+        this.jobModel.find(query).skip(skip).limit(limit).populate('company').sort({ createdAt: -1 }),
         this.jobModel.countDocuments(query),
       ]);
 

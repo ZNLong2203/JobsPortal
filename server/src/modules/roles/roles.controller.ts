@@ -16,7 +16,9 @@ import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { User } from 'src/decorators/user.decorator';
 import { Message } from 'src/common/message';
 import { Roles } from 'src/decorators/role.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('roles')
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
