@@ -15,6 +15,7 @@ export interface Job {
   startDate: string | Date;
   endDate: string | Date;
   isActive: boolean;
+  createdAt?: string | Date;
 }
 
 export interface NewJob extends Omit<Job, '_id' | 'createdBy' | 'createdAt' | 'updatedAt'> {

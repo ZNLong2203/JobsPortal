@@ -42,7 +42,7 @@ export function useJobs(page: number = 1, limit: number = 10) {
   }
 }
 
-export function useJob(_id: string) {
+export function useJobDetails(_id: string) {
   return useQuery({
     queryKey: ['job', _id],
     queryFn: () => getJobById(_id),

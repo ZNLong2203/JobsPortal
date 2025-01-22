@@ -7,30 +7,19 @@ import { Briefcase, Users, MapPin, DollarSign } from 'lucide-react'
 import { useCompanyDetailsAndJobs } from '@/hooks/useCompanyDetailsAndJobs'
 import { LoadingSpinner } from '@/components/common/IsLoading'
 import { ErrorMessage } from '@/components/common/IsError'
-import { useState, useEffect } from 'react'
-import { Job } from '@/types/job'
-// import { Company } from '@/types/company'
 
 export default function CompanyDetailsPage() {
   const params = useParams()
   const companyId = params.id as string
   const { data, isLoading, isError, error } = useCompanyDetailsAndJobs(companyId)
-  const [jobs, setJobs] = useState<Job[]>([])
-
-  useEffect(() => {
-    if (data?.jobs) {
-      setJobs(data.jobs)
-    }
-  }, [data])
 
   if (isLoading) return <LoadingSpinner />
   if (isError) return <ErrorMessage message={error?.message || 'An error occurred'} />
 
   const { company } = data
+  const jobsList = Array.isArray(data.jobs) ? data.jobs : []
 
   if (!company) return <ErrorMessage message="Company not found" />
-
-  const jobsList = Array.isArray(jobs) ? jobs : []
 
   return (
     <div className="container mx-auto py-8">
