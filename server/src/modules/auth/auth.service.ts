@@ -134,4 +134,26 @@ export class AuthService {
       throw new UnauthorizedException(error.message);
     }
   }
+
+  async googleLogin(user: any, res: Response): Promise<any> {
+    try {
+      const { email, name, photo } = user;
+      const checkUser = await this.usersService.findUserByEmailForCheckExist(email);
+      if (!checkUser) {
+        const createUser: CreateUserDto = {
+          email,
+          name,
+          password: '',
+          avatar: photo,
+        };
+        await this.usersService.createUser(createUser);
+      }
+      
+      const existingUser = await this.usersService.findUserByEmail(email);
+      const loginData = await this.login(existingUser, res);
+      return loginData;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 }

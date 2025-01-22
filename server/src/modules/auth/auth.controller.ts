@@ -5,6 +5,7 @@ import {
   Body,
   Request,
   Res,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -13,6 +14,7 @@ import { Public } from '../../decorators/public.decorator';
 import { Message } from 'src/common/message';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -62,6 +64,42 @@ export class AuthController {
 
     return {
       message: Message.LOGOUT_SUCCESS,
+    };
+  }
+  
+  // Google login
+  @Public()
+  @Get('/google')
+  @UseGuards(AuthGuard('google'))
+  async googleLogin() {}
+
+  @Public()
+  @Get('/google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleLoginCallback(@Request() req: any, @Res({ passthrough: true }) res: Response) {
+    const loginUser = await this.authService.googleLogin(req.user, res);
+
+    return {
+      message: Message.LOGIN_SUCCESS,
+      data: loginUser,
+    };
+  }
+
+  // Facebook login
+  @Public()
+  @Get('facebook')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLogin() {}
+
+  @Public()
+  @Get('facebook/callback')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookLoginCallback(@Request() req: any, @Res({ passthrough: true }) res: Response) {
+    const loginUser = req.user;
+
+    return {
+      message: Message.LOGIN_SUCCESS,
+      data: loginUser,
     };
   }
 }

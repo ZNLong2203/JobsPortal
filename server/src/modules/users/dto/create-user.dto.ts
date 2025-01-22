@@ -13,8 +13,11 @@ export class CreateUserDto {
   name: string;
 
   @IsOptional()
-  role: string;
+  avatar?: string;
 
   @IsOptional()
-  address: string;
+  role?: string;
+
+  @IsOptional()
+  address?: string;
 }
