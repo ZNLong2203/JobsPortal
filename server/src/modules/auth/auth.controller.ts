@@ -66,7 +66,7 @@ export class AuthController {
       message: Message.LOGOUT_SUCCESS,
     };
   }
-  
+
   // Google login
   @Public()
   @Get('/google')
@@ -76,7 +76,10 @@ export class AuthController {
   @Public()
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleLoginCallback(@Request() req: any, @Res({ passthrough: true }) res: Response) {
+  async googleLoginCallback(
+    @Request() req: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const loginUser = await this.authService.googleLogin(req.user, res);
 
     return {
@@ -85,17 +88,20 @@ export class AuthController {
     };
   }
 
-  // Facebook login
+  // Github login
   @Public()
-  @Get('facebook')
-  @UseGuards(AuthGuard('facebook'))
-  async facebookLogin() {}
+  @Get('github')
+  @UseGuards(AuthGuard('github'))
+  async githubLogin() {}
 
   @Public()
-  @Get('facebook/callback')
-  @UseGuards(AuthGuard('facebook'))
-  async facebookLoginCallback(@Request() req: any, @Res({ passthrough: true }) res: Response) {
-    const loginUser = req.user;
+  @Get('github/callback')
+  @UseGuards(AuthGuard('github'))
+  async githubLoginCallback(
+    @Request() req: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const loginUser = await this.authService.githubLogin(req.user, res);
 
     return {
       message: Message.LOGIN_SUCCESS,

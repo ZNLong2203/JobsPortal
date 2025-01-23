@@ -138,17 +138,44 @@ export class AuthService {
   async googleLogin(user: any, res: Response): Promise<any> {
     try {
       const { email, name, photo } = user;
-      const checkUser = await this.usersService.findUserByEmailForCheckExist(email);
+      const checkUser =
+        await this.usersService.findUserByEmailForCheckExist(email);
       if (!checkUser) {
         const createUser: CreateUserDto = {
           email,
           name,
           password: '',
           avatar: photo,
+          loginProvider: 'google',
         };
         await this.usersService.createUser(createUser);
       }
-      
+
+      const existingUser = await this.usersService.findUserByEmail(email);
+      const loginData = await this.login(existingUser, res);
+      return loginData;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async githubLogin(user: any, res: Response): Promise<any> {
+    try {
+      const { displayName, emails, avatar } = user;
+      const email = emails[0].value;
+      const checkUser =
+        await this.usersService.findUserByEmailForCheckExist(email);
+      if (!checkUser) {
+        const createUser: CreateUserDto = {
+          email,
+          name: displayName,
+          password: '',
+          avatar,
+          loginProvider: 'github',
+        };
+        await this.usersService.createUser(createUser);
+      }
+
       const existingUser = await this.usersService.findUserByEmail(email);
       const loginData = await this.login(existingUser, res);
       return loginData;

@@ -20,4 +20,7 @@ export class CreateUserDto {
 
   @IsOptional()
   address?: string;
+
+  @IsOptional()
+  loginProvider?: string;
 }

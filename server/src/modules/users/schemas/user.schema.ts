@@ -41,6 +41,9 @@ export class User {
   @Prop()
   address: string;
 
+  @Prop({ default: 'local' })
+  loginProvider: string;
+
   @Prop({ type: Types.ObjectId })
   createdBy: Types.ObjectId;
 
