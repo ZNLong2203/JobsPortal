@@ -15,11 +15,12 @@ import { Message } from 'src/common/message';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private configService: ConfigService) {}
 
   @Public()
   @Post('/register')
@@ -78,14 +79,15 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleLoginCallback(
     @Request() req: any,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
-    const loginUser = await this.authService.googleLogin(req.user, res);
-
-    return {
-      message: Message.LOGIN_SUCCESS,
-      data: loginUser,
-    };
+    try {
+      const loginUser = await this.authService.googleLogin(req.user, res);
+      const encodedData = encodeURIComponent(JSON.stringify(loginUser));
+      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/callback?provider=google&data=${encodedData}`);
+    } catch (error) {
+      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/login?error=${encodeURIComponent(error.message)}`);
+    }
   }
 
   // Github login
@@ -99,13 +101,14 @@ export class AuthController {
   @UseGuards(AuthGuard('github'))
   async githubLoginCallback(
     @Request() req: any,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
-    const loginUser = await this.authService.githubLogin(req.user, res);
-
-    return {
-      message: Message.LOGIN_SUCCESS,
-      data: loginUser,
-    };
+    try {
+      const loginUser = await this.authService.githubLogin(req.user, res);
+      const encodedData = encodeURIComponent(JSON.stringify(loginUser));
+      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/callback?provider=github&data=${encodedData}`);
+    } catch (error) {
+      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/login?error=${encodeURIComponent(error.message)}`);
+    }
   }
 }
