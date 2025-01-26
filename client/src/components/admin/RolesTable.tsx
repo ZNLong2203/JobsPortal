@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { PencilIcon, TrashIcon } from 'lucide-react'
 import { Role } from '@/types/role'
 import { Badge } from "@/components/ui/badge"
+import { Permission } from "@/types/permission"
 
 interface RolesTableProps {
   roles: Role[];
@@ -32,7 +33,13 @@ export function RolesTable({ roles, onEdit, onDelete }: RolesTableProps) {
                 {role.isActive ? "Active" : "Inactive"}
               </Badge>
             </TableCell>
-            <TableCell>{role.permissions.length} permissions</TableCell>
+            <TableCell>
+              {(role.permissions as Permission[]).map((permission) => (
+                <Badge key={permission._id} variant="outline" className="mr-1">
+                  {permission.name}
+                </Badge>
+              ))}
+            </TableCell>
             <TableCell>
               <Button variant="outline" size="sm" className="mr-2" onClick={() => onEdit(role)}>
                 <PencilIcon className="h-4 w-4 mr-1" />
@@ -49,4 +56,3 @@ export function RolesTable({ roles, onEdit, onDelete }: RolesTableProps) {
     </Table>
   )
 }
-

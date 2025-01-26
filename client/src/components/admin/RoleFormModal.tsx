@@ -1,28 +1,22 @@
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { Role, NewRole } from '@/types/role'
-import { usePermissions } from '@/hooks/usePermissions'
-import { MultiSelect } from "@/components/ui/multi-select"
-import { Permission } from '@/types/permission'
-import { LoadingSpinner } from '@/components/common/IsLoading'
+import { useEffect, useState } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button'
 import { ErrorMessage } from '@/components/common/IsError'
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { MultiSelect } from '@/components/ui/multi-select' 
+import { usePermissions } from '@/hooks/usePermissions'
+import { NewRole, Role } from '@/types/role'
+import { Permission } from '@/types/permission'
 
 interface RoleFormModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (role: NewRole) => void;
-  initialData?: Role;
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (role: NewRole) => void
+  initialData?: Role
 }
 
 export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFormModalProps) {
@@ -30,20 +24,18 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
     name: '',
     des: '',
     isActive: true,
-    permissions: [],
+    permissions: [] as string[],
   })
 
   const { permissions, isLoading, isError, error } = usePermissions()
 
   useEffect(() => {
-    if (initialData) {
-      setRole(initialData)
-    } else {
+    if (initialData?.permissions && Array.isArray(initialData.permissions)) {
       setRole({
-        name: '',
-        des: '',
-        isActive: true,
-        permissions: [],
+        ...initialData,
+        permissions: initialData.permissions.map((p) =>
+          typeof p === 'string' ? p : p._id || ''
+        ),
       })
     }
   }, [initialData])
@@ -53,12 +45,11 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
     onSubmit(role)
   }
 
-  const permissionOptions = Array.isArray(permissions)
-    ? permissions.map((p: Permission) => ({ 
-        label: p.name, 
-        value: p._id || '' 
-      }))
-    : []
+  const permissionArray = Array.isArray(permissions) ? permissions : [] as Permission[]
+  const permissionOptions = permissionArray.map((permission: Permission) => ({
+    label: permission.name,
+    value: permission._id || '',
+  }))
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -66,6 +57,7 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
         <DialogHeader>
           <DialogTitle>{initialData ? 'Edit Role' : 'Add New Role'}</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
@@ -77,6 +69,7 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
                 required
               />
             </div>
+
             <div>
               <Label htmlFor="des">Description</Label>
               <Textarea
@@ -86,6 +79,7 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
                 required
               />
             </div>
+
             <div className="flex items-center space-x-2">
               <Switch
                 id="isActive"
@@ -94,33 +88,32 @@ export function RoleFormModal({ isOpen, onClose, onSubmit, initialData }: RoleFo
               />
               <Label htmlFor="isActive">Active</Label>
             </div>
+
             <div>
               <Label htmlFor="permissions">Permissions</Label>
               {isLoading ? (
                 <LoadingSpinner />
               ) : isError ? (
-                <ErrorMessage message={error instanceof Error ? error.message : 'Failed to load permissions'} />
+                <ErrorMessage message={error?.message || 'Failed to load permissions'} />
               ) : (
                 <MultiSelect
                   options={permissionOptions}
-                  selected={role.permissions}
+                  selected={role.permissions.map(p => typeof p === 'string' ? p : p._id || '')}
                   onChange={(selected) => setRole({ ...role, permissions: selected })}
                   placeholder="Select permissions"
                 />
               )}
             </div>
           </div>
-          <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={onClose}>
+
+          <div className="mt-6 flex justify-end space-x-2">
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || isError}>
-              {initialData ? 'Update' : 'Add'} Role
-            </Button>
-          </DialogFooter>
+            <Button type="submit">Save</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
   )
 }
-

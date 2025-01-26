@@ -1,9 +1,11 @@
+import { Permission } from "./permission";
+
 export interface Role {
   _id?: string;
   name: string;
   des: string;
   isActive: boolean;
-  permissions: string[];
+  permissions: string[] | Permission[];
 }
 
 export interface NewRole extends Omit<Role, '_id'> {
