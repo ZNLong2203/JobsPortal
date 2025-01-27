@@ -71,9 +71,10 @@ export class JobsController {
     @Param('id') id: Types.ObjectId,
     @Body() updateJobDto: UpdateJobDto,
   ) {
-    await this.jobsService.updateJob(id, updateJobDto);
+    const updatedJob = await this.jobsService.updateJob(id, updateJobDto);
     return {
       message: Message.JOB_UPDATED,
+      data: updatedJob,
     };
   }
 

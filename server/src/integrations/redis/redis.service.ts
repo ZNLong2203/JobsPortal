@@ -9,16 +9,21 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly configService: ConfigService) {}
 
-  getClient(): Redis {
-    return this.redis;
-  }
-
   async onModuleInit() {
     this.redis = createRedisClient(this.configService);
   }
 
   async onModuleDestroy() {
     await this.redis.quit();
+  }
+
+  async getCacheVersion(key: string): Promise<number> {
+    const version = await this.redis.get(key);
+    return version ? parseInt(version, 10) : 1;
+  }
+
+  async incrementCacheVersion(key: string): Promise<number> {
+    return this.redis.incr(key);
   }
 
   async get(key: string): Promise<string | null> {

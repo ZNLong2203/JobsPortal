@@ -10,10 +10,30 @@ import { Job, JobDocument } from './schemas/job.schema';
 import { Model, Types } from 'mongoose';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { Message } from 'src/common/message';
+import { RedisService } from 'src/integrations/redis/redis.service';
 
 @Injectable()
 export class JobsService {
-  constructor(@InjectModel(Job.name) private jobModel: Model<JobDocument>) {}
+  private readonly cacheVersionKey = 'job:version';
+  private readonly jobCachePrefix = 'job:';
+  private readonly allJobsCacheKey = 'job:all';
+
+  constructor(
+    private readonly redisService: RedisService,
+    @InjectModel(Job.name) private jobModel: Model<JobDocument>,
+  ) {}
+
+  private getCacheKey(id: Types.ObjectId): string {
+    return `${this.jobCachePrefix}${id}`;
+  }
+
+  async getCacheVersion(): Promise<number> {
+    return this.redisService.getCacheVersion(this.cacheVersionKey);
+  }
+
+  async incrementCacheVersion(): Promise<void> {
+    await this.redisService.incrementCacheVersion(this.cacheVersionKey);
+  }
 
   async createJob(createJobDto: CreateJobDto, user: IReqUser): Promise<Job> {
     try {
@@ -21,6 +41,8 @@ export class JobsService {
         ...createJobDto,
         createdBy: user._id,
       });
+
+      await this.incrementCacheVersion();
 
       return newJob;
     } catch (error) {
@@ -30,28 +52,43 @@ export class JobsService {
 
   async findAllJob(page: number, limit: number, query: any): Promise<any> {
     try {
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.allJobsCacheKey}:${page}:${limit}:${cacheVersion}`;
+
+      const cacheData = await this.redisService.get(cacheKey);
+      if (cacheData) {
+        return JSON.parse(cacheData);
+      }
+
       const skip = (page - 1) * limit;
-      const [jobs, totalDocuments] = await Promise.all([
+      const [jobs, total] = await Promise.all([
         this.jobModel
           .find(query)
           .skip(skip)
           .limit(limit)
           .populate('company')
-          .sort({ createdAt: -1 }),
+          .sort({ createdAt: -1 })
+          .lean(),
         this.jobModel.countDocuments(query),
       ]);
 
-      const totalPages = Math.ceil(totalDocuments / limit);
-
-      return {
+      const result = {
         jobs,
         metadata: {
-          total: totalDocuments,
+          total,
           page,
-          totalPages,
           limit,
+          totalPages: Math.ceil(total / limit),
         },
       };
+
+      await this.redisService.set(
+        cacheKey, 
+        JSON.stringify(result),
+        60 * 60 * 24,
+      );
+
+      return result;
     } catch (error) {
       throw new NotFoundException(error.message);
     }
@@ -59,8 +96,22 @@ export class JobsService {
 
   async findOneJob(id: Types.ObjectId): Promise<Job> {
     try {
-      const job = await this.jobModel.findById(id).populate('company');
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.getCacheKey(id)}:${cacheVersion}`;
+
+      const cachedJob = await this.redisService.get(cacheKey);
+      if (cachedJob) {
+        return JSON.parse(cachedJob);
+      }
+
+      const job = await this.jobModel.findById(id).populate('company').lean();
       if (!job) throw new BadRequestException(Message.JOB_NOT_FOUND);
+
+      await this.redisService.set(
+        cacheKey, 
+        JSON.stringify(job),
+        60 * 60 * 24,
+      );
 
       return job;
     } catch (error) {
@@ -148,21 +199,15 @@ export class JobsService {
   async updateJob(
     id: Types.ObjectId,
     updateJobDto: UpdateJobDto,
-  ): Promise<void> {
+  ): Promise<Job> {
     try {
-      await this.jobModel.findByIdAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          ...updateJobDto,
-        },
-        {
-          new: true,
-        },
-      );
+      const updatedJob = await this.jobModel
+        .findByIdAndUpdate(id, updateJobDto, { new: true })
+        .lean();
 
-      return;
+      await this.incrementCacheVersion();
+
+      return updatedJob;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -177,6 +222,8 @@ export class JobsService {
       }
 
       await this.jobModel.findByIdAndDelete(id);
+
+      await this.incrementCacheVersion();
 
       return;
     } catch (error) {

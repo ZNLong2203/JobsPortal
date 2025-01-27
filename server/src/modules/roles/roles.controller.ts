@@ -77,9 +77,10 @@ export class RolesController {
     @Param('id') id: Types.ObjectId,
     @Body() updateRoleDto: UpdateRoleDto,
   ) {
-    await this.rolesService.updateRole(id, updateRoleDto);
+    const updatedRole = await this.rolesService.updateRole(id, updateRoleDto);
     return {
       message: Message.ROLE_UPDATED,
+      data: updatedRole,
     };
   }
 

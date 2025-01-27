@@ -9,12 +9,30 @@ import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Resume, ResumeDocument } from './schemas/resume.schema';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
+import { RedisService } from 'src/integrations/redis/redis.service';
 
 @Injectable()
 export class ResumesService {
+  private readonly cacheVersionKey = 'resume:version';
+  private readonly resumeCachePrefix = 'resume:';
+  private readonly allResumesCacheKey = 'resume:all';
+
   constructor(
+    private readonly redisService: RedisService,
     @InjectModel(Resume.name) private resumeModel: Model<ResumeDocument>,
   ) {}
+
+  private getCacheKey(id: Types.ObjectId): string {
+    return `${this.resumeCachePrefix}${id}`;
+  }
+
+  private async getCacheVersion(): Promise<number> {
+    return this.redisService.getCacheVersion(this.cacheVersionKey);
+  }
+
+  private async incrementCacheVersion(): Promise<void> {
+    await this.redisService.incrementCacheVersion(this.cacheVersionKey);
+  }
 
   async createResume(
     createResumeDto: CreateResumeDto,
@@ -26,6 +44,8 @@ export class ResumesService {
         createdBy: user._id,
       });
 
+      await this.incrementCacheVersion();
+
       return newResume;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -34,8 +54,16 @@ export class ResumesService {
 
   async findAllResume(page: number, limit: number, query: any): Promise<any> {
     try {
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.allResumesCacheKey}:${page}:${limit}:${cacheVersion}`;
+
+      const cacheData = await this.redisService.get(cacheKey);
+      if (cacheData) {
+        return JSON.parse(cacheData);
+      }
+
       const skip = (page - 1) * limit;
-      const [resumes, totalDocuments] = await Promise.all([
+      const [resumes, total] = await Promise.all([
         this.resumeModel
           .find(query)
           .skip(skip)
@@ -43,7 +71,8 @@ export class ResumesService {
           .populate('user', '-password')
           .populate('company')
           .populate('job')
-          .sort({ createdAt: -1 }),
+          .sort({ createdAt: -1 })
+          .lean(),
         this.resumeModel
           .countDocuments(query)
           .populate('user', '-password')
@@ -51,17 +80,23 @@ export class ResumesService {
           .populate('job'),
       ]);
 
-      const totalPages = Math.ceil(totalDocuments / limit);
-
-      return {
+      const result = {
         resumes,
         metadata: {
-          total: totalDocuments,
+          total,
           page,
-          totalPages,
           limit,
+          totalPages: Math.ceil(total / limit),
         },
       };
+
+      await this.redisService.set(
+        cacheKey,
+        JSON.stringify(result),
+        60 * 60 * 24,
+      )
+
+      return result;
     } catch (error) {
       throw new NotFoundException(error.message);
     }
@@ -73,8 +108,16 @@ export class ResumesService {
     user: IReqUser,
   ): Promise<any> {
     try {
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.allResumesCacheKey}:${user._id}:${page}:${limit}:${cacheVersion}`;
+
+      const cacheData = await this.redisService.get(cacheKey);
+      if (cacheData) {
+        return JSON.parse(cacheData);
+      }
+
       const skip = (page - 1) * limit;
-      const [resumes, totalDocuments] = await Promise.all([
+      const [resumes, total] = await Promise.all([
         this.resumeModel
           .find({
             createdBy: user._id,
@@ -83,7 +126,9 @@ export class ResumesService {
           .limit(limit)
           .populate('user', '-password')
           .populate('company')
-          .populate('job'),
+          .populate('job')
+          .sort({ createdAt: -1 })
+          .lean(),
         this.resumeModel
           .countDocuments({
             createdBy: user._id,
@@ -93,17 +138,23 @@ export class ResumesService {
           .populate('job'),
       ]);
 
-      const totalPages = Math.ceil(totalDocuments / limit);
-
-      return {
+      const result = {
         resumes,
         metadata: {
-          total: totalDocuments,
+          total,
           page,
-          totalPages,
           limit,
+          totalPages: Math.ceil(total / limit),
         },
       };
+
+      await this.redisService.set(
+        cacheKey,
+        JSON.stringify(result),
+        60 * 60 * 24,
+      );
+
+      return result;
     } catch (error) {
       throw new NotFoundException(error.message);
     }
@@ -111,12 +162,27 @@ export class ResumesService {
 
   async findOneResume(id: Types.ObjectId): Promise<Resume> {
     try {
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.getCacheKey(id)}:${cacheVersion}`;
+
+      const cachedResume = await this.redisService.get(cacheKey);
+      if (cachedResume) {
+        return JSON.parse(cachedResume);
+      }
+
       const resume = await this.resumeModel
         .findById(id)
         .populate('user', '-password')
         .populate('company')
-        .populate('job');
+        .populate('job')
+        .lean();
       if (!resume) throw new NotFoundException('Resume not found');
+
+      await this.redisService.set(
+        cacheKey,
+        JSON.stringify(resume),
+        60 * 60 * 24,
+      );
 
       return resume;
     } catch (error) {
@@ -171,23 +237,17 @@ export class ResumesService {
   async updateResume(
     id: Types.ObjectId,
     updateResumeDto: UpdateResumeDto,
-  ): Promise<void> {
+  ): Promise<Resume> {
     try {
-      const updatedResume = await this.resumeModel.findByIdAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          $set: updateResumeDto,
-        },
-        {
-          new: true,
-        },
-      );
+      const updatedResume = await this.resumeModel
+        .findByIdAndUpdate(id, updateResumeDto, { new: true })
+        .lean();
 
       if (!updatedResume) throw new NotFoundException('Resume not found');
 
-      return;
+      await this.incrementCacheVersion();
+
+      return updatedResume;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -216,6 +276,8 @@ export class ResumesService {
 
       if (!updatedResume) throw new NotFoundException('Resume not found');
 
+      await this.incrementCacheVersion();
+
       return;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -232,6 +294,8 @@ export class ResumesService {
       }
 
       await this.resumeModel.findByIdAndDelete(id);
+
+      await this.incrementCacheVersion();
 
       return;
     } catch (error) {

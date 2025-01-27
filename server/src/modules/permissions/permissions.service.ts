@@ -10,13 +10,30 @@ import { Permission, PermissionDocument } from './schemas/permission.schema';
 import { Model, Types } from 'mongoose';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { Message } from 'src/common/message';
+import { RedisService } from 'src/integrations/redis/redis.service';
 
 @Injectable()
 export class PermissionsService {
+  private readonly cacheVersionKey = 'permission:version';
+  private readonly permissionCachePrefix = 'permission:';
+  private readonly allPermissionsCacheKey = 'permission:all';
+
   constructor(
-    @InjectModel(Permission.name)
-    private permissionModel: Model<PermissionDocument>,
+    private readonly redisService: RedisService,
+    @InjectModel(Permission.name) private permissionModel: Model<PermissionDocument>,
   ) {}
+
+  private getCacheKey(id: Types.ObjectId): string {
+    return `${this.permissionCachePrefix}${id}`;
+  }
+
+  private async getCacheVersion(): Promise<number> {
+    return this.redisService.getCacheVersion(this.cacheVersionKey);
+  }
+
+  private async incrementCacheVersion(): Promise<void> {
+    await this.redisService.incrementCacheVersion(this.cacheVersionKey);
+  }
 
   async createPermission(
     createPermissionDto: CreatePermissionDto,
@@ -37,6 +54,8 @@ export class PermissionsService {
         createdBy: user._id,
       });
 
+      await this.incrementCacheVersion();
+
       return newPermission;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -49,23 +68,37 @@ export class PermissionsService {
     query: any,
   ): Promise<any> {
     try {
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.allPermissionsCacheKey}:${page}:${limit}:${cacheVersion}`;
+
+      const cachedData = await this.redisService.get(cacheKey);
+      if (cachedData) {
+        return JSON.parse(cachedData);
+      }
+
       const skip = (page - 1) * limit;
-      const [permissions, totalDocuments] = await Promise.all([
-        this.permissionModel.find(query).skip(skip).limit(limit),
+      const [permissions, total] = await Promise.all([
+        this.permissionModel.find(query).skip(skip).limit(limit).lean(),
         this.permissionModel.countDocuments(query),
       ]);
 
-      const totalPages = Math.ceil(totalDocuments / limit);
-
-      return {
+      const result = {
         permissions,
         metadata: {
-          total: totalDocuments,
+          total,
           page,
-          totalPages,
           limit,
+          totalPages: Math.ceil(total / limit),
         },
       };
+
+      await this.redisService.set(
+        cacheKey, 
+        JSON.stringify(result),
+        60 * 60 * 24,
+      );
+
+      return result;
     } catch (error) {
       throw new NotFoundException(error.message);
     }
@@ -73,11 +106,25 @@ export class PermissionsService {
 
   async findOnePermission(id: Types.ObjectId): Promise<Permission> {
     try {
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.getCacheKey(id)}:${cacheVersion}`;
+
+      const cachedPermission = await this.redisService.get(cacheKey);
+      if (cachedPermission) {
+        return JSON.parse(cachedPermission);
+      }
+
       const permission = await this.permissionModel.findById(id);
 
       if (!permission) {
         throw new BadRequestException(Message.PERMISSION_NOT_FOUND);
       }
+
+      await this.redisService.set(
+        cacheKey, 
+        JSON.stringify(permission),
+        60 * 60 * 24,
+      );
 
       return permission;
     } catch (error) {
@@ -88,21 +135,15 @@ export class PermissionsService {
   async updatePermission(
     id: Types.ObjectId,
     updatePermissionDto: UpdatePermissionDto,
-  ): Promise<void> {
+  ): Promise<Permission> {
     try {
-      await this.permissionModel.findByIdAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          ...updatePermissionDto,
-        },
-        {
-          new: true,
-        },
-      );
+      const updatedPermission = await this.permissionModel
+        .findByIdAndUpdate(id, updatePermissionDto, { new: true })
+        .lean();
+      
+      await this.incrementCacheVersion();
 
-      return;
+      return updatedPermission;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -111,6 +152,9 @@ export class PermissionsService {
   async removePermission(id: Types.ObjectId): Promise<void> {
     try {
       await this.permissionModel.findByIdAndDelete(id);
+
+      await this.incrementCacheVersion();
+
       return;
     } catch (error) {
       throw new BadRequestException(error.message);

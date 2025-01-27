@@ -100,7 +100,7 @@ export class UsersController {
 
   @Delete('/:id')
   async deleteUser(@Param('id') id: Types.ObjectId) {
-    await this.usersService.deleteUser(id);
+    await this.usersService.removeUser(id);
     return {
       message: Message.USER_DELETED,
     };

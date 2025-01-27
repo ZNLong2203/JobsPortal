@@ -20,7 +20,10 @@ import { ConfigService } from '@nestjs/config';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService, private configService: ConfigService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Public()
   @Post('/register')
@@ -77,16 +80,17 @@ export class AuthController {
   @Public()
   @Get('/google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleLoginCallback(
-    @Request() req: any,
-    @Res() res: Response,
-  ) {
+  async googleLoginCallback(@Request() req: any, @Res() res: Response) {
     try {
       const loginUser = await this.authService.googleLogin(req.user, res);
       const encodedData = encodeURIComponent(JSON.stringify(loginUser));
-      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/callback?provider=google&data=${encodedData}`);
+      return res.redirect(
+        `${this.configService.get<string>('CLIENT_URL')}/auth/callback?provider=google&data=${encodedData}`,
+      );
     } catch (error) {
-      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/login?error=${encodeURIComponent(error.message)}`);
+      return res.redirect(
+        `${this.configService.get<string>('CLIENT_URL')}/auth/login?error=${encodeURIComponent(error.message)}`,
+      );
     }
   }
 
@@ -99,16 +103,17 @@ export class AuthController {
   @Public()
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
-  async githubLoginCallback(
-    @Request() req: any,
-    @Res() res: Response,
-  ) {
+  async githubLoginCallback(@Request() req: any, @Res() res: Response) {
     try {
       const loginUser = await this.authService.githubLogin(req.user, res);
       const encodedData = encodeURIComponent(JSON.stringify(loginUser));
-      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/callback?provider=github&data=${encodedData}`);
+      return res.redirect(
+        `${this.configService.get<string>('CLIENT_URL')}/auth/callback?provider=github&data=${encodedData}`,
+      );
     } catch (error) {
-      return res.redirect(`${this.configService.get<string>('CLIENT_URL')}/auth/login?error=${encodeURIComponent(error.message)}`);
+      return res.redirect(
+        `${this.configService.get<string>('CLIENT_URL')}/auth/login?error=${encodeURIComponent(error.message)}`,
+      );
     }
   }
 }

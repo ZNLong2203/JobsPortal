@@ -146,7 +146,7 @@ export class UsersService {
     }
   }
 
-  async deleteUser(id: Types.ObjectId): Promise<void> {
+  async removeUser(id: Types.ObjectId): Promise<void> {
     try {
       await this.userModel.findByIdAndDelete(id);
       return;

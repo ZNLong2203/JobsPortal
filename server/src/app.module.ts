@@ -12,7 +12,7 @@ import { ResumesModule } from './modules/resumes/resumes.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
-// import { RedisModule } from './integrations/redis/redis.module';
+import { RedisModule } from './integrations/redis/redis.module';
 import { GeminiModule } from './integrations/gemini/gemini.module';
 // import { KafkaModule } from './integrations/kafka/kafka.module';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -53,7 +53,7 @@ import * as mongooseDelete from 'mongoose-delete';
     PermissionsModule,
     RolesModule,
     StatisticsModule,
-    // RedisModule,
+    RedisModule,
     // KafkaModule,
     GeminiModule,
   ],

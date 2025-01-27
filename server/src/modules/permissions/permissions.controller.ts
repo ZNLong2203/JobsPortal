@@ -75,10 +75,11 @@ export class PermissionsController {
     @Param('id') id: Types.ObjectId,
     @Body() updatePermissionDto: UpdatePermissionDto,
   ) {
-    await this.permissionsService.updatePermission(id, updatePermissionDto);
+    const updatedPermission = await this.permissionsService.updatePermission(id, updatePermissionDto);
 
     return {
       message: Message.PERMISSION_UPDATED,
+      data: updatedPermission,
     };
   }
 

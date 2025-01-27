@@ -10,12 +10,30 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Company, CompanyDocument } from './schemas/company.schema';
 import { Model, Types } from 'mongoose';
 import { Message } from 'src/common/message';
+import { RedisService } from 'src/integrations/redis/redis.service';
 
 @Injectable()
 export class CompanyService {
+  private readonly cacheVersionKey = 'company:version';
+  private readonly companyCachePrefix = 'company:';
+  private readonly allCompaniesCacheKey = 'company:all';
+
   constructor(
+    private readonly redisService: RedisService,
     @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
   ) {}
+
+  private getCacheKey(id: Types.ObjectId): string {
+    return `${this.companyCachePrefix}${id}`;
+  }
+
+  private async getCacheVersion(): Promise<number> {
+    return this.redisService.getCacheVersion(this.cacheVersionKey);
+  }
+
+  private async incrementCacheVersion(): Promise<void> {
+    await this.redisService.incrementCacheVersion(this.cacheVersionKey);
+  }
 
   async createCompany(
     createCompanyDto: CreateCompanyDto,
@@ -27,6 +45,8 @@ export class CompanyService {
         createdBy: user._id,
       });
 
+      await this.incrementCacheVersion();
+
       return createdCompany;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -35,36 +55,66 @@ export class CompanyService {
 
   async findAllCompany(page: number, limit: number, query: any): Promise<any> {
     try {
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.allCompaniesCacheKey}:${page}:${limit}:${cacheVersion}`;
+
+      const cachedData = await this.redisService.get(cacheKey);
+      if (cachedData) {
+        return JSON.parse(cachedData);
+      }
+
       const skip = (page - 1) * limit;
-      const [companies, totalDocuments] = await Promise.all([
-        this.companyModel.find(query).skip(skip).limit(limit),
+      const [companies, total] = await Promise.all([
+        this.companyModel.find(query).skip(skip).limit(limit).lean(),
         this.companyModel.countDocuments(query),
       ]);
 
-      const totalPages = Math.ceil(totalDocuments / limit);
-
-      return {
+      const result = {
         companies,
         metadata: {
-          total: totalDocuments,
+          total,
           page,
-          totalPages,
           limit,
+          totalPages: Math.ceil(total / limit),
         },
       };
+
+      await this.redisService.set(
+        cacheKey, 
+        JSON.stringify(result),
+        60 * 60 * 24,
+      );
+
+      return result;
     } catch (error) {
-      throw new NotFoundException(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
   async findOneCompany(id: Types.ObjectId): Promise<Company> {
     try {
-      const company = await this.companyModel.findById(id);
-      if (!company) throw new Error(Message.COMPANY_NOT_FOUND);
+      const cacheVersion = await this.getCacheVersion();
+      const cacheKey = `${this.getCacheKey(id)}:${cacheVersion}`;
+
+      const cachedCompany = await this.redisService.get(cacheKey);
+      if (cachedCompany) {
+        return JSON.parse(cachedCompany);
+      }
+
+      const company = await this.companyModel.findById(id).lean();
+      if (!company) {
+        throw new BadRequestException('Company not found');
+      }
+
+      await this.redisService.set(
+        cacheKey, 
+        JSON.stringify(company),
+        60 * 60 * 24,
+      );
 
       return company;
     } catch (error) {
-      throw new NotFoundException(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -80,21 +130,15 @@ export class CompanyService {
   async updateCompany(
     id: Types.ObjectId,
     updateCompanyDto: UpdateCompanyDto,
-  ): Promise<void> {
+  ): Promise<Company> {
     try {
-      await this.companyModel.findByIdAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          ...updateCompanyDto,
-        },
-        {
-          new: true,
-        },
-      );
+      const updatedCompany = await this.companyModel
+        .findByIdAndUpdate(id, updateCompanyDto, { new: true })
+        .lean();
 
-      return;
+      await this.incrementCacheVersion();
+
+      return updatedCompany;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -109,6 +153,8 @@ export class CompanyService {
       }
 
       await this.companyModel.findByIdAndDelete(id);
+
+      await this.incrementCacheVersion();
 
       return;
     } catch (error) {
