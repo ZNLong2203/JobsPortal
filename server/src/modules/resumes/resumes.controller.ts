@@ -75,7 +75,10 @@ export class ResumesController {
     @Param('id') id: Types.ObjectId,
     @Body() updateResumeDto: UpdateResumeDto,
   ) {
-    const updatedResume = await this.resumesService.updateResume(id, updateResumeDto);
+    const updatedResume = await this.resumesService.updateResume(
+      id,
+      updateResumeDto,
+    );
     return {
       message: Message.RESUME_UPDATED,
       data: updatedResume,

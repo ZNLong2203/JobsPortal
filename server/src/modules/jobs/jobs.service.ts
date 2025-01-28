@@ -83,7 +83,7 @@ export class JobsService {
       };
 
       await this.redisService.set(
-        cacheKey, 
+        cacheKey,
         JSON.stringify(result),
         60 * 60 * 24,
       );
@@ -107,11 +107,7 @@ export class JobsService {
       const job = await this.jobModel.findById(id).populate('company').lean();
       if (!job) throw new BadRequestException(Message.JOB_NOT_FOUND);
 
-      await this.redisService.set(
-        cacheKey, 
-        JSON.stringify(job),
-        60 * 60 * 24,
-      );
+      await this.redisService.set(cacheKey, JSON.stringify(job), 60 * 60 * 24);
 
       return job;
     } catch (error) {

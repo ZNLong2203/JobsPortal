@@ -106,14 +106,13 @@ export class RolesService {
         return JSON.parse(cachedRole);
       }
 
-      const role = await this.roleModel.findById(id).populate('permissions').lean();
+      const role = await this.roleModel
+        .findById(id)
+        .populate('permissions')
+        .lean();
       if (!role) throw new NotFoundException(Message.ROLE_NOT_FOUND);
 
-      await this.redisService.set(
-        cacheKey,
-        JSON.stringify(role),
-        60 * 60 * 24,
-      );
+      await this.redisService.set(cacheKey, JSON.stringify(role), 60 * 60 * 24);
 
       return role;
     } catch (error) {

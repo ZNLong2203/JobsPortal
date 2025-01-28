@@ -20,7 +20,8 @@ export class PermissionsService {
 
   constructor(
     private readonly redisService: RedisService,
-    @InjectModel(Permission.name) private permissionModel: Model<PermissionDocument>,
+    @InjectModel(Permission.name)
+    private permissionModel: Model<PermissionDocument>,
   ) {}
 
   private getCacheKey(id: Types.ObjectId): string {
@@ -93,7 +94,7 @@ export class PermissionsService {
       };
 
       await this.redisService.set(
-        cacheKey, 
+        cacheKey,
         JSON.stringify(result),
         60 * 60 * 24,
       );
@@ -121,7 +122,7 @@ export class PermissionsService {
       }
 
       await this.redisService.set(
-        cacheKey, 
+        cacheKey,
         JSON.stringify(permission),
         60 * 60 * 24,
       );
@@ -140,7 +141,7 @@ export class PermissionsService {
       const updatedPermission = await this.permissionModel
         .findByIdAndUpdate(id, updatePermissionDto, { new: true })
         .lean();
-      
+
       await this.incrementCacheVersion();
 
       return updatedPermission;

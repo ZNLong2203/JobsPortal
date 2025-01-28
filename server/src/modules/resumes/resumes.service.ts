@@ -94,7 +94,7 @@ export class ResumesService {
         cacheKey,
         JSON.stringify(result),
         60 * 60 * 24,
-      )
+      );
 
       return result;
     } catch (error) {

@@ -80,7 +80,7 @@ export class CompanyService {
       };
 
       await this.redisService.set(
-        cacheKey, 
+        cacheKey,
         JSON.stringify(result),
         60 * 60 * 24,
       );
@@ -107,7 +107,7 @@ export class CompanyService {
       }
 
       await this.redisService.set(
-        cacheKey, 
+        cacheKey,
         JSON.stringify(company),
         60 * 60 * 24,
       );
