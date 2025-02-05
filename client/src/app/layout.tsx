@@ -10,8 +10,8 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'FindJobs - Your Career Starts Here',
-  description: 'Find your dream job with FindJobs. Browse thousands of job listings from top companies.',
+  title: 'JobsPortal - Your Career Starts Here',
+  description: 'Find your dream job with JobsPortal. Browse thousands of job listings from top companies.',
 };
 
 export default function RootLayout({

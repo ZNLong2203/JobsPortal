@@ -24,4 +24,24 @@ export class MailService {
       throw new Error(`Failed to send email: ${error.message}`);
     }
   }
+
+  async sendRejectEmail(email: string, token: string) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Resume Rejected',
+        template: 'mail-reject-template',
+        context: {
+          candidateName: 'Candidate',
+          jobTitle: 'Job Title',
+          companyName: 'Company Name',
+          dashboardLink: `${process.env.CLIENT_URL}/dashboard`,
+          currentYear: new Date().getFullYear(),
+          token,
+        },
+      });
+    } catch (error) {
+      throw new Error(`Failed to send email: ${error.message}`);
+    }
+  }
 }

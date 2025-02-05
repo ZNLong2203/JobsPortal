@@ -2,7 +2,7 @@ import axiosInstance from "@/lib/axios-customize";
 import { Job, NewJob } from "@/types/job";
 import { PageData } from "@/types/pagedata";
 
-export const getAllJob = async (page: number = 1, limit: number = 10, query?: string): Promise<{ 
+export const getAllJob = async (page: number = 1, limit: number = 10, query?: Record<string, string>): Promise<{ 
   jobs: Job[], 
   metadata: PageData
 }> => {
