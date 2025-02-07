@@ -54,8 +54,11 @@ export class ResumesService {
 
   async findAllResume(page: number, limit: number, query: any): Promise<any> {
     try {
+      const queryBuilder: any = {};
+      const queryParams = query.query || query;
+
       const cacheVersion = await this.getCacheVersion();
-      const cacheKey = `${this.allResumesCacheKey}:${page}:${limit}:${cacheVersion}`;
+      const cacheKey = `${this.allResumesCacheKey}:${page}:${limit}:${queryBuilder}:${cacheVersion}`;
 
       const cacheData = await this.redisService.get(cacheKey);
       if (cacheData) {
@@ -65,7 +68,7 @@ export class ResumesService {
       const skip = (page - 1) * limit;
       const [resumes, total] = await Promise.all([
         this.resumeModel
-          .find(query)
+          .find(queryBuilder)
           .skip(skip)
           .limit(limit)
           .populate('user', '-password')
@@ -74,7 +77,7 @@ export class ResumesService {
           .sort({ createdAt: -1 })
           .lean(),
         this.resumeModel
-          .countDocuments(query)
+          .countDocuments(queryBuilder)
           .populate('user', '-password')
           .populate('company')
           .populate('job'),

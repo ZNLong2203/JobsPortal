@@ -47,13 +47,20 @@ export default function JobManagement() {
   }
 
   const handleUpdateJob = (updatedJob: Job) => {
-    updateJob({ job: updatedJob }, {
+    const jobToUpdate: Job = {
+      ...updatedJob,
+      company: typeof updatedJob.company === 'object' && updatedJob.company._id 
+        ? updatedJob.company._id 
+        : updatedJob.company
+    }
+
+    updateJob({ job: jobToUpdate }, {
       onSuccess: () => {
         toast.success('Job updated successfully')
         setIsModalOpen(false)
         setEditingJob(null)
       },
-      onError: (error) => {
+      onError: (error: Error) => {
         toast.error(`Failed to update job: ${error.message}`)
       }
     })
@@ -167,4 +174,3 @@ export default function JobManagement() {
     </div>
   )
 }
-

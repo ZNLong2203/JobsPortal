@@ -69,8 +69,11 @@ export class PermissionsService {
     query: any,
   ): Promise<any> {
     try {
+      const queryBuilder: any = {};
+      const queryParams = query.query || query;
+
       const cacheVersion = await this.getCacheVersion();
-      const cacheKey = `${this.allPermissionsCacheKey}:${page}:${limit}:${cacheVersion}`;
+      const cacheKey = `${this.allPermissionsCacheKey}:${page}:${limit}:${queryBuilder}:${cacheVersion}`;
 
       const cachedData = await this.redisService.get(cacheKey);
       if (cachedData) {
@@ -79,8 +82,8 @@ export class PermissionsService {
 
       const skip = (page - 1) * limit;
       const [permissions, total] = await Promise.all([
-        this.permissionModel.find(query).skip(skip).limit(limit).lean(),
-        this.permissionModel.countDocuments(query),
+        this.permissionModel.find(queryBuilder).skip(skip).limit(limit).lean(),
+        this.permissionModel.countDocuments(queryBuilder),
       ]);
 
       const result = {

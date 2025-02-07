@@ -55,8 +55,11 @@ export class RolesService {
 
   async findAllRole(page: number, limit: number, query: any): Promise<any> {
     try {
+      const queryBuilder: any = {};
+      const queryParams = query.query || query;
+
       const cacheVersion = await this.getCacheVersion();
-      const cacheKey = `${this.allRolesCacheKey}:${page}:${limit}:${cacheVersion}`;
+      const cacheKey = `${this.allRolesCacheKey}:${page}:${limit}:${queryBuilder}:${cacheVersion}`;
 
       const cacheData = await this.redisService.get(cacheKey);
       if (cacheData) {
@@ -66,12 +69,12 @@ export class RolesService {
       const skip = (page - 1) * limit;
       const [roles, total] = await Promise.all([
         this.roleModel
-          .find(query)
+          .find(queryBuilder)
           .skip(skip)
           .limit(limit)
           .populate('permissions')
           .lean(),
-        this.roleModel.countDocuments(query).populate('permissions'),
+        this.roleModel.countDocuments(queryBuilder).populate('permissions'),
       ]);
 
       const result = {

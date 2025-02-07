@@ -10,6 +10,8 @@ import { LoadingSpinner } from "@/components/common/IsLoading"
 import { ErrorMessage } from "@/components/common/IsError"
 import { Pagination } from "@/components/common/Pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Link from "next/link"
+import { useDebounce } from 'use-debounce'
 
 const JOB_TYPES = {
   ALL: 'all',
@@ -31,19 +33,17 @@ export default function JobListings() {
   const [filters, setFilters] = useState({
     search: '',
     location: '',
-    type: '',
-    level: ''
+    type: JOB_TYPES.ALL,
+    level: JOB_LEVELS.ALL
   })
+  const [debouncedFilters] = useDebounce(filters, 500)
 
-  const { jobs: jobsData, isLoading, isError, error } = useJobs(page, limit, filters)
+  const { jobs: jobsData, isLoading, isError, error } = useJobs(page, limit, debouncedFilters)
   const jobsList = Array.isArray(jobsData) ? jobsData : jobsData?.jobs ?? []
   const metadata = Array.isArray(jobsData) ? null : jobsData?.metadata ?? null
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
-  }
-
-  const handleApplyFilters = () => {
     setPage(1) 
   }
 
@@ -74,10 +74,11 @@ export default function JobListings() {
                 <SelectValue placeholder="Job Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={JOB_TYPES.ALL}>All Types</SelectItem>
-                <SelectItem value={JOB_TYPES.FULL_TIME}>Full-time</SelectItem>
-                <SelectItem value={JOB_TYPES.PART_TIME}>Part-time</SelectItem>
-                <SelectItem value={JOB_TYPES.CONTRACT}>Contract</SelectItem>
+                {Object.entries(JOB_TYPES).map(([key, value]) => (
+                  <SelectItem key={value} value={value}>
+                    {key.replace('_', ' ')}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Select value={filters.level} onValueChange={(value) => handleFilterChange('level', value)}>
@@ -85,13 +86,14 @@ export default function JobListings() {
                 <SelectValue placeholder="Experience Level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={JOB_LEVELS.ALL}>All Levels</SelectItem>
-                <SelectItem value={JOB_LEVELS.ENTRY}>Entry Level</SelectItem>
-                <SelectItem value={JOB_LEVELS.MID}>Mid Level</SelectItem>
-                <SelectItem value={JOB_LEVELS.SENIOR}>Senior Level</SelectItem>
+                {Object.entries(JOB_LEVELS).map(([key, value]) => (
+                  <SelectItem key={value} value={value}>
+                    {key.replace('_', ' ')}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            <Button className="w-full" onClick={handleApplyFilters}>
+            <Button className="w-full" onClick={() => setPage(1)}>
               Apply Filters
             </Button>
           </div>
@@ -136,8 +138,10 @@ function JobCard({ job }: { job: Job }) {
           <Briefcase className="mr-1 h-4 w-4" /> {job.type}
         </div>
       </div>
-      <p className="text-gray-700 mb-4">{job.des}</p>
-      <Button>Apply Now</Button>
+      {/* <p className="text-gray-700 mb-4">{job.des}</p> */}
+      <Button>
+        <Link href={`/jobs/${job._id}`}>View Details</Link>
+      </Button>
     </div>
   )
 }

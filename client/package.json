@@ -38,7 +38,8 @@
     "react-redux": "^9.2.0",
     "recharts": "^2.15.0",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

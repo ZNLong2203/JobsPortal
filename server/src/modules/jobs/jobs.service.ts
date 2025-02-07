@@ -52,8 +52,27 @@ export class JobsService {
 
   async findAllJob(page: number, limit: number, query: any): Promise<any> {
     try {
+      const queryBuilder: any = {};
+      const queryParams = query.query || query;
+
+      if (queryParams?.search) {
+        queryBuilder.title = { $regex: queryParams.search, $options: 'i' };
+      }
+      if (queryParams?.location) {
+        queryBuilder.location = { $regex: queryParams.location, $options: 'i' };
+      }
+      if (queryParams?.type && queryParams?.type !== 'all') {
+        queryBuilder.type = queryParams.type;
+      }
+      if (queryParams?.level && queryParams?.level !== 'all') {
+        queryBuilder.level = queryParams.level;
+      }
+      if (queryParams?.company) {
+        queryBuilder.company = queryParams.company;
+      }
+
       const cacheVersion = await this.getCacheVersion();
-      const cacheKey = `${this.allJobsCacheKey}:${page}:${limit}:${cacheVersion}`;
+      const cacheKey = `${this.allJobsCacheKey}:${page}:${limit}:${JSON.stringify(queryBuilder)}:${cacheVersion}`;
 
       const cacheData = await this.redisService.get(cacheKey);
       if (cacheData) {
@@ -63,13 +82,13 @@ export class JobsService {
       const skip = (page - 1) * limit;
       const [jobs, total] = await Promise.all([
         this.jobModel
-          .find(query)
+          .find(queryBuilder)
           .skip(skip)
           .limit(limit)
           .populate('company')
           .sort({ createdAt: -1 })
           .lean(),
-        this.jobModel.countDocuments(query),
+        this.jobModel.countDocuments(queryBuilder),
       ]);
 
       const result = {
@@ -192,13 +211,24 @@ export class JobsService {
       throw new BadRequestException(error.message);
     }
   }
+
   async updateJob(
     id: Types.ObjectId,
     updateJobDto: UpdateJobDto,
   ): Promise<Job> {
     try {
+      const existingJob = await this.jobModel.findById(id);
+      if (!existingJob) {
+        throw new BadRequestException(Message.JOB_NOT_FOUND);
+      }
+
+      if (updateJobDto.company.toString() !== existingJob.company.toString()) {
+        updateJobDto.company = (updateJobDto.company as any)._id || updateJobDto.company;
+      }
+
       const updatedJob = await this.jobModel
         .findByIdAndUpdate(id, updateJobDto, { new: true })
+        .populate('company')
         .lean();
 
       await this.incrementCacheVersion();

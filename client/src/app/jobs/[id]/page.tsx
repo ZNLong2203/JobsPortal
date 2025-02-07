@@ -12,6 +12,7 @@ import { useJobDetails } from "@/hooks/useJobs"
 import { LoadingSpinner } from "@/components/common/IsLoading"
 import { ErrorMessage } from "@/components/common/IsError"
 import { useState } from "react"
+import { MessageContent } from "@/components/common/MessageContext"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 
@@ -80,7 +81,7 @@ export default function JobDetailsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <DollarSign className="h-5 w-5 text-blue-500" />
-                <span>${job.salary.toLocaleString()}/year</span>
+                <span>{job.salary.toLocaleString()}/year</span>
               </div>
               <div className="flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-blue-500" />
@@ -93,8 +94,9 @@ export default function JobDetailsPage() {
             <div className="space-y-6">
               <section>
                 <h3 className="text-xl font-bold mb-3">Job Description</h3>
-                <p className="text-gray-700 leading-relaxed">{job.des}</p>
+                <MessageContent content={job.des} />
               </section>
+              
               <section>
                 <h3 className="text-xl font-bold mb-3">Required Skills</h3>
                 <div className="flex flex-wrap gap-2">

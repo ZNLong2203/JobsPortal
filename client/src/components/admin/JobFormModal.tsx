@@ -99,6 +99,14 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
     }, 0)
   }
 
+  const JOB_TYPES = {
+    FULL_TIME: 'Full-time',
+    PART_TIME: 'Part-time',
+    REMOTE: 'Remote',
+    INTERNSHIP: 'Internship',
+    CONTRACT: 'Contract',
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -198,12 +206,22 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
             </div>
             <div>
               <Label htmlFor="type">Job Type</Label>
-              <Input
-                id="type"
+              <Select
                 value={job.type}
-                onChange={(e) => setJob({ ...job, type: e.target.value })}
-                required
-              />
+                onValueChange={(value) => setJob({ ...job, type: value })}
+              
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a job type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={JOB_TYPES.FULL_TIME}>{JOB_TYPES.FULL_TIME}</SelectItem>
+                  <SelectItem value={JOB_TYPES.PART_TIME}>{JOB_TYPES.PART_TIME}</SelectItem>
+                  <SelectItem value={JOB_TYPES.REMOTE}>{JOB_TYPES.REMOTE}</SelectItem>
+                  <SelectItem value={JOB_TYPES.INTERNSHIP}>{JOB_TYPES.INTERNSHIP}</SelectItem>
+                  <SelectItem value={JOB_TYPES.CONTRACT}>{JOB_TYPES.CONTRACT}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">

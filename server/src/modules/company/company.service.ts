@@ -55,8 +55,11 @@ export class CompanyService {
 
   async findAllCompany(page: number, limit: number, query: any): Promise<any> {
     try {
+      const queryBuilder: any = {};
+      const queryParams = query.query || query;
+
       const cacheVersion = await this.getCacheVersion();
-      const cacheKey = `${this.allCompaniesCacheKey}:${page}:${limit}:${cacheVersion}`;
+      const cacheKey = `${this.allCompaniesCacheKey}:${page}:${limit}:${queryBuilder}:${cacheVersion}`;
 
       const cachedData = await this.redisService.get(cacheKey);
       if (cachedData) {
@@ -65,8 +68,8 @@ export class CompanyService {
 
       const skip = (page - 1) * limit;
       const [companies, total] = await Promise.all([
-        this.companyModel.find(query).skip(skip).limit(limit).lean(),
-        this.companyModel.countDocuments(query),
+        this.companyModel.find(queryBuilder).skip(skip).limit(limit).lean(),
+        this.companyModel.countDocuments(queryBuilder),
       ]);
 
       const result = {
