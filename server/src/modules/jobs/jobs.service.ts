@@ -223,7 +223,8 @@ export class JobsService {
       }
 
       if (updateJobDto.company.toString() !== existingJob.company.toString()) {
-        updateJobDto.company = (updateJobDto.company as any)._id || updateJobDto.company;
+        updateJobDto.company =
+          (updateJobDto.company as any)._id || updateJobDto.company;
       }
 
       const updatedJob = await this.jobModel

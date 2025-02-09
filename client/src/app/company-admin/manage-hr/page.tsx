@@ -8,15 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Plus, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-
-// Mock data - replace with actual API calls in a real application
-const hrTeam = [
-  { id: 1, name: "Alice Johnson", role: "HR Manager", email: "alice@example.com", avatar: "/avatars/alice.jpg" },
-  { id: 2, name: "Bob Smith", role: "Recruiter", email: "bob@example.com", avatar: "/avatars/bob.jpg" },
-  { id: 3, name: "Carol Williams", role: "HR Specialist", email: "carol@example.com", avatar: "/avatars/carol.jpg" },
-]
+import { useAllHR } from "@/hooks/useUsers"
+import { LoadingSpinner } from "@/components/common/IsLoading"
+import { ErrorMessage } from "@/components/common/IsError"
 
 export default function ManageHR() {
+  const { data: hrTeam = [], isLoading, isError, error } = useAllHR()
   const [isAddHRDialogOpen, setIsAddHRDialogOpen] = useState(false)
   const [newHRName, setNewHRName] = useState("")
   const [newHREmail, setNewHREmail] = useState("")
@@ -38,6 +35,9 @@ export default function ManageHR() {
     member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  if (isLoading) return <LoadingSpinner />
+  if (isError) return <ErrorMessage message={error?.message || "Error loading HR team"} />
 
   return (
     <div className="container mx-auto py-8">
@@ -122,7 +122,7 @@ export default function ManageHR() {
         <CardContent>
           <div className="space-y-6">
             {filteredHRTeam.map((member) => (
-              <div key={member.id} className="flex items-center justify-between">
+              <div key={member._id} className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <Avatar>
                     <AvatarImage src={member.avatar} alt={member.name} />

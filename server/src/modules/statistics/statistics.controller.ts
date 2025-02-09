@@ -13,6 +13,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { User } from 'src/decorators/user.decorator';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { DeclareRole } from 'src/common/constants';
 
 @ApiTags('statistics')
 @Controller('statistics')
@@ -20,7 +21,7 @@ export class StatisticsController {
   constructor(private readonly statisticsService: StatisticsService) {}
 
   @Get('/admin')
-  @Roles('admin')
+  @Roles(DeclareRole.Admin)
   async getAdminStatistics() {
     const statistics = await this.statisticsService.getAdminStatistics();
 
@@ -31,7 +32,7 @@ export class StatisticsController {
   }
 
   @Get('/company')
-  @Roles('hr')
+  @Roles(DeclareRole.CompanyAdmin)
   async getCompanyStatistics(@User() user: IReqUser) {
     const statistics = await this.statisticsService.getCompanyStatistics(user);
 

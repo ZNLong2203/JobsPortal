@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getUsers, getUser, createUser, updateUser, deleteUser } from '@/redux/api/userApi'
+import { getUsers, getUser, createUser, updateUser, deleteUser, getAllHR } from '@/redux/api/userApi'
 import { NewUser, User } from '@/types/user'
 
 export function useUsers(page: number = 1, limit: number = 10) {
@@ -49,3 +49,9 @@ export function useUser(_id: string) {
   })
 }
 
+export function useAllHR() {
+  return useQuery({
+    queryKey: ['users/hr'],
+    queryFn: () => getAllHR(),
+  })
+}

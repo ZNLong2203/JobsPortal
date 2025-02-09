@@ -17,6 +17,11 @@ export const getUser = async (_id: string): Promise<User> => {
   return res.data.data
 }
 
+export const getAllHR = async (): Promise<User[]> => {
+  const res = await axiosInstance.get('/users/hr')
+  return res.data.data
+}
+
 export const createUser = async (user: NewUser): Promise<User> => {
   const res = await axiosInstance.post('/users', user)
   return res.data.data

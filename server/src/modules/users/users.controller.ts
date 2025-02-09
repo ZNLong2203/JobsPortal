@@ -17,6 +17,8 @@ import { User } from 'src/decorators/user.decorator';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { ResumesService } from '../resumes/resumes.service';
 import { ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/role.decorator';
+import { DeclareRole } from 'src/common/constants';
 
 @ApiTags('users')
 @Controller('users')
@@ -35,6 +37,7 @@ export class UsersController {
   }
 
   @Get()
+  @Roles(DeclareRole.Admin)
   async findAllUser(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -57,8 +60,20 @@ export class UsersController {
     };
   }
 
+  @Get('/hr') 
+  // @Roles(DeclareRole.CompanyAdmin, DeclareRole.HR)
+  async findAllHR(
+    @User() user: IReqUser,
+  ) {
+    const allHR = await this.usersService.findAllHR(user);
+    return {
+      message: Message.USER_ALL_FETCHED,
+      data: allHR,
+    };
+  }
+
   @Get('/:id/resumes')
-  async findAllResumesByUser(
+  async findAllResumesFromUser(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @User() user: IReqUser,

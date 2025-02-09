@@ -14,7 +14,7 @@ export default function CompanyAdminLayout({
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/company-admin" },
     { icon: Users, label: "Manage HR", href: "/company-admin/manage-hr" },
-    { icon: Briefcase, label: "Job Postings", href: "/company-admin/job-postings" },
+    { icon: Briefcase, label: "Job Postings", href: "/company-admin/jobs-postings" },
     { icon: Building, label: "Company", href: "/company-admin/company" },
   ]
 

@@ -91,6 +91,19 @@ export class UsersService {
     }
   }
 
+  async findAllHR(user: IReqUser): Promise<User[]> {
+    try {
+      const users = await this.userModel.find({
+        role: 'hr',
+        company: user.company,
+      }).select('-password').lean();
+
+      return users;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
   // This methods is use to return all user data for login
   async findUserByEmail(email: string): Promise<IUser> {
     try {

@@ -139,35 +139,6 @@ export default function CompanyAdminDashboard() {
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Applicant Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentApplicants.map((applicant) => (
-                <div key={applicant.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{applicant.name}</p>
-                    <p className="text-sm text-muted-foreground">{applicant.position}</p>
-                  </div>
-                  <Badge
-                    variant={
-                      applicant.status === "New"
-                        ? "default"
-                        : applicant.status === "Interviewed"
-                          ? "secondary"
-                          : "outline"
-                    }
-                  >
-                    {applicant.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
