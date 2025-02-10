@@ -32,7 +32,8 @@ export default function Header() {
           <nav className="hidden md:flex space-x-8">
             <Link href="/jobs" className="text-gray-700 hover:text-blue-600">Find Jobs</Link>
             <Link href="/companies" className="text-gray-700 hover:text-blue-600">Companies</Link>
-            <Link href="/career-advice" className="text-gray-700 hover:text-blue-600">Career Advice</Link>
+            <Link href="/register-company" className="text-gray-700 hover:text-blue-600">Register Company</Link>
+            {/* <Link href="/career-advice" className="text-gray-700 hover:text-blue-600">Career Advice</Link> */}
           </nav>
           <div className="flex items-center space-x-4">
             {userInfo && userInfo.role === 'admin' && (
@@ -43,6 +44,11 @@ export default function Header() {
             {userInfo && userInfo.role === 'hr' && (
               <Link href="/hr">
                 <Button variant="outline">HR</Button>
+              </Link>
+            )}
+            {userInfo && userInfo.role === 'company-admin' && (
+              <Link href="/company-admin">
+                <Button variant="outline">Company Admin</Button>
               </Link>
             )}
             {isAuthenticated && userInfo ? (

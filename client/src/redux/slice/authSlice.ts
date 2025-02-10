@@ -3,6 +3,7 @@ import { safeStorage } from '@/utils/safeStorage';
 
 interface AuthState {
   userInfo: {
+    _id: string;
     name: string;
     email: string;
     role: string;

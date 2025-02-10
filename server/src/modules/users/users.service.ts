@@ -43,6 +43,7 @@ export class UsersService {
       const newUser = await this.userModel.create({
         ...createUserDto,
         password: hashedPassword,
+        company: user.company,
         createdBy: user._id,
       });
 

@@ -12,8 +12,9 @@ export function useCompanies(page: number = 1, limit: number = 10) {
 
   const createCompanyMutation = useMutation({
     mutationFn: (company: NewCompany) => createCompany(company),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['companies'] })
+      return data;
     },
   })
 

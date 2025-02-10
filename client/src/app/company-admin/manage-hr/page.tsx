@@ -5,34 +5,55 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { useAllHR } from "@/hooks/useUsers"
+import { useAllHR, useUsers } from "@/hooks/useUsers"
 import { LoadingSpinner } from "@/components/common/IsLoading"
 import { ErrorMessage } from "@/components/common/IsError"
+import toast from 'react-hot-toast'
 
 export default function ManageHR() {
   const { data: hrTeam = [], isLoading, isError, error } = useAllHR()
+  const { createUser, deleteUser } = useUsers()
   const [isAddHRDialogOpen, setIsAddHRDialogOpen] = useState(false)
   const [newHRName, setNewHRName] = useState("")
   const [newHREmail, setNewHREmail] = useState("")
+  const [newHRPassword, setNewHRPassword] = useState("")
   const [newHRRole, setNewHRRole] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
 
   const handleAddHR = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically make an API call to add the new HR personnel
-    console.log("Adding new HR:", { name: newHRName, email: newHREmail, role: newHRRole })
+    createUser({
+      name: newHRName,
+      email: newHREmail,
+      password: newHRPassword,
+      role: newHRRole,
+    })
     setIsAddHRDialogOpen(false)
     setNewHRName("")
     setNewHREmail("")
+    setNewHRPassword("")
     setNewHRRole("")
+  }
+
+  const handleDeleteHR = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this HR personnel?')) {
+      deleteUser(id, {
+        onSuccess: () => {
+          toast.success('HR personnel deleted successfully')
+        },
+        onError: (error: Error) => {
+          toast.error(`Failed to delete HR personnel: ${error.message}`)
+        }
+      })
+    }
   }
 
   const filteredHRTeam = hrTeam.filter(member => 
     member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (member.role?.toLowerCase() ?? '').includes(searchTerm.toLowerCase()) ||
     member.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -78,6 +99,18 @@ export default function ManageHR() {
                     type="email"
                     value={newHREmail}
                     onChange={(e) => setNewHREmail(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="password" className="text-right">
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={newHRPassword}
+                    onChange={(e) => setNewHRPassword(e.target.value)}
                     className="col-span-3"
                   />
                 </div>
@@ -133,7 +166,17 @@ export default function ManageHR() {
                     <p className="text-sm text-muted-foreground">{member.role}</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">{member.email}</p>
+                <div className="flex items-center gap-4">
+                  <p className="text-sm text-muted-foreground">{member.email}</p>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 hover:text-red-600"
+                    onClick={() => handleDeleteHR(member._id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

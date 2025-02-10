@@ -18,4 +18,10 @@ export class CreateCompanyDto {
 
   @IsOptional()
   des: string;
+
+  @IsOptional()
+  website?: string;
+
+  @IsOptional()
+  contactEmail?: string;
 }

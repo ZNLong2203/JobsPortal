@@ -33,7 +33,12 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @User() user: IReqUser,
   ) {
-    return await this.usersService.createUserByAdmin(createUserDto, user);
+    const newUser = this.usersService.createUserByAdmin(createUserDto, user);
+
+    return {
+      message: Message.USER_CREATED,
+      data: newUser,
+    }
   }
 
   @Get()
@@ -114,7 +119,7 @@ export class UsersController {
   }
 
   @Delete('/:id')
-  async deleteUser(@Param('id') id: Types.ObjectId) {
+  async removeUser(@Param('id') id: Types.ObjectId) {
     await this.usersService.removeUser(id);
     return {
       message: Message.USER_DELETED,

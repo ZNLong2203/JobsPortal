@@ -26,6 +26,12 @@ export class Company {
   @Prop()
   des: string;
 
+  @Prop()
+  website: string;
+
+  @Prop()
+  contactEmail: string;
+
   @Prop({ type: Types.ObjectId, required: true })
   createdBy: Types.ObjectId;
 

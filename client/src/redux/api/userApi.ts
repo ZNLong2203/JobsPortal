@@ -1,5 +1,5 @@
 import axiosInstance from "@/lib/axios-customize";
-import { User, NewUser } from "@/types/user";
+import { User, NewUser, UpdateUser } from "@/types/user";
 import { PageData } from "@/types/pagedata";
 
 export const getUsers = async (page: number = 1, limit: number = 10): Promise<{ 
@@ -27,7 +27,7 @@ export const createUser = async (user: NewUser): Promise<User> => {
   return res.data.data
 }
 
-export const updateUser = async (user: User): Promise<User> => {
+export const updateUser = async (user: UpdateUser): Promise<User> => {
   const res = await axiosInstance.patch(`/users/${user._id}`, user)
   return res.data.data
 }

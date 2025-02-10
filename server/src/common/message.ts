@@ -13,6 +13,7 @@ export class Message {
   // User
   static readonly USER_NOT_FOUND = 'User not found';
   static readonly USER_ALREADY_EXISTS = 'User already exists';
+  static readonly USER_CREATED = 'User created successfully';
   static readonly USER_ALL_FETCHED = 'All user fetched successfully';
   static readonly USER_FETCHED = 'User fetched successfully';
   static readonly USER_UPDATED = 'User updated successfully';

@@ -4,8 +4,10 @@ export interface Company {
   address: string;
   industry: string;
   employees: number;
-  logo: string;
+  logo?: string;
   des: string;
+  website?: string;
+  contactEmail?: string;
 }
 
 export interface NewCompany extends Omit<Company, '_id'> {

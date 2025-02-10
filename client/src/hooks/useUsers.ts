@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getUsers, getUser, createUser, updateUser, deleteUser, getAllHR } from '@/redux/api/userApi'
-import { NewUser, User } from '@/types/user'
+import { NewUser, UpdateUser } from '@/types/user'
 
 export function useUsers(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient()
@@ -18,7 +18,7 @@ export function useUsers(page: number = 1, limit: number = 10) {
   })
 
   const updateUserMutation = useMutation({
-    mutationFn: ({ user }: { user: User }) => updateUser(user),
+    mutationFn: ({ user }: { user: UpdateUser }) => updateUser(user),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },
