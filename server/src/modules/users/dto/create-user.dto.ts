@@ -27,8 +27,5 @@ export class CreateUserDto {
   role?: UserRole;
 
   @IsOptional()
-  address?: string;
-
-  @IsOptional()
   loginProvider?: string;
 }

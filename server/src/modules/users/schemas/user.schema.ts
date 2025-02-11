@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { Company } from 'src/modules/company/schemas/company.schema';
 import { Permission } from 'src/modules/permissions/schemas/permission.schema';
 import { Role } from 'src/modules/roles/schemas/role.schema';
+import { UserProfile } from './user-profile.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -32,14 +33,8 @@ export class User {
   @Prop({ type: Types.ObjectId, ref: Company.name })
   company: Types.ObjectId | Company;
 
-  @Prop()
-  gender: string;
-
-  @Prop()
-  age: number;
-
-  @Prop()
-  address: string;
+  @Prop({ type: Types.ObjectId, ref: UserProfile.name})
+  profile: Types.ObjectId | UserProfile;
 
   @Prop({ default: 'local' })
   loginProvider: string;
