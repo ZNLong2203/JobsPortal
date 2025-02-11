@@ -33,7 +33,7 @@ export class User {
   @Prop({ type: Types.ObjectId, ref: Company.name })
   company: Types.ObjectId | Company;
 
-  @Prop({ type: Types.ObjectId, ref: UserProfile.name})
+  @Prop({ type: Types.ObjectId, ref: UserProfile.name })
   profile: Types.ObjectId | UserProfile;
 
   @Prop({ default: 'local' })

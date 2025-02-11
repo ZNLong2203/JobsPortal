@@ -17,6 +17,7 @@ export class Message {
   static readonly USER_ALL_FETCHED = 'All user fetched successfully';
   static readonly USER_FETCHED = 'User fetched successfully';
   static readonly USER_UPDATED = 'User updated successfully';
+  static readonly USER_PROFILE_UPDATED = 'User profile updated successfully';
   static readonly USER_DELETED = 'User deleted successfully';
 
   // Company

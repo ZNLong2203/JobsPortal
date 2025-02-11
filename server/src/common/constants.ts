@@ -3,4 +3,4 @@ export const DeclareRole = {
   CompanyAdmin: 'company-admin',
   HR: 'hr',
   Member: 'member',
-}
+};

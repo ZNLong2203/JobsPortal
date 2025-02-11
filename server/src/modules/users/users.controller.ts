@@ -19,6 +19,8 @@ import { ResumesService } from '../resumes/resumes.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/role.decorator';
 import { DeclareRole } from 'src/common/constants';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { ProfileFieldEnum } from './dto/remove-user-profile.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -38,7 +40,7 @@ export class UsersController {
     return {
       message: Message.USER_CREATED,
       data: newUser,
-    }
+    };
   }
 
   @Get()
@@ -65,11 +67,9 @@ export class UsersController {
     };
   }
 
-  @Get('/hr') 
-  // @Roles(DeclareRole.CompanyAdmin, DeclareRole.HR)
-  async findAllHR(
-    @User() user: IReqUser,
-  ) {
+  @Get('/hr')
+  @Roles(DeclareRole.CompanyAdmin, DeclareRole.HR)
+  async findAllHR(@User() user: IReqUser) {
     const allHR = await this.usersService.findAllHR(user);
     return {
       message: Message.USER_ALL_FETCHED,
@@ -112,9 +112,27 @@ export class UsersController {
     @Param('id') id: Types.ObjectId,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    await this.usersService.updateUser(id, updateUserDto);
+    const updatedUser = await this.usersService.updateUser(id, updateUserDto);
+
     return {
       message: Message.USER_UPDATED,
+      data: updatedUser,
+    };
+  }
+
+  @Patch('/:id/profile')
+  async updateUserProfile(
+    @Param('id') id: Types.ObjectId,
+    @Body() updateUserProfileDto: UpdateUserProfileDto,
+  ) {
+    const updatedProfile = await this.usersService.updateUserProfile(
+      id,
+      updateUserProfileDto,
+    );
+
+    return {
+      message: Message.USER_PROFILE_UPDATED,
+      data: updatedProfile,
     };
   }
 
@@ -123,6 +141,18 @@ export class UsersController {
     await this.usersService.removeUser(id);
     return {
       message: Message.USER_DELETED,
+    };
+  }
+
+  @Delete('/:id/profile/:field')
+  async removeUserProfile(
+    @Param('id') id: Types.ObjectId,
+    @Param('field') field: ProfileFieldEnum,
+    @Query('itemId') itemId?: string
+  ) {
+    await this.usersService.removeUserProfile(id, field, itemId);
+    return {
+      message: `${field} removed successfully from user profile`,
     };
   }
 }

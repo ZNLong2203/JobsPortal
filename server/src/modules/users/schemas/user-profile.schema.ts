@@ -29,14 +29,16 @@ export class UserProfile {
   @Prop([String])
   languages: string[];
 
-  @Prop([{
-    title: String,
-    company: String,
-    location: String,
-    startDate: Date,
-    endDate: Date,
-    description: String
-  }])
+  @Prop([
+    {
+      title: String,
+      company: String,
+      location: String,
+      startDate: Date,
+      endDate: Date,
+      description: String,
+    },
+  ])
   experience: Array<{
     title: string;
     company: string;
@@ -46,13 +48,15 @@ export class UserProfile {
     description: string;
   }>;
 
-  @Prop([{
-    school: String,
-    degree: String,
-    field: String,
-    startDate: Date,
-    endDate: Date
-  }])
+  @Prop([
+    {
+      school: String,
+      degree: String,
+      field: String,
+      startDate: Date,
+      endDate: Date,
+    },
+  ])
   education: Array<{
     school: string;
     degree: string;
