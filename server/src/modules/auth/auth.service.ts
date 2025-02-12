@@ -78,6 +78,12 @@ export class AuthService {
         httpOnly: true,
       });
 
+      // Create user profile
+      const userProfile = await this.usersService.findUserProfile(_id);
+      if (!userProfile) {
+        await this.usersService.createUserProfile(_id);
+      }
+
       return {
         access_token: this.jwtService.sign(payload),
         userInfo: {

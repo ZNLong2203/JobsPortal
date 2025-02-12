@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getUsers, getUser, createUser, updateUser, deleteUser, getAllHR } from '@/redux/api/userApi'
+import { getUsers, getUser, createUser, updateUser, deleteUser, getAllHR, getUserProfile, updateUserProfile, removeUserProfileField } from '@/redux/api/userApi'
 import { NewUser, UpdateUser } from '@/types/user'
+import { ProfileFieldEnum, UpdateUserProfileDto } from '@/types/userProfile'
 
 export function useUsers(page: number = 1, limit: number = 10) {
   const queryClient = useQueryClient()
@@ -54,4 +55,38 @@ export function useAllHR() {
     queryKey: ['users/hr'],
     queryFn: () => getAllHR(),
   })
+}
+
+
+export function useUserProfile(userId: string) {
+  const queryClient = useQueryClient()
+
+  const profileQuery = useQuery({
+    queryKey: ['userProfile', userId],
+    queryFn: () => getUserProfile(userId),
+  })
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (profile: UpdateUserProfileDto) => updateUserProfile(userId, profile),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userId] })
+    },
+  })
+
+  const removeProfileFieldMutation = useMutation({
+    mutationFn: ({ field, itemId }: { field: ProfileFieldEnum, itemId?: string }) => 
+      removeUserProfileField(userId, field, itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userId] })
+    },
+  })
+
+  return {
+    profile: profileQuery.data,
+    isLoading: profileQuery.isLoading,
+    isError: profileQuery.isError,
+    error: profileQuery.error,
+    updateProfile: updateProfileMutation.mutate,
+    removeProfileField: removeProfileFieldMutation.mutate,
+  }
 }

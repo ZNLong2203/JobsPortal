@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axios-customize";
 import { User, NewUser, UpdateUser } from "@/types/user";
 import { PageData } from "@/types/pagedata";
+import { ProfileFieldEnum, UpdateUserProfileDto, UserProfile } from "@/types/userProfile";
 
 export const getUsers = async (page: number = 1, limit: number = 10): Promise<{ 
   users: User[], 
@@ -34,4 +35,25 @@ export const updateUser = async (user: UpdateUser): Promise<User> => {
 
 export const deleteUser = async (_id: string): Promise<void> => {
   await axiosInstance.delete(`/users/${_id}`)
+}
+
+export const getUserProfile = async (_id: string): Promise<UserProfile> => {
+  const res = await axiosInstance.get(`/users/${_id}/profile`)
+  return res.data.data
+}
+
+export const updateUserProfile = async (id: string, profile: UpdateUserProfileDto): Promise<UserProfile> => {
+  const res = await axiosInstance.patch(`/users/${id}/profile`, profile)
+  return res.data.data
+}
+
+export const removeUserProfileField = async (
+  id: string, 
+  field: ProfileFieldEnum,
+  itemId?: string
+): Promise<void> => {
+  const url = itemId 
+    ? `/users/${id}/profile/${field}?itemId=${itemId}`
+    : `/users/${id}/profile/${field}`
+  await axiosInstance.delete(url)
 }

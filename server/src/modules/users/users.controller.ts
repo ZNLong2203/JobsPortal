@@ -98,6 +98,16 @@ export class UsersController {
     };
   }
 
+  @Get('/:id/profile')
+  async findUserProfile(@Param('id') id: Types.ObjectId) {
+    const userProfile = await this.usersService.findUserProfile(id);
+    
+    return {
+      message: Message.USER_PROFILE_FETCHED,
+      data: userProfile,
+    };
+  }
+
   @Get('/:id')
   async findUserById(@Param('id') id: Types.ObjectId) {
     const user = await this.usersService.findUserById(id);
@@ -148,7 +158,7 @@ export class UsersController {
   async removeUserProfile(
     @Param('id') id: Types.ObjectId,
     @Param('field') field: ProfileFieldEnum,
-    @Query('itemId') itemId?: string
+    @Query('itemId') itemId?: string,
   ) {
     await this.usersService.removeUserProfile(id, field, itemId);
     return {

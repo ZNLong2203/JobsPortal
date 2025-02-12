@@ -5,7 +5,7 @@ export enum ProfileFieldEnum {
   EDUCATION = 'education',
   CERTIFICATIONS = 'certifications',
   SKILLS = 'skills',
-  LANGUAGES = 'languages'
+  LANGUAGES = 'languages',
 }
 
 export class RemoveProfileFieldDto {
@@ -14,5 +14,5 @@ export class RemoveProfileFieldDto {
   field: ProfileFieldEnum;
 
   @IsNotEmpty()
-  itemId?: string; 
+  itemId?: string;
 }

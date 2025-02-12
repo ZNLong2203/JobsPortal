@@ -8,10 +8,10 @@ export interface User {
   email: string,
   name: string,
   avatar?: string,
-  company?: Company,
-  role?: Role,
-  permissions?: Permission[],
-  profile?: UserProfile,
+  company?: string | Company,
+  role?: string | Role,
+  permissions?: string[] | Permission[],
+  profile?: string | UserProfile,
   loginProvider?: string,
 }
 
@@ -20,10 +20,10 @@ export interface UpdateUser {
   email?: string;
   name?: string;
   avatar?: string;
-  company?: Company;
-  role?: Role;
-  permissions?: Permission[];
-  profile?: UserProfile;
+  company?: string | Company;
+  role?: string | Role;
+  permissions?: string[] | Permission[];
+  profile?: string | UserProfile;
   loginProvider?: string;
 }
 

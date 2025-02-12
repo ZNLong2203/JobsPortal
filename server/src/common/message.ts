@@ -2,6 +2,7 @@ export class Message {
   // Common
   static readonly INVALID_ID = 'Invalid id';
   static readonly INVALID_REQUEST = 'Invalid request';
+  static readonly INVALID_FIELD = 'Invalid field';
   static readonly EMAIL_ALREADY_EXISTS = 'Email already exists';
 
   // Auth
@@ -13,8 +14,11 @@ export class Message {
   // User
   static readonly USER_NOT_FOUND = 'User not found';
   static readonly USER_ALREADY_EXISTS = 'User already exists';
+  static readonly USER_PROFILE_NOT_FOUND = 'User profile not found';
+  static readonly USER_PROFILE_FIELD_NOT_FOUND = 'User profile field not found';
   static readonly USER_CREATED = 'User created successfully';
   static readonly USER_ALL_FETCHED = 'All user fetched successfully';
+  static readonly USER_PROFILE_FETCHED = 'User profile fetched successfully';
   static readonly USER_FETCHED = 'User fetched successfully';
   static readonly USER_UPDATED = 'User updated successfully';
   static readonly USER_PROFILE_UPDATED = 'User profile updated successfully';

@@ -59,6 +59,24 @@ export class UsersService {
     }
   }
 
+  async createUserProfile(id: Types.ObjectId): Promise<UserProfile> {
+    try {
+      const newUserProfile = await this.userProfileModel.create({
+        userId: id,
+      });
+
+      await this.userModel.findByIdAndUpdate(
+        id,
+        { profile: newUserProfile._id },
+        { new: true },
+      );
+      
+      return newUserProfile;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async findAllUser(page: number, limit: number, query: any): Promise<any> {
     try {
       const skip = (page - 1) * limit;
@@ -89,7 +107,10 @@ export class UsersService {
         throw new Error(Message.INVALID_ID);
       }
 
-      const user = await this.userModel.findById(id);
+      const user = await this.userModel
+        .findById(id)
+        .select('-password')
+        .lean();
       if (!user) throw new NotFoundException(Message.USER_NOT_FOUND);
 
       return user;
@@ -137,6 +158,21 @@ export class UsersService {
     }
   }
 
+  async findUserProfile(id: Types.ObjectId): Promise<UserProfile> {
+    try {
+      const user = await this.userModel.findById(id);
+      if (!user || !user.profile) {
+        return null;
+      }
+
+      const profile = await this.userProfileModel.findById(user.profile).populate('userId').lean();
+
+      return profile;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async getTotalUsers(): Promise<number> {
     try {
       const totalUsers = await this.userModel.countDocuments();
@@ -170,7 +206,8 @@ export class UsersService {
       const checkProfile = await this.userModel.findById(id);
 
       if (!checkProfile.profile) {
-        const newProfile = await this.userProfileModel.create(updateUserProfileDto);
+        const newProfile =
+          await this.userProfileModel.create(updateUserProfileDto);
         const updatedUser = await this.userModel.findByIdAndUpdate(
           {
             _id: id,
@@ -184,15 +221,14 @@ export class UsersService {
         );
 
         return updatedUser;
-      } 
-      else {
+      } else {
         const updatedProfile = await this.userProfileModel.findByIdAndUpdate(
           checkProfile.profile,
           updateUserProfileDto,
           {
             new: true,
-          }
-        )
+          },
+        );
 
         return updatedProfile;
       }
@@ -213,7 +249,7 @@ export class UsersService {
   async removeUserProfile(
     id: Types.ObjectId,
     field: ProfileFieldEnum,
-    itemId?: string
+    itemId?: string,
   ): Promise<void> {
     try {
       const user = await this.userModel.findById(id);
@@ -226,7 +262,9 @@ export class UsersService {
       switch (field) {
         case ProfileFieldEnum.EXPERIENCE:
           if (itemId) {
-            updateQuery.$pull = { experience: { _id: new Types.ObjectId(itemId) } };
+            updateQuery.$pull = {
+              experience: { _id: new Types.ObjectId(itemId) },
+            };
           } else {
             updateQuery.$set = { experience: [] };
           }
@@ -234,7 +272,9 @@ export class UsersService {
 
         case ProfileFieldEnum.EDUCATION:
           if (itemId) {
-            updateQuery.$pull = { education: { _id: new Types.ObjectId(itemId) } };
+            updateQuery.$pull = {
+              education: { _id: new Types.ObjectId(itemId) },
+            };
           } else {
             updateQuery.$set = { education: [] };
           }
@@ -258,17 +298,22 @@ export class UsersService {
 
       const result = await this.userProfileModel.updateOne(
         { _id: user.profile },
-        updateQuery
+        updateQuery,
       );
 
       if (result.modifiedCount === 0) {
         throw new NotFoundException(Message.USER_PROFILE_FIELD_NOT_FOUND);
       }
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
-      throw new BadRequestException(`Failed to remove ${field}: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to remove ${field}: ${error.message}`,
+      );
     }
   }
 }

@@ -53,7 +53,7 @@ export default function ManageHR() {
 
   const filteredHRTeam = hrTeam.filter(member => 
     member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (member.role?.toLowerCase() ?? '').includes(searchTerm.toLowerCase()) ||
+    String(member.role).toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -163,7 +163,7 @@ export default function ManageHR() {
                   </Avatar>
                   <div>
                     <p className="font-medium">{member.name}</p>
-                    <p className="text-sm text-muted-foreground">{member.role}</p>
+                    <p className="text-sm text-muted-foreground">{member.role?.toString()}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">

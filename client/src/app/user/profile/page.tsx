@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -23,89 +22,87 @@ import * as z from "zod"
 import { Mail, Phone, MapPin, Briefcase, GraduationCap, Calendar, Languages, Award, Pencil } from "lucide-react"
 import { toast } from "react-hot-toast"
 import Link from "next/link"
+import { useSelector } from "react-redux"
+import { RootState } from "@/redux/store"
+import { useUserProfile } from "@/hooks/useUserProfile"
+import { ProfileFieldEnum } from "@/types/userProfile"
+import { LoadingSpinner } from "@/components/common/IsLoading"
+import { ErrorMessage } from "@/components/common/IsError"
+import { useState } from "react"
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
-  location: z.string().min(2, { message: "Location must be at least 2 characters." }),
-  bio: z.string().max(500, { message: "Bio must not exceed 500 characters." }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }).or(z.string().optional()),
+  email: z.string().email({ message: "Invalid email address." }).or(z.string().optional()),
+  phone: z.string().min(10, { message: "Please enter a valid phone number." }).or(z.string().optional()),
+  location: z.string().min(2, { message: "Location must be at least 2 characters." }).or(z.string().optional()),
+  bio: z.string().max(500, { message: "Bio must not exceed 500 characters." }).or(z.string().optional()),
   skills: z.string().refine((value) => value.split(",").every((skill) => skill.trim().length > 0), {
     message: "Each skill must be non-empty.",
-  }),
+  }).or(z.string().optional()),
   languages: z.string().refine((value) => value.split(",").every((language) => language.trim().length > 0), {
     message: "Each language must be non-empty.",
-  }),
+  }).or(z.string().optional()),
 })
 
 export default function ProfilePage() {
-  const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1 234 567 890",
-    location: "San Francisco, CA",
-    avatar: "/placeholder.svg?height=100&width=100",
-    bio: "Experienced software engineer with a passion for building user-friendly applications.",
-    experience: [
-      {
-        id: 1,
-        role: "Senior Software Engineer",
-        company: "Tech Corp",
-        period: "2020 - Present",
-        description: "Leading development of core products and mentoring junior developers.",
-      },
-      {
-        id: 2,
-        role: "Software Engineer",
-        company: "StartUp Inc",
-        period: "2018 - 2020",
-        description: "Developed and maintained multiple web applications.",
-      },
-    ],
-    education: [
-      {
-        id: 1,
-        degree: "Master of Computer Science",
-        school: "Tech University",
-        year: "2018",
-      },
-      {
-        id: 2,
-        degree: "Bachelor of Computer Science",
-        school: "State University",
-        year: "2016",
-      },
-    ],
-    skills: ["JavaScript", "React", "Node.js", "Python", "SQL", "AWS"],
-    languages: ["English (Native)", "Spanish (Intermediate)", "French (Basic)"],
-    certifications: ["AWS Certified Developer", "Google Cloud Professional"],
-  })
+  const { userInfo } = useSelector((state: RootState) => state.auth)
+  const { profile, isLoading, isError, error, updateProfile, removeProfileField } = useUserProfile(userInfo?._id || '')
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      location: user.location,
-      bio: user.bio,
-      skills: user.skills.join(", "),
-      languages: user.languages.join(", "),
+      name: userInfo?.name || '',
+      email: userInfo?.email || '',
+      phone: profile?.phone || '',
+      location: profile?.address || '',
+      bio: profile?.bio || '',
+      skills: profile?.skills?.join(', ') || '',
+      languages: profile?.languages?.join(', ') || '',
     },
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setUser((prevUser) => ({
-      ...prevUser,
-      ...values,
-      skills: values.skills.split(",").map((skill) => skill.trim()),
-      languages: values.languages.split(",").map((language) => language.trim()),
-    }))
-    setIsEditModalOpen(false)
-    toast.success("Profile updated successfully")
+    if (!userInfo?._id) return;
+    
+    const profileData = {
+      userId: userInfo._id as string,
+      phone: values.phone || '',
+      address: values.location || '',
+      bio: values.bio || '',
+      skills: (values.skills ?? '').split(',').map(s => s.trim()),
+      languages: (values.languages ?? '').split(',').map(l => l.trim()),
+      gender: profile?.gender || '',
+      age: profile?.age || 0,
+      experience: profile?.experience || [],
+      education: profile?.education || [],
+      certifications: profile?.certifications || []
+    }
+
+    updateProfile(profileData, {
+      onSuccess: () => {
+        toast.success('Profile updated successfully')
+        setIsEditModalOpen(false)
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to update profile: ${error.message}`)
+      }
+    })
   }
+
+  const handleRemoveExperience = (itemId: string) => {
+    removeProfileField(
+      { field: ProfileFieldEnum.EXPERIENCE, itemId },
+      {
+        onSuccess: () => toast.success('Experience removed successfully'),
+        onError: (error) => toast.error(`Failed to remove experience: ${error.message}`)
+      }
+    )
+  }
+
+  if (isLoading) return <LoadingSpinner />
+  if (isError) return <ErrorMessage message={error?.message || 'Error loading profile'} />
 
   return (
     <div className="container mx-auto py-8">
@@ -116,29 +113,29 @@ export default function ProfilePage() {
             <CardContent className="pt-6">
               <div className="flex flex-col items-center">
                 <Avatar className="h-32 w-32 mb-4">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={userInfo?.avatar || '/placeholder.svg?height=100&width=100'} alt={userInfo?.name} />
+                  <AvatarFallback>{userInfo?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <h2 className="text-2xl font-bold mb-2">{user.name}</h2>
+                <h2 className="text-2xl font-bold mb-2">{userInfo?.name}</h2>
                 <div className="flex items-center text-gray-600 mb-4">
                   <MapPin className="h-4 w-4 mr-2" />
-                  {user.location}
+                  {profile?.address}
                 </div>
                 <div className="w-full space-y-3">
                   <div className="flex items-center text-gray-600">
                     <Mail className="h-4 w-4 mr-2" />
-                    {user.email}
+                    {userInfo?.email}
                   </div>
                   <div className="flex items-center text-gray-600">
                     <Phone className="h-4 w-4 mr-2" />
-                    {user.phone}
+                    {profile?.phone}
                   </div>
                 </div>
               </div>
               <div className="mt-6">
                 <h3 className="font-semibold mb-2">Skills</h3>
                 <div className="flex flex-wrap gap-2">
-                  {user.skills.map((skill) => (
+                  {profile?.skills?.map((skill) => (
                     <Badge key={skill} variant="secondary">
                       {skill}
                     </Badge>
@@ -148,7 +145,7 @@ export default function ProfilePage() {
               <div className="mt-6">
                 <h3 className="font-semibold mb-2">Languages</h3>
                 <div className="space-y-2">
-                  {user.languages.map((language) => (
+                  {profile?.languages?.map((language) => (
                     <div key={language} className="flex items-center text-gray-600">
                       <Languages className="h-4 w-4 mr-2" />
                       {language}
@@ -289,7 +286,7 @@ export default function ProfilePage() {
                   <CardTitle>About Me</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">{user.bio}</p>
+                  <p className="text-gray-600">{profile?.bio}</p>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -307,17 +304,20 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {user.experience.map((exp) => (
-                      <div key={exp.id} className="border-l-2 border-gray-200 pl-4 ml-2">
-                        <h3 className="text-lg font-semibold">{exp.role}</h3>
+                    {profile?.experience?.map((exp, index) => (
+                      <div key={index} className="border-l-2 border-gray-200 pl-4 ml-2">
+                        <h3 className="text-lg font-semibold">{exp.title}</h3>
                         <div className="flex items-center text-gray-600 mb-2">
                           <Briefcase className="h-4 w-4 mr-2" />
                           {exp.company}
                           <span className="mx-2">•</span>
                           <Calendar className="h-4 w-4 mr-2" />
-                          {exp.period}
+                          {`${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}`}
                         </div>
                         <p className="text-gray-600">{exp.description}</p>
+                        <Button variant="outline" onClick={() => handleRemoveExperience(exp.title)}>
+                          Remove Experience
+                        </Button>
                       </div>
                     ))}
                   </div>
@@ -338,15 +338,15 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {user.education.map((edu) => (
-                      <div key={edu.id} className="border-l-2 border-gray-200 pl-4 ml-2">
+                    {profile?.education?.map((edu, index) => (
+                      <div key={index} className="border-l-2 border-gray-200 pl-4 ml-2">
                         <h3 className="text-lg font-semibold">{edu.degree}</h3>
                         <div className="flex items-center text-gray-600">
                           <GraduationCap className="h-4 w-4 mr-2" />
                           {edu.school}
                           <span className="mx-2">•</span>
                           <Calendar className="h-4 w-4 mr-2" />
-                          {edu.year}
+                          {`${new Date(edu.startDate).getFullYear()} - ${new Date(edu.endDate).getFullYear()}`}
                         </div>
                       </div>
                     ))}
@@ -368,7 +368,7 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {user.certifications.map((cert, index) => (
+                    {profile?.certifications?.map((cert, index) => (
                       <div key={index} className="flex items-center text-gray-600">
                         <Award className="h-4 w-4 mr-2" />
                         {cert}
@@ -384,4 +384,3 @@ export default function ProfilePage() {
     </div>
   )
 }
-

@@ -33,5 +33,11 @@ export class CreateUserDto {
   role?: UserRole;
 
   @IsOptional()
+  company?: string;
+
+  @IsOptional()
+  profile?: string;
+
+  @IsOptional()
   loginProvider?: string;
 }

@@ -31,7 +31,7 @@ export default function Header() {
           </div>
           <nav className="hidden md:flex space-x-8">
             <Link href="/jobs" className="text-gray-700 hover:text-blue-600">Find Jobs</Link>
-            <Link href="/companies" className="text-gray-700 hover:text-blue-600">Companies</Link>
+            <Link href="/companies" className="text-gray-700 hover:text-blue-600">Find Companies</Link>
             <Link href="/register-company" className="text-gray-700 hover:text-blue-600">Register Company</Link>
             {/* <Link href="/career-advice" className="text-gray-700 hover:text-blue-600">Career Advice</Link> */}
           </nav>
