@@ -23,6 +23,19 @@ export class Resume {
   @Prop({ enum: ['pending', 'approved', 'rejected'], default: 'pending' })
   status: string;
 
+  // Snapshot user info
+  @Prop()
+  name: string;
+
+  @Prop()
+  email: string;
+
+  @Prop()
+  phone: string;
+
+  @Prop()
+  coverLetter: string;
+
   @Prop({ type: Types.Array })
   history: {
     status: string;

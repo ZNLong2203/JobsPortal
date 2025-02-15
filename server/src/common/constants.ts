@@ -4,3 +4,9 @@ export const DeclareRole = {
   HR: 'hr',
   Member: 'member',
 };
+
+export enum FileType {
+  RESUME = 'resume',
+  COMPANY_IMAGE = 'company',
+  USER_AVATAR = 'avatar',
+}

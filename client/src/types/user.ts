@@ -13,6 +13,9 @@ export interface User {
   permissions?: string[] | Permission[],
   profile?: string | UserProfile,
   loginProvider?: string,
+  gender?: string;
+  age?: number;
+  address?: string;
 }
 
 export interface UpdateUser {
@@ -25,9 +28,15 @@ export interface UpdateUser {
   permissions?: string[] | Permission[];
   profile?: string | UserProfile;
   loginProvider?: string;
+  gender?: string;
+  age?: number;
+  address?: string;
 }
 
 export interface NewUser extends Omit<User, '_id'> {
   _id?: string;
-  password: string;
+  password?: string;
+  gender?: string;
+  age?: number;
+  address?: string;
 }

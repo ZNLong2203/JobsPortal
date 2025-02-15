@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { UserProfile, ProfileFieldEnum } from '@/types/userProfile'
+import { ProfileFieldEnum, UpdateUserProfileDto } from '@/types/userProfile'
 import { getUserProfile, removeUserProfileField, updateUserProfile } from '@/redux/api/userApi'
 
 export function useUserProfile(userId: string) {
@@ -11,7 +11,7 @@ export function useUserProfile(userId: string) {
   })
 
   const updateProfileMutation = useMutation({
-    mutationFn: (profile: UserProfile) => updateUserProfile(userId, profile),
+    mutationFn: (profile: UpdateUserProfileDto) => updateUserProfile(userId, profile),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile', userId] })
     },

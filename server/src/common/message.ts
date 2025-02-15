@@ -50,6 +50,10 @@ export class Message {
   static readonly FILE_NOT_ALLOWED = 'File not allowed';
   static readonly FILE_SIZE_EXCEEDED = 'File size exceeded';
   static readonly FILE_TYPE_NOT_ALLOWED = 'File type not allowed';
+  static readonly FILE_RESUME_UPLOADED = 'Resume uploaded successfully';
+  static readonly FILE_COMPANY_IMAGE_UPLOADED =
+    'Company image uploaded successfully';
+  static readonly FILE_USER_AVATAR_UPLOADED = 'User avatar uploaded successfully';
 
   // Resume
   static readonly RESUME_CREATED = 'Resume created successfully';

@@ -37,7 +37,16 @@ export function UserFormModal({ isOpen, onClose, onSubmit, initialData }: UserFo
 
   useEffect(() => {
     if (initialData) {
-      setUser(initialData)
+      setUser({
+        email: initialData.email,
+        name: initialData.name,
+        avatar: initialData.avatar,
+        role: typeof initialData.role === 'object' ? (initialData.role as Role)._id : initialData.role,
+        permissions: initialData.permissions,
+        gender: typeof initialData.profile === 'object' ? initialData.profile.gender || '' : '',
+        age: typeof initialData.profile === 'object' ? initialData.profile.age || 0 : 0,
+        address: typeof initialData.profile === 'object' ? initialData.profile.address || '' : '',
+      })
     } else {
       setUser({
         email: '',
@@ -102,7 +111,7 @@ export function UserFormModal({ isOpen, onClose, onSubmit, initialData }: UserFo
             <div>
               <Label htmlFor="role">Role</Label>
               <Select
-                value={user.role}
+                value={typeof user.role === 'object' ? user.role._id : user.role}
                 onValueChange={(value) => setUser({ ...user, role: value })}
               >
                 <SelectTrigger>
@@ -165,4 +174,3 @@ export function UserFormModal({ isOpen, onClose, onSubmit, initialData }: UserFo
     </Dialog>
   )
 }
-

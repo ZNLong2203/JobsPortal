@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { PencilIcon, TrashIcon } from 'lucide-react'
 import { User } from '@/types/user'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Role } from '@/types/role'
 
 interface UsersTableProps {
   users: User[];
@@ -25,33 +26,36 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users.map((user) => (
-          <TableRow key={user._id}>
-            <TableCell>
-              <Avatar>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-            </TableCell>
-            <TableCell>{user.name}</TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>{user.role}</TableCell>
-            <TableCell>{user.gender}</TableCell>
-            <TableCell>{user.age}</TableCell>
-            <TableCell>
-              <Button variant="outline" size="sm" className="mr-2" onClick={() => onEdit(user)}>
-                <PencilIcon className="h-4 w-4 mr-1" />
-                Edit
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => onDelete(user._id)}>
-                <TrashIcon className="h-4 w-4 mr-1" />
-                Delete
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+        {users.map((user) => {
+          // Nếu role được populate, hiển thị role.name, ngược lại hiển thị giá trị role
+          const roleName = typeof user.role === 'object' ? (user.role as Role).name : user.role;
+          return (
+            <TableRow key={user._id}>
+              <TableCell>
+                <Avatar>
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </TableCell>
+              <TableCell>{user.name}</TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell>{roleName}</TableCell>
+              <TableCell>{user.gender}</TableCell>
+              <TableCell>{user.age}</TableCell>
+              <TableCell>
+                <Button variant="outline" size="sm" className="mr-2" onClick={() => onEdit(user)}>
+                  <PencilIcon className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => onDelete(user._id)}>
+                  <TrashIcon className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
+          )
+        })}
       </TableBody>
     </Table>
   )
 }
-
