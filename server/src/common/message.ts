@@ -53,7 +53,8 @@ export class Message {
   static readonly FILE_RESUME_UPLOADED = 'Resume uploaded successfully';
   static readonly FILE_COMPANY_IMAGE_UPLOADED =
     'Company image uploaded successfully';
-  static readonly FILE_USER_AVATAR_UPLOADED = 'User avatar uploaded successfully';
+  static readonly FILE_USER_AVATAR_UPLOADED =
+    'User avatar uploaded successfully';
 
   // Resume
   static readonly RESUME_CREATED = 'Resume created successfully';

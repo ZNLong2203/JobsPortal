@@ -70,7 +70,7 @@ export class UsersService {
         { profile: newUserProfile._id },
         { new: true },
       );
-      
+
       return newUserProfile;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -107,10 +107,7 @@ export class UsersService {
         throw new Error(Message.INVALID_ID);
       }
 
-      const user = await this.userModel
-        .findById(id)
-        .select('-password')
-        .lean();
+      const user = await this.userModel.findById(id).select('-password').lean();
       if (!user) throw new NotFoundException(Message.USER_NOT_FOUND);
 
       return user;
@@ -165,7 +162,10 @@ export class UsersService {
         return null;
       }
 
-      const profile = await this.userProfileModel.findById(user.profile).populate('userId').lean();
+      const profile = await this.userProfileModel
+        .findById(user.profile)
+        .populate('userId')
+        .lean();
 
       return profile;
     } catch (error) {

@@ -1,6 +1,13 @@
 import { ApiTags } from '@nestjs/swagger';
 import { FileType } from 'src/common/constants';
-import { Controller, HttpStatus, ParseFilePipeBuilder, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  HttpStatus,
+  ParseFilePipeBuilder,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Message } from 'src/common/message';
@@ -16,7 +23,8 @@ export class FilesController {
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType: 'application/pdf|application/msword|application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          fileType:
+            'application/pdf|application/msword|application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         })
         .addMaxSizeValidator({
           maxSize: 5 * 1024 * 1024, // 5MB
@@ -30,7 +38,7 @@ export class FilesController {
     const fileData = await this.filesService.uploadFile(
       file.buffer,
       file.originalname,
-      FileType.RESUME
+      FileType.RESUME,
     );
 
     return {
@@ -38,7 +46,7 @@ export class FilesController {
       data: {
         url: fileData.secure_url,
         publicId: fileData.public_id,
-      }
+      },
     };
   }
 
@@ -62,7 +70,7 @@ export class FilesController {
     const fileData = await this.filesService.uploadFile(
       file.buffer,
       file.originalname,
-      FileType.COMPANY_IMAGE
+      FileType.COMPANY_IMAGE,
     );
 
     return {
@@ -70,7 +78,7 @@ export class FilesController {
       data: {
         url: fileData.secure_url,
         publicId: fileData.public_id,
-      }
+      },
     };
   }
 
@@ -94,7 +102,7 @@ export class FilesController {
     const fileData = await this.filesService.uploadFile(
       file.buffer,
       file.originalname,
-      FileType.USER_AVATAR
+      FileType.USER_AVATAR,
     );
 
     return {
@@ -102,7 +110,7 @@ export class FilesController {
       data: {
         url: fileData.secure_url,
         publicId: fileData.public_id,
-      }
+      },
     };
   }
 }

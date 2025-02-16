@@ -26,11 +26,11 @@ export function CompaniesTable({ companies, onEdit, onDelete }: CompaniesTablePr
         {companies.map((company) => (
           <TableRow key={company._id}>
             <TableCell>
-              <Image src={company.logo} alt={company.name} width={50} height={50} className="rounded-full" />
+              <Image src={company.logo ?? '/default-logo.png'} alt={company.name} width={50} height={50} className="rounded-full" />
             </TableCell>
             <TableCell>{company.name}</TableCell>
-            <TableCell>{company.address}</TableCell>
-            <TableCell>{company.des}</TableCell>
+            <TableCell className="truncate max-w-[200px]" title={company.address}>{company.address}</TableCell>
+            <TableCell className="truncate max-w-[200px]" title={company.des}>{company.des}</TableCell>
             <TableCell>
               <Button variant="outline" size="sm" className="mr-2" onClick={() => onEdit(company)}>
                 <PencilIcon className="h-4 w-4 mr-1" />

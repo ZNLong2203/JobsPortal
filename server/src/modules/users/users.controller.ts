@@ -101,7 +101,7 @@ export class UsersController {
   @Get('/:id/profile')
   async findUserProfile(@Param('id') id: Types.ObjectId) {
     const userProfile = await this.usersService.findUserProfile(id);
-    
+
     return {
       message: Message.USER_PROFILE_FETCHED,
       data: userProfile,

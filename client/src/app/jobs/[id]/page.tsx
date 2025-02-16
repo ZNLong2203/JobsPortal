@@ -1,39 +1,68 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useParams } from "next/navigation"
-import Image from "next/image"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Briefcase, MapPin, DollarSign, Calendar, FileText, Clock, Users, ChevronRight, Building, GraduationCap } from 'lucide-react'
-import { useJobDetails } from "@/hooks/useJobs"
-import { LoadingSpinner } from "@/components/common/IsLoading"
-import { ErrorMessage } from "@/components/common/IsError"
-import { MessageContent } from "@/components/common/MessageContext"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { toast } from "react-hot-toast"
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Briefcase,
+  MapPin,
+  DollarSign,
+  Calendar,
+  FileText,
+  Clock,
+  Users,
+  ChevronRight,
+  Building,
+  GraduationCap,
+} from "lucide-react";
+import { useJobDetails } from "@/hooks/useJobs";
+import { LoadingSpinner } from "@/components/common/IsLoading";
+import { ErrorMessage } from "@/components/common/IsError";
+import { MessageContent } from "@/components/common/MessageContext";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { toast } from "react-hot-toast";
+import { useResumes } from "@/hooks/useResumes";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
   phone: z.string().min(10, { message: "Please enter a valid phone number." }),
   resume: z.instanceof(File, { message: "Please upload your resume." }),
-  coverLetter: z.string().min(50, { message: "Cover letter must be at least 50 characters." }),
-})
+  coverLetter: z.string().min(5, { message: "Cover letter must be at least 5 characters." }),
+});
 
 export default function JobDetailsPage() {
-  const params = useParams()
-  const jobId = params.id as string
-  const { data: job, isLoading, isError, error } = useJobDetails(jobId)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const params = useParams();
+  const jobId = params.id as string;
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+  const { data: job, isLoading, isError, error } = useJobDetails(jobId);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,17 +72,42 @@ export default function JobDetailsPage() {
       phone: "",
       coverLetter: "",
     },
-  })
+  });
 
-  if (isLoading) return <LoadingSpinner />
-  if (isError) return <ErrorMessage message={error?.message || "An error occurred"} />
-  if (!job) return <ErrorMessage message="Job not found" />
+  const { createResume, isUploading } = useResumes();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (isError) return <ErrorMessage message={error?.message || "An error occurred"} />;
+  if (!job) return <ErrorMessage message="Job not found" />;
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted", values)
-    toast.success("Application submitted successfully!")
-    setIsDialogOpen(false)
-    form.reset()
+    createResume(
+      {
+        resumeData: {
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          coverLetter: values.coverLetter,
+          status: "pending", 
+          job: jobId,
+          user: userInfo?._id || '', 
+          company: job && typeof job.company === "object" && job.company._id ? job.company._id : "companyId", // replace with actual company ID
+          url: "resumeUrl", 
+        },
+        file: values.resume,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Application submitted successfully!");
+          form.reset();
+          setIsDialogOpen(false);
+        },
+        onError: (err: Error) => {
+          console.error("Error submitting application:", err);
+          toast.error("Có lỗi xảy ra, vui lòng thử lại sau!");
+        },
+      }
+    );
   }
 
   return (
@@ -73,7 +127,11 @@ export default function JobDetailsPage() {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-32 relative">
                 <div className="absolute bottom-0 left-6 transform translate-y-1/2 bg-white p-2 rounded-lg shadow-md">
                   <Image
-                    src={typeof job.company === "object" ? job.company.logo || "/placeholder.svg" : "/placeholder.svg"}
+                    src={
+                      typeof job.company === "object"
+                        ? job.company.logo || "/placeholder.svg"
+                        : "/placeholder.svg"
+                    }
                     alt={`${typeof job.company === "object" ? job.company.name : job.company} logo`}
                     className="w-24 h-24 object-contain"
                     width={96}
@@ -81,7 +139,7 @@ export default function JobDetailsPage() {
                   />
                 </div>
               </div>
-              
+
               <CardHeader className="pt-16">
                 <div className="flex justify-between items-start">
                   <div>
@@ -154,7 +212,9 @@ export default function JobDetailsPage() {
                                   <Input
                                     type="file"
                                     accept=".pdf,.doc,.docx"
-                                    onChange={(e) => onChange(e.target.files ? e.target.files[0] : null)}
+                                    onChange={(e) =>
+                                      onChange(e.target.files ? e.target.files[0] : null)
+                                    }
                                     {...field}
                                     value={undefined}
                                   />
@@ -180,8 +240,8 @@ export default function JobDetailsPage() {
                               </FormItem>
                             )}
                           />
-                          <Button type="submit" className="w-full">
-                            Submit Application
+                          <Button type="submit" className="w-full" disabled={isUploading}>
+                            {isUploading ? "Submitting..." : "Submit Application"}
                           </Button>
                         </form>
                       </Form>
@@ -217,7 +277,6 @@ export default function JobDetailsPage() {
                     <h3 className="text-xl font-bold mb-3">Job Description</h3>
                     <MessageContent content={job.des} />
                   </section>
-                  
                   <section>
                     <h3 className="text-xl font-bold mb-3">Required Skills</h3>
                     <div className="flex flex-wrap gap-2">
@@ -286,39 +345,9 @@ export default function JobDetailsPage() {
               </CardContent>
             </Card>
 
-            {/* <Card className="mt-6 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">Job Match</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Skills Match</span>
-                      <span className="text-sm font-medium">85%</span>
-                    </div>
-                    <Progress value={85} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Experience Match</span>
-                      <span className="text-sm font-medium">70%</span>
-                    </div>
-                    <Progress value={70} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Education Match</span>
-                      <span className="text-sm font-medium">90%</span>
-                    </div>
-                    <Progress value={90} className="h-2" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

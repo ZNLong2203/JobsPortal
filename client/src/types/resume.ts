@@ -9,6 +9,10 @@ export interface Resume {
   job: string | Job;
   url: string;
   status: string;
+  name: string;
+  email: string;
+  phone: string;
+  coverLetter: string;
   createdAt?: Date;
 }
 
