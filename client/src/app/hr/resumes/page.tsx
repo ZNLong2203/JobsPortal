@@ -14,16 +14,88 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Eye, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Eye, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
+import { useResumes } from '@/hooks/useResumes'
+import { LoadingSpinner } from '@/components/common/IsLoading'
+import { ErrorMessage } from '@/components/common/IsError'
+import toast from 'react-hot-toast'
+import moment from 'moment'
+import { Pagination } from '@/components/common/Pagination'
+import { User } from '@/types/user'
+import { Job } from '@/types/job'
+import { Resume } from '@/types/resume'
 
 export default function ResumeManagement() {
-  const [resumes] = useState([
-    { id: 1, name: 'John Doe', position: 'Senior Developer', date: '2023-06-01', status: 'New' },
-    { id: 2, name: 'Jane Smith', position: 'UX Designer', date: '2023-05-28', status: 'Reviewed' },
-    { id: 3, name: 'Mike Johnson', position: 'Product Manager', date: '2023-05-25', status: 'Interviewed' },
-    { id: 4, name: 'Emily Brown', position: 'Marketing Specialist', date: '2023-05-22', status: 'New' },
-    { id: 5, name: 'Chris Lee', position: 'Data Analyst', date: '2023-05-20', status: 'Rejected' },
-  ])
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+  const limit = 10;
+  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const { 
+    resumes: resumesData,
+    isLoading,
+    isError,
+    error,
+    updateResumeStatus,
+  } = useResumes(page, limit, userInfo?.company as string);
+
+  const resumeList = Array.isArray(resumesData) ? resumesData : resumesData?.resumes ?? [];
+  const metadata = Array.isArray(resumesData) ? null : resumesData?.metadata ?? null;
+
+  const handleApprove = (resume: Resume) => {
+    if (window.confirm('Are you sure you want to approve this resume?')) {
+      updateResumeStatus(
+        { 
+          id: resume._id as string, 
+          status: 'approved',
+          email: resume.email
+        },
+        {
+          onSuccess: () => {
+            toast.success('Resume approved successfully');
+          },
+          onError: (error: Error) => {
+            toast.error(`Failed to approve resume: ${error.message}`);
+          }
+        }
+      );
+    }
+  };
+
+  const handleReject = (resume: Resume) => {
+    if (window.confirm('Are you sure you want to reject this resume?')) {
+      updateResumeStatus(
+        { 
+          id: resume._id as string, 
+          status: 'rejected',
+          email: resume.email
+        },
+        {
+          onSuccess: () => {
+            toast.success('Resume rejected successfully');
+          },
+          onError: (error: Error) => {
+            toast.error(`Failed to reject resume: ${error.message}`);
+          }
+        }
+      );
+    }
+  };
+
+  const filteredResumes = resumeList.filter(resume => 
+    resume.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (typeof resume.job !== 'string' && resume.job.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (isError) {
+    return <ErrorMessage message={error?.message || "An error occurred"} />;
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -33,11 +105,12 @@ export default function ResumeManagement() {
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <div className="flex-1">
-              <Input placeholder="Search resumes..." />
+              <Input 
+                placeholder="Search resumes..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <Button variant="outline">
-              <Search className="mr-2 h-4 w-4" /> Search
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -58,24 +131,26 @@ export default function ResumeManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {resumes.map((resume) => (
-                <TableRow key={resume.id}>
+              {filteredResumes.map((resume) => (
+                <TableRow key={resume._id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center">
                       <Avatar className="h-8 w-8 mr-2">
-                        <AvatarImage src={`/placeholder.svg?height=32&width=32`} alt={resume.name} />
+                        <AvatarImage 
+                          src={(resume.user as User).avatar} 
+                          alt={resume.name} 
+                        />
                         <AvatarFallback>{resume.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       {resume.name}
                     </div>
                   </TableCell>
-                  <TableCell>{resume.position}</TableCell>
-                  <TableCell>{resume.date}</TableCell>
+                  <TableCell>{(resume.job as Job).name}</TableCell>
+                  <TableCell>{moment(resume.createdAt).format('MMM D, YYYY')}</TableCell>
                   <TableCell>
                     <Badge variant={
-                      resume.status === 'New' ? 'default' :
-                      resume.status === 'Reviewed' ? 'secondary' :
-                      resume.status === 'Interviewed' ? 'secondary' :
+                      resume.status === 'pending' ? 'default' :
+                      resume.status === 'approved' ? 'secondary' :
                       'destructive'
                     }>
                       {resume.status}
@@ -83,13 +158,29 @@ export default function ResumeManagement() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open(resume.url, '_blank')}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" className="text-green-600">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-green-600"
+                        onClick={() => handleApprove(resume)}
+                        disabled={resume.status !== 'pending'}
+                      >
                         <ThumbsUp className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" className="text-red-600">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-600"
+                        onClick={() => handleReject(resume)}
+                        disabled={resume.status !== 'pending'}
+                      >
                         <ThumbsDown className="h-4 w-4" />
                       </Button>
                     </div>
@@ -98,9 +189,19 @@ export default function ResumeManagement() {
               ))}
             </TableBody>
           </Table>
+          
+          {metadata && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={metadata.totalPages}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 

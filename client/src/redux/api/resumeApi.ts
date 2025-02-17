@@ -2,12 +2,12 @@ import axiosInstance from "@/lib/axios-customize";
 import { Resume, NewResume } from "@/types/resume";
 import { PageData } from "@/types/pagedata";
 
-export const getAllResume = async (page: number = 1, limit: number = 10): Promise<{ 
+export const getAllResume = async (page: number = 1, limit: number = 10, company?: string): Promise<{ 
   resumes: Resume[], 
   metadata: PageData
 }> => {
   const res = await axiosInstance.get('/resumes', {
-    params: { page, limit }
+    params: { page, limit, company }
   })
   return res.data.data
 }

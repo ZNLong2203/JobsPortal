@@ -1,22 +1,12 @@
-import * as React from "react"
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
+import React from 'react'
+import { Command as CommandPrimitive, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "cmdk";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
+import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
-export type Option = {
+interface Option {
   label: string
   value: string
 }
@@ -26,25 +16,24 @@ interface MultiSelectProps {
   selected: string[]
   onChange: (selected: string[]) => void
   placeholder?: string
+  className?: string
 }
 
 export function MultiSelect({
   options,
   selected,
   onChange,
-  placeholder = "Select items...",
+  placeholder = 'Select items...',
+  className,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false)
 
   const handleSelect = (value: string) => {
-    const updatedSelected = selected?.includes(value)
+    const newSelected = selected.includes(value)
       ? selected.filter((item) => item !== value)
-      : [...(selected || []), value]
-    onChange(updatedSelected)
+      : [...selected, value]
+    onChange(newSelected)
   }
-
-  const safeOptions = options || []
-  const safeSelected = selected || []
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,45 +42,50 @@ export function MultiSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn('w-full justify-between', className)}
         >
-          {safeSelected.length > 0 ? (
-            <div className="flex flex-wrap gap-1">
-              {safeSelected.map((value) => (
-                <Badge key={value} variant="secondary">
-                  {safeOptions.find((option) => option.value === value)?.label || value}
-                </Badge>
-              ))}
-            </div>
-          ) : (
-            placeholder
-          )}
+          <div className="flex gap-1 flex-wrap">
+            {selected.length === 0 && placeholder}
+            {selected.map((value) => (
+              <Badge
+                key={value}
+                variant="secondary"
+                className="mr-1"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleSelect(value)
+                }}
+              >
+                {options.find((opt) => opt.value === value)?.label}
+                <X className="ml-1 h-3 w-3" />
+              </Badge>
+            ))}
+          </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command>
+        <CommandPrimitive>
           <CommandInput placeholder="Search..." />
           <CommandEmpty>No item found.</CommandEmpty>
-          <CommandGroup className="max-h-64 overflow-auto">
-            {safeOptions.map((option) => (
+          <CommandGroup>
+            {options.map((option) => (
               <CommandItem
                 key={option.value}
                 onSelect={() => handleSelect(option.value)}
               >
                 <Check
                   className={cn(
-                    "mr-2 h-4 w-4",
-                    safeSelected.includes(option.value) ? "opacity-100" : "opacity-0"
+                    'mr-2 h-4 w-4',
+                    selected.includes(option.value) ? 'opacity-100' : 'opacity-0'
                   )}
                 />
                 {option.label}
               </CommandItem>
             ))}
           </CommandGroup>
-        </Command>
+        </CommandPrimitive>
       </PopoverContent>
     </Popover>
   )
 }
-

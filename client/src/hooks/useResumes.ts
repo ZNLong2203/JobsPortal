@@ -2,13 +2,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllResume, getResumeById, createResume, updateResume, deleteResume } from '@/redux/api/resumeApi';
 import { Resume, NewResume } from '@/types/resume';
 import { uploadResume } from '@/redux/api/fileApi';
+import { sendApproveEmail, sendRejectEmail } from '@/redux/api/mailApi';
 
-export const useResumes = (page: number = 1, limit: number = 10) => {
+export const useResumes = (page: number = 1, limit: number = 10, company?: string) => {
   const queryClient = useQueryClient();
 
   const allResumeQuery = useQuery({
-    queryKey: ['resumes', page, limit],
-    queryFn: () => getAllResume(page, limit),
+    queryKey: ['resumes', page, limit, company],
+    queryFn: () => getAllResume(page, limit, company),
   });
 
   const uploadResumeMutation = useMutation({
@@ -19,6 +20,7 @@ export const useResumes = (page: number = 1, limit: number = 10) => {
     }
   });
 
+  
   const createResumeMutation = useMutation({
     mutationFn: async ({
       resumeData,
@@ -31,18 +33,44 @@ export const useResumes = (page: number = 1, limit: number = 10) => {
       const formData = new FormData();
       formData.append('file', file);
       const uploadResult = await uploadResume(formData);
-
+      
       // Create resume with the uploaded file URL
       const resume = {
         ...resumeData,
         url: uploadResult.url, 
       };
-
+      
       return createResume(resume);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumes'] });
     },
+  });
+
+  const updateResumeStatusMutation = useMutation({
+    mutationFn: async ({ 
+      id, 
+      status, 
+      email 
+    }: { 
+      id: string; 
+      status: 'approved' | 'rejected'; 
+      email: string;
+    }) => {
+      // Get existing resume 
+      const existingResume = await getResumeById(id);
+      
+      // Update resume with new status
+      await updateResume({ ...existingResume, status });
+      
+      // Send email
+      await (status === 'approved' 
+        ? sendApproveEmail(email)
+        : sendRejectEmail(email));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resumes'] });
+    }
   });
 
   const updateResumeMutation = useMutation({
@@ -66,6 +94,7 @@ export const useResumes = (page: number = 1, limit: number = 10) => {
     error: allResumeQuery.error,
     createResume: createResumeMutation.mutate,
     updateResume: updateResumeMutation.mutate,
+    updateResumeStatus: updateResumeStatusMutation.mutate,
     deleteResume: deleteResumeMutation.mutate,
     isUploading: uploadResumeMutation.isPending || createResumeMutation.isPending
   };
