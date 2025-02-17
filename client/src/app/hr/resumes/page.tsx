@@ -12,6 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Eye, ThumbsUp, ThumbsDown } from 'lucide-react'
@@ -32,6 +42,11 @@ export default function ResumeManagement() {
   const limit = 10;
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedResume, setSelectedResume] = useState<{ resume: Resume | null, action: 'approve' | 'reject' | null }>({
+    resume: null,
+    action: null
+  });
   
   const { 
     resumes: resumesData,
@@ -44,44 +59,38 @@ export default function ResumeManagement() {
   const resumeList = Array.isArray(resumesData) ? resumesData : resumesData?.resumes ?? [];
   const metadata = Array.isArray(resumesData) ? null : resumesData?.metadata ?? null;
 
-  const handleApprove = (resume: Resume) => {
-    if (window.confirm('Are you sure you want to approve this resume?')) {
-      updateResumeStatus(
-        { 
-          id: resume._id as string, 
-          status: 'approved',
-          email: resume.email
-        },
-        {
-          onSuccess: () => {
-            toast.success('Resume approved successfully');
-          },
-          onError: (error: Error) => {
-            toast.error(`Failed to approve resume: ${error.message}`);
-          }
-        }
-      );
-    }
+  const handleActionClick = (resume: Resume, action: 'approve' | 'reject') => {
+    setSelectedResume({ resume, action });
+    setDialogOpen(true);
   };
 
-  const handleReject = (resume: Resume) => {
-    if (window.confirm('Are you sure you want to reject this resume?')) {
-      updateResumeStatus(
-        { 
-          id: resume._id as string, 
-          status: 'rejected',
-          email: resume.email
-        },
-        {
-          onSuccess: () => {
-            toast.success('Resume rejected successfully');
-          },
-          onError: (error: Error) => {
-            toast.error(`Failed to reject resume: ${error.message}`);
-          }
+  const handleConfirmAction = () => {
+    if (!selectedResume.resume || !selectedResume.action) return;
+
+    const status = selectedResume.action === 'approve' ? 'approved' : 'rejected';
+    
+    updateResumeStatus(
+      { 
+        id: selectedResume.resume._id as string, 
+        status,
+        email: selectedResume.resume.email,
+        emailInfo: {
+          candidateName: selectedResume.resume.name,
+          jobTitle: typeof selectedResume.resume.job === 'object' ? selectedResume.resume.job.name : '',
+          companyName: typeof selectedResume.resume.company === 'object' ? selectedResume.resume.company.name : ''
         }
-      );
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Resume ${status} successfully`);
+          setDialogOpen(false);
+        },
+        onError: (error: Error) => {
+          toast.error(`Failed to ${status} resume: ${error.message}`);
+          setDialogOpen(false);
+        }
+      }
+    );
   };
 
   const filteredResumes = resumeList.filter(resume => 
@@ -169,7 +178,7 @@ export default function ResumeManagement() {
                         variant="outline" 
                         size="sm" 
                         className="text-green-600"
-                        onClick={() => handleApprove(resume)}
+                        onClick={() => handleActionClick(resume, 'approve')}
                         disabled={resume.status !== 'pending'}
                       >
                         <ThumbsUp className="h-4 w-4" />
@@ -178,7 +187,7 @@ export default function ResumeManagement() {
                         variant="outline" 
                         size="sm" 
                         className="text-red-600"
-                        onClick={() => handleReject(resume)}
+                        onClick={() => handleActionClick(resume, 'reject')}
                         disabled={resume.status !== 'pending'}
                       >
                         <ThumbsDown className="h-4 w-4" />
@@ -201,7 +210,29 @@ export default function ResumeManagement() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {selectedResume.action === 'approve' ? 'Approve Resume' : 'Reject Resume'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to {selectedResume.action} this resume from {selectedResume.resume?.name}?
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmAction}
+              className={selectedResume.action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
+            >
+              {selectedResume.action === 'approve' ? 'Approve' : 'Reject'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
-

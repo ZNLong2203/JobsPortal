@@ -51,22 +51,30 @@ export const useResumes = (page: number = 1, limit: number = 10, company?: strin
     mutationFn: async ({ 
       id, 
       status, 
-      email 
+      email,
+      emailInfo
     }: { 
       id: string; 
       status: 'approved' | 'rejected'; 
       email: string;
+      emailInfo: { candidateName: string; jobTitle: string; companyName: string; }
     }) => {
       // Get existing resume 
       const existingResume = await getResumeById(id);
-      
-      // Update resume with new status
+      // Update resume status
       await updateResume({ ...existingResume, status });
       
-      // Send email
+      // Send email with correct structure
+      const mailData = {
+        mail: email,
+        candidateName: emailInfo.candidateName,
+        jobTitle: emailInfo.jobTitle,
+        companyName: emailInfo.companyName
+      };
+
       await (status === 'approved' 
-        ? sendApproveEmail(email)
-        : sendRejectEmail(email));
+        ? sendApproveEmail(mailData)
+        : sendRejectEmail(mailData));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumes'] });

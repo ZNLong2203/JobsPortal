@@ -1,23 +1,23 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { EmailInfoDto } from './dto/email-info.dto';
 
 @Injectable()
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendApproveEmail(email: string, token: string) {
+  async sendApproveEmail(emailInfo: EmailInfoDto) {
     try {
       await this.mailerService.sendMail({
-        to: email,
+        to: emailInfo.mail,
         subject: 'Resume Approved',
         template: 'mail-approve-template',
         context: {
-          candidateName: 'Candidate',
-          jobTitle: 'Job Title',
-          companyName: 'Company Name',
-          dashboardLink: `${process.env.CLIENT_URL}/dashboard`,
+          candidateName: emailInfo.candidateName,
+          jobTitle: emailInfo.jobTitle,
+          companyName: emailInfo.companyName,
+          jobPortalLink: `${process.env.CLIENT_URL}`,
           currentYear: new Date().getFullYear(),
-          token,
         },
       });
     } catch (error) {
@@ -25,19 +25,18 @@ export class MailService {
     }
   }
 
-  async sendRejectEmail(email: string, token: string) {
+  async sendRejectEmail(emailInfo: EmailInfoDto) {
     try {
       await this.mailerService.sendMail({
-        to: email,
+        to: emailInfo.mail,
         subject: 'Resume Rejected',
         template: 'mail-reject-template',
         context: {
-          candidateName: 'Candidate',
-          jobTitle: 'Job Title',
-          companyName: 'Company Name',
-          dashboardLink: `${process.env.CLIENT_URL}/dashboard`,
+          candidateName: emailInfo.candidateName,
+          jobTitle: emailInfo.jobTitle,
+          companyName: emailInfo.companyName,
+          jobPortalLink: `${process.env.CLIENT_URL}`,
           currentYear: new Date().getFullYear(),
-          token,
         },
       });
     } catch (error) {
