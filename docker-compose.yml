@@ -1,6 +1,6 @@
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:lastest
+    image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -10,7 +10,7 @@ services:
       - 2181:2181
 
   kafka:
-    image: confluentinc/cp-kafka:lastest
+    image: confluentinc/cp-kafka:latest
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -28,6 +28,7 @@ services:
     volumes:
       - redis-data:/data
     environment:
+      - REDIS_HOST=redis
       - REDIS_PASSWORD=admin
   
   client:
@@ -48,6 +49,8 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PASSWORD=admin
+      - KAFKA_CLIENT_ID=1
+      - KAFKA_BROKER=kafka:9092
     depends_on:
       - redis
 

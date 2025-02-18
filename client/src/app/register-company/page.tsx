@@ -1,10 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import Image from "next/image"
+import Link from "next/link"
+import { useSelector } from "react-redux"
+import toast from "react-hot-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,14 +18,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Building, Briefcase, Globe, CheckCircle } from "lucide-react"
 import { useCompanies } from "@/hooks/useCompanies"
 import { useUsers } from "@/hooks/useUsers"
-import Link from "next/link"
 import { LoadingSpinner } from "@/components/common/IsLoading"
 import { ErrorMessage } from "@/components/common/IsError"
-import toast from "react-hot-toast"
-import { UpdateUser } from "@/types/user"
-import { useSelector } from "react-redux"
 import { RootState } from "@/redux/store"
 import { DeclareRole } from "@/utils/declareRole"
+import { UpdateUser } from "@/types/user"
+import { uploadCompanyImage } from "@/redux/api/fileApi"
+
+const DEFAULT_LOGO = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl3KRLQ-4_EdCiWdQ5WVmZBhS4HCHiTxV71A&s"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -36,12 +40,7 @@ const formSchema = z.object({
   employees: z.number().min(1, {
     message: "Number of employees must be at least 1.",
   }),
-  logo: z
-    .string()
-    .url({
-      message: "Please enter a valid URL for the logo.",
-    })
-    .optional(),
+  logo: z.any(),
   des: z.string().min(10, {
     message: "Company description must be at least 10 characters.",
   }),
@@ -58,6 +57,10 @@ export default function RegisterCompanyPage() {
   const { createCompany, isLoading, isError, error } = useCompanies()
   const { updateUser } = useUsers()
   const [step, setStep] = useState(1)
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string>(DEFAULT_LOGO)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,36 +68,64 @@ export default function RegisterCompanyPage() {
       address: "",
       industry: "",
       employees: 1,
-      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl3KRLQ-4_EdCiWdQ5WVmZBhS4HCHiTxV71A&s",
+      logo: null,
       des: "",
       website: "",
       contactEmail: "",
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    createCompany(values, {
-      onSuccess: (data) => {
-        const userUpdate: UpdateUser = {
-          _id: userInfo?._id || "",
-          company: data._id,
-          role: DeclareRole.CompanyAdmin,
-        };
-        
-        updateUser({ user: userUpdate }, {
-          onSuccess: () => {
-            setStep(4);
-            toast.success('Company registered successfully');
+  useEffect(() => {
+    return () => {
+      // Cleanup preview URL when component unmounts
+      if (previewUrl && previewUrl !== DEFAULT_LOGO) {
+        URL.revokeObjectURL(previewUrl)
+      }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }, [previewUrl])
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      let logoUrl = DEFAULT_LOGO
+
+      if (logoFile) {
+        const formData = new FormData()
+        formData.append('file', logoFile)
+        const uploadResponse = await uploadCompanyImage(formData)
+        logoUrl = uploadResponse.data.url
+      }
+
+      createCompany(
+        { ...values, logo: logoUrl },
+        {
+          onSuccess: (data) => {
+            const userUpdate: UpdateUser = {
+              _id: userInfo?._id || "",
+              company: data._id,
+              role: DeclareRole.CompanyAdmin,
+            }
+            
+            updateUser({ user: userUpdate }, {
+              onSuccess: () => {
+                setStep(4)
+                toast.success('Company registered successfully')
+              },
+              onError: (error: Error) => {
+                toast.error(`Failed to update user: ${error.message}`)
+              }
+            })
           },
           onError: (error: Error) => {
-            toast.error(`Failed to update user: ${error.message}`);
+            toast.error(`Failed to create company: ${error.message}`)
           }
-        });
-      },
-      onError: (error: Error) => {
-        toast.error(`Failed to create company: ${error.message}`);
-      }
-    });
+        }
+      )
+    } catch {
+      toast.error('Failed to upload company logo')
+    }
   }
 
   const steps = [
@@ -172,6 +203,51 @@ export default function RegisterCompanyPage() {
                   />
                   <FormField
                     control={form.control}
+                    name="logo"
+                    render={({ field: { onChange } }) => (
+                      <FormItem>
+                        <FormLabel>Company Logo</FormLabel>
+                        <FormControl>
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-4">
+                              <Image
+                                src={previewUrl}
+                                alt="Logo preview"
+                                width={100}
+                                height={100}
+                                className="rounded-lg object-cover"
+                              />
+                              <div className="flex-1">
+                                <Input
+                                  ref={fileInputRef}
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) {
+                                      if (file.size > 2 * 1024 * 1024) {
+                                        toast.error('Image size should be less than 2MB')
+                                        return
+                                      }
+                                      setLogoFile(file)
+                                      setPreviewUrl(URL.createObjectURL(file))
+                                      onChange(file)
+                                    }
+                                  }}
+                                />
+                                <FormDescription>
+                                  Upload a company logo (max 2MB)
+                                </FormDescription>
+                              </div>
+                            </div>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="des"
                     render={({ field }) => (
                       <FormItem>
@@ -226,19 +302,6 @@ export default function RegisterCompanyPage() {
                           />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="logo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Company Logo URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://example.com/logo.png" {...field} />
-                        </FormControl>
-                        <FormDescription>Leave blank to use default logo</FormDescription>
                       </FormItem>
                     )}
                   />

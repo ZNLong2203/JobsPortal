@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   experimental: {
     turbo: {
       loaders: {
@@ -10,6 +11,11 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
       {
         protocol: 'https',
         hostname: 'encrypted-tbn0.gstatic.com',

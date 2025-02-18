@@ -11,6 +11,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Company, NewCompany } from '@/types/company'
+import { Upload } from 'lucide-react'
+import Image from 'next/image'
+import toast from 'react-hot-toast'
+import { uploadCompanyImage } from '@/redux/api/fileApi'
+
+const DEFAULT_LOGO = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl3KRLQ-4_EdCiWdQ5WVmZBhS4HCHiTxV71A&s';
 
 interface CompanyFormModalProps {
   isOpen: boolean;
@@ -25,28 +31,66 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
     address: '',
     industry: '',
     employees: 0,
-    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl3KRLQ-4_EdCiWdQ5WVmZBhS4HCHiTxV71A&s',
+    logo: DEFAULT_LOGO,
     des: '',
   })
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string>(company.logo || DEFAULT_LOGO)
 
   useEffect(() => {
     if (initialData) {
       setCompany(initialData)
+      setPreviewUrl(initialData.logo || DEFAULT_LOGO);
     } else {
       setCompany({
         name: '',
         address: '',
         industry: '',
         employees: 0,
-        logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl3KRLQ-4_EdCiWdQ5WVmZBhS4HCHiTxV71A&s',
+        logo: DEFAULT_LOGO,
         des: '',
       })
+      setPreviewUrl(DEFAULT_LOGO);
     }
   }, [initialData])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast.error('Image size should be less than 2MB')
+        return
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file')
+        return
+      }
+      setLogoFile(file)
+      setPreviewUrl(URL.createObjectURL(file))
+      setCompany({ ...company, logo: '' }) 
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(company)
+    
+    if (logoFile) {
+      const formData = new FormData()
+      formData.append('file', logoFile)
+      
+      try {
+        const uploadResponse = await uploadCompanyImage(formData)
+        onSubmit({
+          ...company,
+          logo: uploadResponse.url
+        })
+      } catch {
+        toast.error('Failed to upload image')
+        return
+      }
+    } else {
+      onSubmit(company)
+    }
   }
 
   return (
@@ -95,13 +139,38 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
               />
             </div>
             <div>
-              <Label htmlFor="logo">Logo URL</Label>
-              <Input
-                id="logo"
-                value={company.logo}
-                onChange={(e) => setCompany({ ...company, logo: e.target.value })}
-                required
-              />
+              <Label htmlFor="logo">Company Logo</Label>
+              <div className="mt-2 flex flex-col items-center gap-4">
+                <Image
+                  src={previewUrl}
+                  alt="Company logo preview"
+                  width={100}
+                  height={100}
+                  className="rounded-lg object-cover"
+                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('logo')?.click()}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Logo
+                  </Button>
+                  {logoFile && (
+                    <p className="text-sm text-muted-foreground">
+                      {logoFile.name}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
             <div>
               <Label htmlFor="des">Description</Label>
