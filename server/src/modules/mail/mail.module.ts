@@ -5,10 +5,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { KafkaModule } from 'src/integrations/kafka/kafka.module';
+import { MailProducer } from './mail.producer';
+import { MailConsumer } from './mail.consumer';
 
 @Module({
   imports: [
     ConfigModule,
+    KafkaModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -31,7 +35,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     }),
   ],
   controllers: [MailController],
-  providers: [MailService],
+  providers: [MailService, MailProducer, MailConsumer],
   exports: [MailService],
 })
 export class MailModule {}

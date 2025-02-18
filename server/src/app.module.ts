@@ -15,7 +15,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { RedisModule } from './integrations/redis/redis.module';
 import { GeminiModule } from './integrations/gemini/gemini.module';
-// import { KafkaModule } from './integrations/kafka/kafka.module';
+import { KafkaModule } from './integrations/kafka/kafka.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import * as mongooseDelete from 'mongoose-delete';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -56,7 +56,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     RolesModule,
     StatisticsModule,
     RedisModule,
-    // KafkaModule,
+    KafkaModule,
     GeminiModule,
     MailModule,
   ],

@@ -11,7 +11,7 @@ export class MailService {
       await this.mailerService.sendMail({
         to: emailInfo.mail,
         subject: 'Resume Approved',
-        template: 'mail-approve-template',
+        template: 'mail-approved-template',
         context: {
           candidateName: emailInfo.candidateName,
           jobTitle: emailInfo.jobTitle,
@@ -30,7 +30,7 @@ export class MailService {
       await this.mailerService.sendMail({
         to: emailInfo.mail,
         subject: 'Resume Rejected',
-        template: 'mail-reject-template',
+        template: 'mail-rejected-template',
         context: {
           candidateName: emailInfo.candidateName,
           jobTitle: emailInfo.jobTitle,
