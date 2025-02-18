@@ -139,7 +139,11 @@ export class JobsService {
       const queryData = query
         ? { title: { $regex: query, $options: 'i' } }
         : {};
-      const totalJobs = await this.jobModel.countDocuments(queryData);
+      const totalJobs = await this.jobModel.countDocuments({
+        ...queryData,
+        isActive: true,
+      });
+
       return totalJobs;
     } catch (error) {
       throw new NotFoundException(error.message);

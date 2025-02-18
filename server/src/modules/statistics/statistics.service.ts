@@ -43,14 +43,46 @@ export class StatisticsService {
       const totalResumes = await this.resumeService.getTotalResumes(
         user.company,
       );
+      const totalHr = await this.userService.getTotalHR(user.company);
       const ResumeStatusByMonth =
         await this.resumeService.getResumeStatusByMonth(user.company);
 
       return {
         totalJobs,
         totalResumes,
+        totalHr,
         ResumeStatusByMonth,
       };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  async getHRStatistics(user: IReqUser): Promise<any> {
+    try {
+      const totalJobs = await this.jobsService.getTotalJobs(user.company);
+      const totalResumes = await this.resumeService.getTotalResumes(
+        user.company,
+      );
+      const ResumeStatusByMonth = await this.resumeService.getResumeStatusByJob(
+        user.company,
+      );
+
+      return {
+        totalJobs,
+        totalResumes,
+        ResumeStatusByMonth,
+      };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  async getUserStatistics(user: IReqUser): Promise<any> {
+    try {
+      const data = await this.resumeService.getResumeToStatisticByUser(user);
+
+      return data;
     } catch (error) {
       throw new Error(error.message);
     }

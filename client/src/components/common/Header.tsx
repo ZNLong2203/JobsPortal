@@ -30,9 +30,9 @@ export default function Header() {
             <Link href="/" className="text-2xl font-bold text-blue-600">JobsPortal</Link>
           </div>
           <nav className="hidden md:flex space-x-8">
-            <Link href="/jobs" className="text-gray-700 hover:text-blue-600">Find Jobs</Link>
-            <Link href="/companies" className="text-gray-700 hover:text-blue-600">Find Companies</Link>
-            <Link href="/register-company" className="text-gray-700 hover:text-blue-600">Register Company</Link>
+            <Link href="/jobs" className="text-gray-700 hover:text-blue-600">Job Search</Link>
+            <Link href="/companies" className="text-gray-700 hover:text-blue-600">Companies</Link>
+            <Link href="/register-company" className="text-gray-700 hover:text-blue-600">Employer Registration</Link>
             {/* <Link href="/career-advice" className="text-gray-700 hover:text-blue-600">Career Advice</Link> */}
           </nav>
           <div className="flex items-center space-x-4">

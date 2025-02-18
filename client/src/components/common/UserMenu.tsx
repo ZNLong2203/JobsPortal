@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { User, LogOut, FileText } from 'lucide-react'
+import { User, LogOut, FileText, Backpack } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -55,6 +55,12 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
           <Link href="/user/resume-history">
             <FileText className="mr-2 h-4 w-4" />
             <span>Resume History</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/user/applied-jobs">
+            <Backpack className="mr-2 h-4 w-4" />
+            <span>Applied Jobs</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

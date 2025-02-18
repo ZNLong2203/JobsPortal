@@ -182,6 +182,19 @@ export class UsersService {
     }
   }
 
+  async getTotalHR(company: string): Promise<number> {
+    try {
+      const totalHr = await this.userModel.countDocuments({
+        company: company,
+        role: 'hr',
+      });
+
+      return totalHr;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
   async updateUser(
     id: Types.ObjectId,
     updateUserDto: UpdateUserDto,

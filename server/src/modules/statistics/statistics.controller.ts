@@ -41,4 +41,26 @@ export class StatisticsController {
       data: statistics,
     };
   }
+
+  @Get('/hr')
+  @Roles(DeclareRole.HR)
+  async getHRStatistics(@User() user: IReqUser) {
+    const statistics = await this.statisticsService.getHRStatistics(user);
+
+    return {
+      message: Message.STATISTICS_HR_FETCHED,
+      data: statistics,
+    };
+  }
+
+  @Get('/user')
+  @Roles(DeclareRole.Member)
+  async getUserStatistics(@User() user: IReqUser) {
+    const statistics = await this.statisticsService.getUserStatistics(user);
+
+    return {
+      message: Message.STATISTICS_USER_FETCHED,
+      data: statistics,
+    };
+  }
 }

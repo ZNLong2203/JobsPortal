@@ -105,7 +105,7 @@ export class ResumesService {
     }
   }
 
-  async findAllResumeByUser(
+  async findAllResumeAndJobApplicationByUser(
     page: number,
     limit: number,
     user: IReqUser,
@@ -193,6 +193,57 @@ export class ResumesService {
     }
   }
 
+  async getResumeToStatisticByUser(user: IReqUser): Promise<any> {
+    try {
+      const totalApplicantsResume = await this.resumeModel
+        .find({
+          createdBy: user._id,
+        })
+        .countDocuments();
+
+      const totalApproveResumes = await this.resumeModel
+        .find({
+          createdBy: user._id,
+          status: 'approved',
+        })
+        .countDocuments();
+
+      const totalPendingResumes = await this.resumeModel
+        .find({
+          createdBy: user._id,
+          status: 'pending',
+        })
+        .countDocuments();
+
+      const totalRejectedResumes = await this.resumeModel
+        .find({
+          createdBy: user._id,
+          status: 'rejected',
+        })
+        .countDocuments();
+
+      const resumes = await this.resumeModel
+        .find({
+          createdBy: user._id,
+        })
+        .populate('job')
+        .populate('company')
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean();
+
+      return {
+        totalApplicantsResume: totalApplicantsResume,
+        totalApproveResumes: totalApproveResumes,
+        totalPendingResumes: totalPendingResumes,
+        totalRejectedResumes: totalRejectedResumes,
+        resumes: resumes,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async getTotalResumes(query?: string): Promise<number> {
     try {
       const queryData = query
@@ -228,6 +279,70 @@ export class ResumesService {
             '_id.year': 1,
             '_id.month': 1,
           },
+        },
+      ]);
+
+      return resumes;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async getResumeStatusByJob(companyId: string): Promise<any> {
+    try {
+      const resumes = await this.resumeModel.aggregate([
+        {
+          $match: {
+            company: new Types.ObjectId(companyId),
+          },
+        },
+        {
+          $lookup: {
+            from: 'jobs',
+            localField: 'job',
+            foreignField: '_id',
+            as: 'jobDetails',
+          },
+        },
+        {
+          $unwind: '$jobDetails',
+        },
+        {
+          $group: {
+            _id: {
+              jobId: '$job',
+              jobName: '$jobDetails.name',
+            },
+            totalResumes: { $sum: 1 },
+            pendingCount: {
+              $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
+            },
+            approvedCount: {
+              $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] },
+            },
+            rejectedCount: {
+              $sum: { $cond: [{ $eq: ['$status', 'rejected'] }, 1, 0] },
+            },
+            lastJobDate: { $first: '$jobDetails.createdAt' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            jobId: '$_id.jobId',
+            jobName: '$_id.jobName',
+            totalResumes: 1,
+            pendingCount: 1,
+            approvedCount: 1,
+            rejectedCount: 1,
+            lastJobDate: 1,
+          },
+        },
+        {
+          $sort: { lastJobDate: -1 },
+        },
+        {
+          $limit: 10,
         },
       ]);
 

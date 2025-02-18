@@ -92,6 +92,9 @@ export class Message {
     'Admin statistics fetched successfully';
   static readonly STATISTICS_COMPANY_FETCHED =
     'Company statistics fetched successfully';
+  static readonly STATISTICS_USER_FETCHED =
+    'User statistics fetched successfully';
+  static readonly STATISTICS_HR_FETCHED = 'HR statistics fetched successfully';
 
   // Email
   static readonly EMAIL_SENT = 'Email sent successfully';
