@@ -2,6 +2,7 @@ import axiosInstance from "@/lib/axios-customize";
 import { User, NewUser, UpdateUser } from "@/types/user";
 import { PageData } from "@/types/pagedata";
 import { ProfileFieldEnum, UpdateUserProfileDto, UserProfile } from "@/types/userProfile";
+import { Resume } from "@/types/resume";
 
 export const getUsers = async (page: number = 1, limit: number = 10): Promise<{ 
   users: User[], 
@@ -20,6 +21,20 @@ export const getUser = async (_id: string): Promise<User> => {
 
 export const getAllHR = async (): Promise<User[]> => {
   const res = await axiosInstance.get('/users/hr')
+  return res.data.data
+}
+
+export const getAllResumeAndJobApplicationByUser = async (
+  _id: string, 
+  page: number = 1, 
+  limit: number = 10
+): Promise<{ 
+  resumes: Resume[], 
+  metadata: PageData
+}> => {
+  const res = await axiosInstance.get(`/users/${_id}/resumes`, {
+    params: { page, limit }
+  })
   return res.data.data
 }
 

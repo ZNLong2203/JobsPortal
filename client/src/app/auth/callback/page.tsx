@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { login } from '@/redux/slice/authSlice';
@@ -13,9 +13,11 @@ function AuthCallbackContent() {
   const searchParams = useSearchParams();
   const provider = searchParams.get('provider');
   const encodedData = searchParams.get('data');
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
-    if (encodedData) {
+    if (encodedData && !hasProcessed.current) {
+      hasProcessed.current = true;
       try {
         const decodedData = JSON.parse(decodeURIComponent(encodedData));
         dispatch(

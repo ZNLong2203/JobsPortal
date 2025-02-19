@@ -78,7 +78,7 @@ export class UsersController {
   }
 
   @Get('/:id/resumes')
-  async findAllResumesFromUser(
+  async findAllResumeAndJobApplicationByUser(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @User() user: IReqUser,
