@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .job-card {
+      border: 1px solid #eee;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    .job-title {
+      color: #2563eb;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    .company-name {
+      color: #4b5563;
+      font-weight: bold;
+    }
+    .job-details {
+      margin: 10px 0;
+      color: #6b7280;
+    }
+    .cta-button {
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <h2>Hello {{name}},</h2>
+  <p>We found some new job opportunities that match your skills!</p>
+
+  {{#each jobs}}
+  <div class="job-card">
+    <div class="job-title">{{title}}</div>
+    <div class="company-name">{{company}}</div>
+    <div class="job-details">
+      <p>📍 Location: {{location}}</p>
+      <p>💰 Salary: ${{salary}}</p>
+      <p>🔧 Skills: {{skills}}</p>
+    </div>
+    <a href="{{applicationLink}}" class="cta-button">View Job</a>
+  </div>
+  {{/each}}
+
+  <p style="margin-top: 20px;">
+    Best regards,<br>
+    Your Job Portal Team
+  </p>
+
+  <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">
+    If you no longer wish to receive these notifications, 
+    <a href="{{unsubscribeLink}}">unsubscribe here</a>
+  </p>
+</body>
+</html>

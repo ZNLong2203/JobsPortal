@@ -243,57 +243,99 @@ export class ResumesService {
       throw new BadRequestException(error.message);
     }
   }
-
-  async getTotalResumes(query?: string): Promise<number> {
+  async getTotalResumes(company?: string): Promise<number> {
     try {
-      const queryData = query
-        ? { title: { $regex: query, $options: 'i' } }
-        : {};
-      const totalResumes = await this.resumeModel.countDocuments(queryData);
+      const query = company ? company : {};
+      const totalResumes = await this.resumeModel.countDocuments(query);
+
       return totalResumes;
     } catch (error) {
       throw new NotFoundException(error.message);
     }
   }
 
-  async getResumeStatusByMonth(query?: string): Promise<any> {
+  async getResumeStatusByMonth(company?: string): Promise<any> {
     try {
-      const queryData = query
-        ? { title: { $regex: query, $options: 'i' } }
-        : {};
+      const match: any = {
+        deleted: false,
+      };
+
+      if (company) {
+        match.company = new Types.ObjectId(company);
+      }
+
+      const currentYear = new Date().getFullYear();
+      const startDate = new Date(currentYear - 1, 0, 1);
+
+      match.createdAt = {
+        $gte: startDate,
+      };
+
       const resumes = await this.resumeModel.aggregate([
-        {
-          $match: queryData,
-        },
+        { $match: match },
         {
           $group: {
             _id: {
               month: { $month: '$createdAt' },
               year: { $year: '$createdAt' },
             },
+            pending: {
+              $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
+            },
+            approved: {
+              $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] },
+            },
+            rejected: {
+              $sum: { $cond: [{ $eq: ['$status', 'rejected'] }, 1, 0] },
+            },
             total: { $sum: 1 },
           },
         },
         {
           $sort: {
-            '_id.year': 1,
-            '_id.month': 1,
+            '_id.year': -1,
+            '_id.month': -1,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            month: '$_id.month',
+            year: '$_id.year',
+            pending: 1,
+            approved: 1,
+            rejected: 1,
+            total: 1,
+            monthYear: {
+              $concat: [
+                { $toString: '$_id.month' },
+                '/',
+                { $toString: '$_id.year' },
+              ],
+            },
           },
         },
       ]);
 
       return resumes;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(
+        `Failed to get resume status by month: ${error.message}`,
+      );
     }
   }
 
   async getResumeStatusByJob(companyId: string): Promise<any> {
     try {
+      if (!Types.ObjectId.isValid(companyId)) {
+        throw new BadRequestException('Invalid company ID format');
+      }
+
       const resumes = await this.resumeModel.aggregate([
         {
           $match: {
             company: new Types.ObjectId(companyId),
+            deleted: false,
           },
         },
         {
@@ -305,7 +347,10 @@ export class ResumesService {
           },
         },
         {
-          $unwind: '$jobDetails',
+          $unwind: {
+            path: '$jobDetails',
+            preserveNullAndEmptyArrays: false,
+          },
         },
         {
           $group: {
@@ -323,7 +368,8 @@ export class ResumesService {
             rejectedCount: {
               $sum: { $cond: [{ $eq: ['$status', 'rejected'] }, 1, 0] },
             },
-            lastJobDate: { $first: '$jobDetails.createdAt' },
+            lastJobDate: { $max: '$jobDetails.createdAt' },
+            isActive: { $first: '$jobDetails.isActive' },
           },
         },
         {
@@ -336,19 +382,39 @@ export class ResumesService {
             approvedCount: 1,
             rejectedCount: 1,
             lastJobDate: 1,
+            isActive: 1,
+            percentages: {
+              pending: {
+                $multiply: [
+                  { $divide: ['$pendingCount', '$totalResumes'] },
+                  100,
+                ],
+              },
+              approved: {
+                $multiply: [
+                  { $divide: ['$approvedCount', '$totalResumes'] },
+                  100,
+                ],
+              },
+              rejected: {
+                $multiply: [
+                  { $divide: ['$rejectedCount', '$totalResumes'] },
+                  100,
+                ],
+              },
+            },
           },
         },
         {
           $sort: { lastJobDate: -1 },
         },
-        {
-          $limit: 10,
-        },
       ]);
 
       return resumes;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(
+        `Failed to get resume status by job: ${error.message}`,
+      );
     }
   }
 

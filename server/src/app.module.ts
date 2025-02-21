@@ -12,13 +12,15 @@ import { ResumesModule } from './modules/resumes/resumes.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { MailModule } from './modules/mail/mail.module';
+import { SubscribersModule } from './modules/subscribers/subscribers.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { RedisModule } from './integrations/redis/redis.module';
 import { GeminiModule } from './integrations/gemini/gemini.module';
 import { KafkaModule } from './integrations/kafka/kafka.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import * as mongooseDelete from 'mongoose-delete';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
         limit: 10,
       },
     ]),
+    ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -55,10 +58,12 @@ import { MailerModule } from '@nestjs-modules/mailer';
     PermissionsModule,
     RolesModule,
     StatisticsModule,
+    MailModule,
+    SubscribersModule,
+    NotificationsModule,
     RedisModule,
     KafkaModule,
     GeminiModule,
-    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

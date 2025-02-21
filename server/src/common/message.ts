@@ -98,4 +98,14 @@ export class Message {
 
   // Email
   static readonly EMAIL_SENT = 'Email sent successfully';
+
+  // Subscribers
+  static readonly SUBSCRIBER_CREATED = 'Subscriber created successfully';
+  static readonly SUBSCRIBER_ALL_FETCHED =
+    'All subscriber fetched successfully';
+  static readonly SUBSCRIBER_FETCHED = 'Subscriber fetched successfully';
+  static readonly SUBSCRIBER_UPDATED = 'Subscriber updated successfully';
+  static readonly SUBSCRIBER_DELETED = 'Subscriber deleted successfully';
+  static readonly SUBSCRIBER_NOT_FOUND = 'Subscriber not found';
+  static readonly SUBSCRIBER_ALREADY_EXISTS = 'Subscriber already exists';
 }

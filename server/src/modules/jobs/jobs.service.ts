@@ -134,15 +134,13 @@ export class JobsService {
     }
   }
 
-  async getTotalJobs(query?: string): Promise<number> {
+  async getTotalJobs(company?: string, isActive?: boolean): Promise<number> {
     try {
-      const queryData = query
-        ? { title: { $regex: query, $options: 'i' } }
-        : {};
-      const totalJobs = await this.jobModel.countDocuments({
-        ...queryData,
-        isActive: true,
-      });
+      const query: any = {};
+      if (company) query.company = company;
+      if (isActive !== undefined) query.isActive = isActive;
+
+      const totalJobs = await this.jobModel.countDocuments(query);
 
       return totalJobs;
     } catch (error) {

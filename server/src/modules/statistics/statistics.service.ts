@@ -64,14 +64,14 @@ export class StatisticsService {
       const totalResumes = await this.resumeService.getTotalResumes(
         user.company,
       );
-      const ResumeStatusByMonth = await this.resumeService.getResumeStatusByJob(
+      const ResumeStatusByJob = await this.resumeService.getResumeStatusByJob(
         user.company,
       );
 
       return {
         totalJobs,
         totalResumes,
-        ResumeStatusByMonth,
+        ResumeStatusByJob,
       };
     } catch (error) {
       throw new Error(error.message);
