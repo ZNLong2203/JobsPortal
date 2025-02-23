@@ -7,7 +7,10 @@ With advanced features like AI-powered chatbots, seamless resume management, and
 ### Admin
 - Manage companies and users on the website.
 - Oversee platform performance and ensure smooth operations.
-### Company admin and Hr
+### Company Admin
+- Manage job postings efficiently.
+- Manage hr in company.
+### Hr
 - Manage job postings efficiently.
 - View, filter, and review candidate resumes directly on the platform.
 ### User
