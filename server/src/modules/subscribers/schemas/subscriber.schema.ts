@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type SubscriberDocument = HydratedDocument<Subscriber>;
 
@@ -13,6 +13,15 @@ export class Subscriber {
 
   @Prop()
   skills: string[];
+
+  @Prop({ type: Types.ObjectId })
+  createdBy: Types.ObjectId;
+
+  @Prop()
+  createdAt: Date;
+
+  @Prop()
+  updatedAt: Date;
 }
 
 export const SubscriberSchema = SchemaFactory.createForClass(Subscriber);

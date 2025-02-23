@@ -5,7 +5,7 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
 }
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:2222/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -85,6 +85,7 @@ axiosInstance.interceptors.response.use(
       }
     }
 
+    console.error('API Error:', error.response?.data || error.message);
     return Promise.reject(error);
   }
 );

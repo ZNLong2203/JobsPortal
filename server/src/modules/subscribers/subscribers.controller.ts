@@ -38,8 +38,9 @@ export class SubscribersController {
   }
 
   @Get()
-  async findAllSubscriber() {
-    const allSubscribers = await this.subscribersService.findAllSubscriber();
+  async findAllSubscriberByUser(@User() user: IReqUser) {
+    const allSubscribers =
+      await this.subscribersService.findAllSubscriberByUser(user);
 
     return {
       message: Message.SUBSCRIBER_ALL_FETCHED,

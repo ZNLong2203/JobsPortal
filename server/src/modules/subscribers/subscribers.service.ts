@@ -30,8 +30,10 @@ export class SubscribersService {
         throw new BadRequestException('Subscriber already exists');
       }
 
-      const createdSubscriber =
-        await this.subscriberModel.create(createSubscriberDto);
+      const createdSubscriber = await this.subscriberModel.create({
+        ...createSubscriberDto,
+        createdBy: user._id,
+      });
 
       return createdSubscriber;
     } catch (error) {
@@ -39,9 +41,14 @@ export class SubscribersService {
     }
   }
 
-  async findAllSubscriber(): Promise<any> {
+  async findAllSubscriberByUser(user: IReqUser): Promise<any> {
     try {
-      const allSubscribers = await this.subscriberModel.find();
+      const allSubscribers = await this.subscriberModel
+        .find({
+          createdBy: user._id,
+        })
+        .sort({ createdAt: -1 })
+        .lean();
 
       return allSubscribers;
     } catch (error) {
