@@ -23,9 +23,9 @@ export const logoutApi = async (): Promise<void> => {
   await axiosInstance.post('/auth/logout')
 }
 
-export const loginWithGoogleApi = 'http://localhost:2222/api/v1/auth/google'
+export const loginWithGoogleApi = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`
 
-export const loginWithGithubApi = 'http://localhost:2222/api/v1/auth/github'
+export const loginWithGithubApi = `${process.env.NEXT_PUBLIC_API_URL}/auth/github`
 
 export const handleOAuthSuccess = async (provider: string) => {
   const response = await axiosInstance.get(`/api/auth/${provider}/callback`);
