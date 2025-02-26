@@ -22,13 +22,22 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findUserByEmail(email);
-    const checkPassword = await compare(password, user.password);
+    try {
+      const user = await this.usersService.findUserByEmail(email);
+      if (!user) {
+        throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
+      }
 
-    if (user && checkPassword) {
+      const checkPassword = await compare(password, user.password);
+      if (!checkPassword) {
+        throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
+      }
+
       return user;
+    } catch (error) {
+      console.error('User validation error:', error);
+      throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
     }
-    throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
   }
 
   async register(createUser: CreateUserDto): Promise<void> {
@@ -76,8 +85,10 @@ export class AuthService {
       res.clearCookie('refreshToken');
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        secure: process.env.NODE_ENV !== 'dev',
+        sameSite: process.env.NODE_ENV === 'dev' ? 'lax' : 'none',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        path: '/',
       });
 
       // Create user profile
@@ -125,8 +136,10 @@ export class AuthService {
       res.clearCookie('refreshToken');
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        secure: process.env.NODE_ENV !== 'dev',
+        sameSite: process.env.NODE_ENV === 'dev' ? 'lax' : 'none',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        path: '/',
       });
 
       return {

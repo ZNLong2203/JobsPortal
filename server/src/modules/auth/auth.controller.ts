@@ -6,6 +6,9 @@ import {
   Request,
   Res,
   Get,
+  BadRequestException,
+  InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -28,23 +31,41 @@ export class AuthController {
   @Public()
   @Post('/register')
   async register(@Body() createUser: CreateUserDto) {
-    await this.authService.register(createUser);
-
-    return {
-      message: Message.REGISTER_SUCCESS,
-    };
+    try {
+      await this.authService.register(createUser);
+      return {
+        message: Message.REGISTER_SUCCESS,
+      };
+    } catch (error) {
+      console.error('Registration error:', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Registration failed. Please try again later.',
+      );
+    }
   }
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@Request() req: any, @Res({ passthrough: true }) res: Response) {
-    const loginUser = await this.authService.login(req.user, res);
-
-    return {
-      message: Message.LOGIN_SUCCESS,
-      data: loginUser,
-    };
+    try {
+      const loginUser = await this.authService.login(req.user, res);
+      return {
+        message: Message.LOGIN_SUCCESS,
+        data: loginUser,
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Login failed. Please try again later.',
+      );
+    }
   }
 
   @Public()

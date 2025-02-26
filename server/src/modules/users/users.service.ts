@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -136,11 +137,16 @@ export class UsersService {
   async findUserByEmail(email: string): Promise<IUser> {
     try {
       const user = await this.userModel.findOne({ email });
-      if (!user) throw new NotFoundException(Message.USER_NOT_FOUND);
-
+      if (!user) {
+        throw new NotFoundException(Message.USER_NOT_FOUND);
+      }
       return user;
     } catch (error) {
-      throw new NotFoundException(error.message);
+      console.error('Find user by email error:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error retrieving user');
     }
   }
 
