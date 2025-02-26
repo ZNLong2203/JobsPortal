@@ -22,7 +22,7 @@ async function bootstrap() {
   app.use(compression());
   app.use(morgan('dev'));
   app.enableCors({
-    origin: true,
+    origin: configService.get<string>('CLIENT_URL'),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization',
     credentials: true,
