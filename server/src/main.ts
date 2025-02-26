@@ -19,7 +19,11 @@ async function bootstrap() {
   const clientUrl = configService.get<string>('CLIENT_URL');
 
   app.enableCors({
-    origin: process.env.CLIENT_URL,
+    origin: [
+      clientUrl,
+      'https://jobs-portal-zkare.vercel.app',
+      /\.vercel\.app$/,
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
