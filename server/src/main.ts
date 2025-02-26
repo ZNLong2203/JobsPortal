@@ -30,7 +30,21 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: clientUrl,
+    origin: function (origin, callback) {
+      console.log('Request origin:', origin);
+      console.log('Configured clientUrl:', clientUrl);
+
+      if (
+        !origin ||
+        origin === clientUrl ||
+        origin === 'https://jobs-portal-zkare.vercel.app'
+      ) {
+        callback(null, true);
+      } else {
+        console.log('CORS blocked origin:', origin);
+        callback(null, true);
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization',
     credentials: true,
