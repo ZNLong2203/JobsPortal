@@ -18,17 +18,6 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   const clientUrl = configService.get<string>('CLIENT_URL');
 
-  app.use(cookieParser());
-  app.use(helmet.default());
-  app.use(compression());
-  app.use(morgan('dev'));
-
-  app.setGlobalPrefix('api', { exclude: ['api'] });
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
-
   app.enableCors({
     origin: function (origin, callback) {
       const allowedOrigins = [
@@ -43,9 +32,20 @@ async function bootstrap() {
         callback(new Error('Not allowed by CORS'));
       }
     },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept, Authorization',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
     credentials: true,
+  });
+
+  app.use(cookieParser());
+  app.use(helmet.default());
+  app.use(compression());
+  app.use(morgan('dev'));
+
+  app.setGlobalPrefix('api', { exclude: ['api'] });
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
   });
 
   app.useGlobalPipes(new ValidationPipe());
