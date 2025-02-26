@@ -31,18 +31,16 @@ async function bootstrap() {
 
   app.enableCors({
     origin: function (origin, callback) {
-      console.log('Request origin:', origin);
-      console.log('Configured clientUrl:', clientUrl);
+      const allowedOrigins = [
+        clientUrl,
+        'https://jobs-portal-zkare.vercel.app',
+      ];
 
-      if (
-        !origin ||
-        origin === clientUrl ||
-        origin === 'https://jobs-portal-zkare.vercel.app'
-      ) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.log('CORS blocked origin:', origin);
-        callback(null, true);
+        callback(new Error('Not allowed by CORS'));
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
