@@ -22,7 +22,7 @@ async function bootstrap() {
     origin: function (origin, callback) {
       const allowedOrigins = [
         clientUrl,
-        'https://jobs-portal-zkare.vercel.app',
+        'https://jobs-portal-zkare.vercel.app/',
       ];
 
       if (!origin || allowedOrigins.includes(origin)) {
