@@ -76,6 +76,8 @@ export class AuthService {
       res.clearCookie('refreshToken');
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
+        secure: true,
+        sameSite: 'none',
       });
 
       // Create user profile
@@ -123,6 +125,8 @@ export class AuthService {
       res.clearCookie('refreshToken');
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
+        secure: true,
+        sameSite: 'none',
       });
 
       return {

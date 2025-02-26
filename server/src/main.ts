@@ -22,7 +22,6 @@ async function bootstrap() {
     origin: [
       clientUrl,
       'https://jobs-portal-zkare.vercel.app',
-      'http://localhost:3000',
       /\.vercel\.app$/,
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
