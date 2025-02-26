@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axios-customize";
+import axios from "axios";
 
 interface AuthResponse {
   access_token: string;
@@ -10,9 +11,13 @@ interface AuthResponse {
   };
 }
 
-export const registerApi = async (name: string, email: string, password: string): Promise<void> => {
-  await axiosInstance.post('/auth/register', { name, email, password });
-}
+export const registerApi = async (name: string, email: string, password: string) => {
+  const response = await axios.post('https://cors-anywhere.herokuapp.com/https://jobs-portal-zkare.up.railway.app/api/v1/auth/register', 
+    { name, email, password },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+  return response.data;
+};
 
 export const loginApi = async (username: string, password: string): Promise<AuthResponse> => {
   const response = await axiosInstance.post('/auth/login', { username, password })
