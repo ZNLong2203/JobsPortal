@@ -22,17 +22,18 @@ async function bootstrap() {
   app.use(helmet.default());
   app.use(compression());
   app.use(morgan('dev'));
-  app.enableCors({
-    origin: clientUrl,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept, Authorization',
-    credentials: true,
-  });
 
   app.setGlobalPrefix('api', { exclude: ['api'] });
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
+  });
+
+  app.enableCors({
+    origin: clientUrl,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+    credentials: true,
   });
 
   app.useGlobalPipes(new ValidationPipe());
