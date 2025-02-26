@@ -10,9 +10,10 @@ import * as cookieParser from 'cookie-parser';
 import * as helmet from 'helmet';
 import * as compression from 'compression';
 import * as morgan from 'morgan';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
   const reflector = app.get(Reflector);
