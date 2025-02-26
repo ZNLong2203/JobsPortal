@@ -16,13 +16,14 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
   const reflector = app.get(Reflector);
+  const clientUrl = configService.get<string>('CLIENT_URL');
 
   app.use(cookieParser());
   app.use(helmet.default());
   app.use(compression());
   app.use(morgan('dev'));
   app.enableCors({
-    origin: configService.get<string>('CLIENT_URL'),
+    origin: clientUrl,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization',
     credentials: true,
