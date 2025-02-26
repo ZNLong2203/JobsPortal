@@ -10,22 +10,20 @@ import * as cookieParser from 'cookie-parser';
 import * as helmet from 'helmet';
 import * as compression from 'compression';
 import * as morgan from 'morgan';
-import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
   const reflector = app.get(Reflector);
   const clientUrl = configService.get<string>('CLIENT_URL');
 
   app.enableCors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
       const allowedOrigins = [
         clientUrl,
-        'https://jobs-portal-zkare.vercel.app/',
+        'https://jobs-portal-zkare.vercel.app',
       ];
-
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -36,6 +34,13 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
     credentials: true,
+  });
+
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    next();
   });
 
   app.use(cookieParser());
