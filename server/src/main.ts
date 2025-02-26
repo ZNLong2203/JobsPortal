@@ -19,21 +19,11 @@ async function bootstrap() {
   const clientUrl = configService.get<string>('CLIENT_URL');
 
   app.enableCors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [
-        clientUrl,
-        'https://jobs-portal-zkare.vercel.app',
-      ];
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log('CORS blocked origin:', origin);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+    origin: process.env.CLIENT_URL,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
+    exposedHeaders: 'Authorization',
   });
 
   app.use(cookieParser());

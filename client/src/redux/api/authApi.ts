@@ -1,5 +1,4 @@
 import axiosInstance from "@/lib/axios-customize";
-import axios from "axios";
 
 interface AuthResponse {
   access_token: string;
@@ -12,12 +11,7 @@ interface AuthResponse {
 }
 
 export const registerApi = async (name: string, email: string, password: string): Promise<void> => {
-  await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, { name, email, password }, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    withCredentials: true,
-  })
+  await axiosInstance.post('/auth/register', { name, email, password });
 }
 
 export const loginApi = async (username: string, password: string): Promise<AuthResponse> => {
