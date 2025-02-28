@@ -14,15 +14,29 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKAJS_NO_PARTITIONER_WARNING: 1
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
     ports:
+      - 29092:29092
       - 9092:9092
     depends_on:
       - zookeeper
       
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=app
+
   redis:
     image: redis:alpine
     ports:
@@ -33,29 +47,34 @@ services:
       - REDIS_HOST=redis
       - REDIS_PASSWORD=admin
   
-  # client:
-  #   build:
-  #     context: ./client
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - server  
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server  
   
-  # server:
-  #   build:
-  #     context: ./server
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "2222:2222"
-  #   environment:
-  #     - REDIS_HOST=redis
-  #     - REDIS_PASSWORD=admin
-  #     - KAFKA_CLIENT_ID=1
-  #     - KAFKA_BROKER=kafka:9092
-  #   depends_on:
-  #     - redis
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "2222:2222"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD=admin
+      - KAFKA_CLIENT_ID=1
+      - KAFKA_BROKER=kafka:9092
+      - MONGO_URL=mongodb://admin:admin@mongodb:27017/app?authSource=admin
+    depends_on:
+      - mongodb
+      - redis
+      - kafka
 
 volumes:
   redis-data:
+    driver: local
+  mongodb-data:
     driver: local

@@ -9,7 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model, Types } from 'mongoose';
-import { hashSync, genSalt } from 'bcrypt';
+import { hashSync, genSalt } from 'bcryptjs';
 import { Message } from 'src/common/message';
 import { IReqUser } from '../auth/interfaces/req-user.interface';
 import { IUser } from './interfaces/user.interface';

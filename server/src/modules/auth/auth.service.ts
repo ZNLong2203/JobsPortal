@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { compare } from 'bcrypt';
+import { compare } from 'bcryptjs';
 import { Response } from 'express';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Message } from 'src/common/message';
@@ -85,8 +85,8 @@ export class AuthService {
       res.clearCookie('refreshToken');
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'dev',
-        sameSite: process.env.NODE_ENV === 'dev' ? 'lax' : 'none',
+        secure: process.env.NODE_ENV !== 'development',
+        sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         path: '/',
       });
@@ -136,8 +136,8 @@ export class AuthService {
       res.clearCookie('refreshToken');
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'dev',
-        sameSite: process.env.NODE_ENV === 'dev' ? 'lax' : 'none',
+        secure: process.env.NODE_ENV !== 'development',
+        sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         path: '/',
       });
