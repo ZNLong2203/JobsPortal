@@ -118,26 +118,32 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>{initialData ? "Edit Job" : "Add New Job"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
             <div>
-              <Label htmlFor="name" className="flex items-center gap-2 mb-2">
-                <Briefcase className="h-4 w-4" />
+              <Label htmlFor="name" className="flex items-center gap-2 text-sm mb-1">
+                <Briefcase className="h-3 w-3" />
                 Job Title
               </Label>
-              <Input id="name" value={job.name} onChange={(e) => setJob({ ...job, name: e.target.value })} required />
+              <Input
+                id="name"
+                value={job.name}
+                onChange={(e) => setJob({ ...job, name: e.target.value })}
+                required
+                className="h-8 text-sm"
+              />
             </div>
             <div>
-              <Label htmlFor="company" className="flex items-center gap-2 mb-2">
-                <Briefcase className="h-4 w-4" />
+              <Label htmlFor="company" className="flex items-center gap-2 text-sm mb-1">
+                <Briefcase className="h-3 w-3" />
                 Company
               </Label>
               <Select value={job.company.toString()} onValueChange={(value) => setJob({ ...job, company: value })}>
-                <SelectTrigger>
+                <SelectTrigger className="h-8 text-sm">
                   <SelectValue placeholder="Select a company" />
                 </SelectTrigger>
                 <SelectContent>
@@ -150,20 +156,22 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
               </Select>
             </div>
             <div>
-              <Label htmlFor="skills" className="flex items-center gap-2 mb-2">
-                <Tag className="h-4 w-4" />
-                Skills (comma-separated)
+              <Label htmlFor="skills" className="flex items-center gap-2 text-sm mb-1">
+                <Tag className="h-3 w-3" />
+                Skills
               </Label>
               <Input
                 id="skills"
                 value={job.skills.join(", ")}
                 onChange={(e) => setJob({ ...job, skills: e.target.value.split(",").map((skill) => skill.trim()) })}
                 required
+                className="h-8 text-sm"
+                placeholder="Comma-separated"
               />
             </div>
             <div>
-              <Label htmlFor="location" className="flex items-center gap-2 mb-2">
-                <MapPin className="h-4 w-4" />
+              <Label htmlFor="location" className="flex items-center gap-2 text-sm mb-1">
+                <MapPin className="h-3 w-3" />
                 Location
               </Label>
               <Input
@@ -171,11 +179,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={job.location}
                 onChange={(e) => setJob({ ...job, location: e.target.value })}
                 required
+                className="h-8 text-sm"
               />
             </div>
             <div>
-              <Label htmlFor="salary" className="flex items-center gap-2 mb-2">
-                <DollarSign className="h-4 w-4" />
+              <Label htmlFor="salary" className="flex items-center gap-2 text-sm mb-1">
+                <DollarSign className="h-3 w-3" />
                 Salary
               </Label>
               <Input
@@ -184,11 +193,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={job.salary}
                 onChange={(e) => setJob({ ...job, salary: Number(e.target.value) })}
                 required
+                className="h-8 text-sm"
               />
             </div>
             <div>
-              <Label htmlFor="quantity" className="flex items-center gap-2 mb-2">
-                <Users className="h-4 w-4" />
+              <Label htmlFor="quantity" className="flex items-center gap-2 text-sm mb-1">
+                <Users className="h-3 w-3" />
                 Quantity
               </Label>
               <Input
@@ -197,11 +207,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={job.quantity}
                 onChange={(e) => setJob({ ...job, quantity: Number(e.target.value) })}
                 required
+                className="h-8 text-sm"
               />
             </div>
             <div>
-              <Label htmlFor="level" className="flex items-center gap-2 mb-2">
-                <GraduationCap className="h-4 w-4" />
+              <Label htmlFor="level" className="flex items-center gap-2 text-sm mb-1">
+                <GraduationCap className="h-3 w-3" />
                 Level
               </Label>
               <Input
@@ -209,11 +220,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={job.level}
                 onChange={(e) => setJob({ ...job, level: e.target.value })}
                 required
+                className="h-8 text-sm"
               />
             </div>
             <div>
-              <Label htmlFor="category" className="flex items-center gap-2 mb-2">
-                <Tag className="h-4 w-4" />
+              <Label htmlFor="category" className="flex items-center gap-2 text-sm mb-1">
+                <Tag className="h-3 w-3" />
                 Category
               </Label>
               <Input
@@ -221,15 +233,16 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={job.category}
                 onChange={(e) => setJob({ ...job, category: e.target.value })}
                 required
+                className="h-8 text-sm"
               />
             </div>
             <div>
-              <Label htmlFor="type" className="flex items-center gap-2 mb-2">
-                <Briefcase className="h-4 w-4" />
+              <Label htmlFor="type" className="flex items-center gap-2 text-sm mb-1">
+                <Briefcase className="h-3 w-3" />
                 Job Type
               </Label>
               <Select value={job.type} onValueChange={(value) => setJob({ ...job, type: value })}>
-                <SelectTrigger>
+                <SelectTrigger className="h-8 text-sm">
                   <SelectValue placeholder="Select a job type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -242,8 +255,8 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
               </Select>
             </div>
             <div>
-              <Label htmlFor="startDate" className="flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4" />
+              <Label htmlFor="startDate" className="flex items-center gap-2 text-sm mb-1">
+                <Calendar className="h-3 w-3" />
                 Start Date
               </Label>
               <Input
@@ -252,11 +265,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={moment(job.startDate).format("YYYY-MM-DD")}
                 onChange={(e) => setJob({ ...job, startDate: e.target.value })}
                 required
+                className="h-8 text-sm"
               />
             </div>
             <div>
-              <Label htmlFor="endDate" className="flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4" />
+              <Label htmlFor="endDate" className="flex items-center gap-2 text-sm mb-1">
+                <Calendar className="h-3 w-3" />
                 End Date
               </Label>
               <Input
@@ -265,6 +279,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={moment(job.endDate).format("YYYY-MM-DD")}
                 onChange={(e) => setJob({ ...job, endDate: e.target.value })}
                 required
+                className="h-8 text-sm"
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -273,21 +288,23 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 checked={job.isActive}
                 onCheckedChange={(checked) => setJob({ ...job, isActive: checked })}
               />
-              <Label htmlFor="isActive">Active</Label>
+              <Label htmlFor="isActive" className="text-sm">
+                Active
+              </Label>
             </div>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label htmlFor="des" className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4" />
+            <div className="flex items-center justify-between mb-1">
+              <Label htmlFor="des" className="flex items-center gap-2 text-sm">
+                <HelpCircle className="h-3 w-3" />
                 Job Description
               </Label>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <HelpCircle className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" className="h-6 text-xs">
+                      <HelpCircle className="h-3 w-3" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -298,17 +315,41 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
             </div>
             <div className="border rounded-md">
               <div className="flex items-center gap-1 p-1 border-b">
-                <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor("**Bold**")}>
-                  <Bold className="h-4 w-4" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertTextAtCursor("**Bold**")}
+                  className="h-6 text-xs"
+                >
+                  <Bold className="h-3 w-3" />
                 </Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor("*Italic*")}>
-                  <Italic className="h-4 w-4" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertTextAtCursor("*Italic*")}
+                  className="h-6 text-xs"
+                >
+                  <Italic className="h-3 w-3" />
                 </Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor("\n• ")}>
-                  <List className="h-4 w-4" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertTextAtCursor("\n• ")}
+                  className="h-6 text-xs"
+                >
+                  <List className="h-3 w-3" />
                 </Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => insertTextAtCursor("\n1. ")}>
-                  <ListOrdered className="h-4 w-4" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => insertTextAtCursor("\n1. ")}
+                  className="h-6 text-xs"
+                >
+                  <ListOrdered className="h-3 w-3" />
                 </Button>
               </div>
               <Textarea
@@ -316,16 +357,18 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={job.des}
                 onChange={(e) => setJob({ ...job, des: e.target.value })}
                 required
-                className="min-h-[150px] border-0 rounded-none focus-visible:ring-0"
+                className="min-h-[100px] border-0 rounded-none focus-visible:ring-0 text-sm"
               />
             </div>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className="h-8 text-sm">
               Cancel
             </Button>
-            <Button type="submit">{initialData ? "Update" : "Add"} Job</Button>
+            <Button type="submit" className="h-8 text-sm">
+              {initialData ? "Update" : "Add"} Job
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
