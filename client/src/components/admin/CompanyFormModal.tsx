@@ -97,10 +97,10 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
           <DialogTitle>{initialData ? "Edit Company" : "Add New Company"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name" className="flex items-center gap-2">
+                <Label htmlFor="name" className="flex items-center gap-2 mb-2">
                   <Building className="h-4 w-4" />
                   Company Name
                 </Label>
@@ -112,7 +112,7 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
                 />
               </div>
               <div>
-                <Label htmlFor="address" className="flex items-center gap-2">
+                <Label htmlFor="address" className="flex items-center gap-2 mb-2">
                   <MapPin className="h-4 w-4" />
                   Address
                 </Label>
@@ -124,7 +124,7 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
                 />
               </div>
               <div>
-                <Label htmlFor="industry" className="flex items-center gap-2">
+                <Label htmlFor="industry" className="flex items-center gap-2 mb-2">
                   <Briefcase className="h-4 w-4" />
                   Industry
                 </Label>
@@ -136,7 +136,7 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
                 />
               </div>
               <div>
-                <Label htmlFor="employees" className="flex items-center gap-2">
+                <Label htmlFor="employees" className="flex items-center gap-2 mb-2">
                   <Users className="h-4 w-4" />
                   Number of Employees
                 </Label>
@@ -151,7 +151,7 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
             </div>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="logo" className="flex items-center gap-2">
+                <Label htmlFor="logo" className="flex items-center gap-2 mb-2">
                   <Upload className="h-4 w-4" />
                   Company Logo
                 </Label>
@@ -174,7 +174,7 @@ export function CompanyFormModal({ isOpen, onClose, onSubmit, initialData }: Com
                 </div>
               </div>
               <div>
-                <Label htmlFor="des" className="flex items-center gap-2">
+                <Label htmlFor="des" className="flex items-center gap-2 mb-2">
                   <FileText className="h-4 w-4" />
                   Description
                 </Label>

@@ -118,169 +118,166 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>{initialData ? "Edit Job" : "Add New Job"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name" className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Job Title
-                </Label>
-                <Input id="name" value={job.name} onChange={(e) => setJob({ ...job, name: e.target.value })} required />
-              </div>
-              <div>
-                <Label htmlFor="company" className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Company
-                </Label>
-                <Select value={job.company.toString()} onValueChange={(value) => setJob({ ...job, company: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a company" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(Array.isArray(companies) ? companies : companies.companies).map((company: Company) => (
-                      <SelectItem key={company._id} value={company._id ?? ""}>
-                        {company.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="skills" className="flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
-                  Skills (comma-separated)
-                </Label>
-                <Input
-                  id="skills"
-                  value={job.skills.join(", ")}
-                  onChange={(e) => setJob({ ...job, skills: e.target.value.split(",").map((skill) => skill.trim()) })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="location" className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Location
-                </Label>
-                <Input
-                  id="location"
-                  value={job.location}
-                  onChange={(e) => setJob({ ...job, location: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="salary" className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Salary
-                </Label>
-                <Input
-                  id="salary"
-                  type="number"
-                  value={job.salary}
-                  onChange={(e) => setJob({ ...job, salary: Number(e.target.value) })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="quantity" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Quantity
-                </Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  value={job.quantity}
-                  onChange={(e) => setJob({ ...job, quantity: Number(e.target.value) })}
-                  required
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <div>
+              <Label htmlFor="name" className="flex items-center gap-2 mb-2">
+                <Briefcase className="h-4 w-4" />
+                Job Title
+              </Label>
+              <Input id="name" value={job.name} onChange={(e) => setJob({ ...job, name: e.target.value })} required />
             </div>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="level" className="flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
-                  Level
-                </Label>
-                <Input
-                  id="level"
-                  value={job.level}
-                  onChange={(e) => setJob({ ...job, level: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="category" className="flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
-                  Category
-                </Label>
-                <Input
-                  id="category"
-                  value={job.category}
-                  onChange={(e) => setJob({ ...job, category: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="type" className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Job Type
-                </Label>
-                <Select value={job.type} onValueChange={(value) => setJob({ ...job, type: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a job type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(JOB_TYPES).map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="startDate" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Start Date
-                </Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={moment(job.startDate).format("YYYY-MM-DD")}
-                  onChange={(e) => setJob({ ...job, startDate: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="endDate" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  End Date
-                </Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={moment(job.endDate).format("YYYY-MM-DD")}
-                  onChange={(e) => setJob({ ...job, endDate: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isActive"
-                  checked={job.isActive}
-                  onCheckedChange={(checked) => setJob({ ...job, isActive: checked })}
-                />
-                <Label htmlFor="isActive">Active</Label>
-              </div>
+            <div>
+              <Label htmlFor="company" className="flex items-center gap-2 mb-2">
+                <Briefcase className="h-4 w-4" />
+                Company
+              </Label>
+              <Select value={job.company.toString()} onValueChange={(value) => setJob({ ...job, company: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a company" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Array.isArray(companies) ? companies : companies.companies).map((company: Company) => (
+                    <SelectItem key={company._id} value={company._id ?? ""}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="skills" className="flex items-center gap-2 mb-2">
+                <Tag className="h-4 w-4" />
+                Skills (comma-separated)
+              </Label>
+              <Input
+                id="skills"
+                value={job.skills.join(", ")}
+                onChange={(e) => setJob({ ...job, skills: e.target.value.split(",").map((skill) => skill.trim()) })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="location" className="flex items-center gap-2 mb-2">
+                <MapPin className="h-4 w-4" />
+                Location
+              </Label>
+              <Input
+                id="location"
+                value={job.location}
+                onChange={(e) => setJob({ ...job, location: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="salary" className="flex items-center gap-2 mb-2">
+                <DollarSign className="h-4 w-4" />
+                Salary
+              </Label>
+              <Input
+                id="salary"
+                type="number"
+                value={job.salary}
+                onChange={(e) => setJob({ ...job, salary: Number(e.target.value) })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="quantity" className="flex items-center gap-2 mb-2">
+                <Users className="h-4 w-4" />
+                Quantity
+              </Label>
+              <Input
+                id="quantity"
+                type="number"
+                value={job.quantity}
+                onChange={(e) => setJob({ ...job, quantity: Number(e.target.value) })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="level" className="flex items-center gap-2 mb-2">
+                <GraduationCap className="h-4 w-4" />
+                Level
+              </Label>
+              <Input
+                id="level"
+                value={job.level}
+                onChange={(e) => setJob({ ...job, level: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="category" className="flex items-center gap-2 mb-2">
+                <Tag className="h-4 w-4" />
+                Category
+              </Label>
+              <Input
+                id="category"
+                value={job.category}
+                onChange={(e) => setJob({ ...job, category: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="type" className="flex items-center gap-2 mb-2">
+                <Briefcase className="h-4 w-4" />
+                Job Type
+              </Label>
+              <Select value={job.type} onValueChange={(value) => setJob({ ...job, type: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a job type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(JOB_TYPES).map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="startDate" className="flex items-center gap-2 mb-2">
+                <Calendar className="h-4 w-4" />
+                Start Date
+              </Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={moment(job.startDate).format("YYYY-MM-DD")}
+                onChange={(e) => setJob({ ...job, startDate: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="endDate" className="flex items-center gap-2 mb-2">
+                <Calendar className="h-4 w-4" />
+                End Date
+              </Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={moment(job.endDate).format("YYYY-MM-DD")}
+                onChange={(e) => setJob({ ...job, endDate: e.target.value })}
+                required
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isActive"
+                checked={job.isActive}
+                onCheckedChange={(checked) => setJob({ ...job, isActive: checked })}
+              />
+              <Label htmlFor="isActive">Active</Label>
             </div>
           </div>
-          <div className="mt-6">
+
+          <div>
             <div className="flex items-center justify-between mb-2">
               <Label htmlFor="des" className="flex items-center gap-2">
                 <HelpCircle className="h-4 w-4" />
@@ -319,11 +316,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialData }: JobForm
                 value={job.des}
                 onChange={(e) => setJob({ ...job, des: e.target.value })}
                 required
-                className="min-h-[200px] border-0 rounded-none focus-visible:ring-0"
+                className="min-h-[150px] border-0 rounded-none focus-visible:ring-0"
               />
             </div>
           </div>
-          <DialogFooter className="mt-6">
+
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
