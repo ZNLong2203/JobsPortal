@@ -20,10 +20,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build success!'
+            echo 'Build project success!'
         }
         failure {
-            echo 'Build failed!'
+            echo 'Build project failed!'
         }
     }
 }
