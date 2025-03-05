@@ -56,15 +56,15 @@ export class JobsService {
       const queryParams = query.query || query;
 
       if (queryParams?.search) {
-        queryBuilder.title = { $regex: queryParams.search, $options: 'i' };
+        queryBuilder.name = { $regex: queryParams.search, $options: 'i' };
       }
       if (queryParams?.location) {
         queryBuilder.location = { $regex: queryParams.location, $options: 'i' };
       }
-      if (queryParams?.type && queryParams?.type !== 'all') {
+      if (queryParams?.type && queryParams?.type !== 'All') {
         queryBuilder.type = queryParams.type;
       }
-      if (queryParams?.level && queryParams?.level !== 'all') {
+      if (queryParams?.level && queryParams?.level !== 'All') {
         queryBuilder.level = queryParams.level;
       }
       if (queryParams?.company) {

@@ -24,7 +24,10 @@ export class Job {
   @Prop()
   quantity: number;
 
-  @Prop()
+  @Prop({
+    enum: ['Fresher', 'Junior', 'Middle', 'Senior', 'Manager'],
+    default: 'Fresher',
+  })
   level: string;
 
   @Prop()

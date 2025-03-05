@@ -17,6 +17,8 @@ const JOB_TYPES = {
   ALL: 'All',
   FULL_TIME: 'Full-time',
   PART_TIME: 'Part-time',
+  REMOTE: 'Remote',
+  INTERNSHIP: 'Internship',
   CONTRACT: 'Contract'
 } as const;
 
