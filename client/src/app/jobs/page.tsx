@@ -14,17 +14,17 @@ import Link from "next/link"
 import { useDebounce } from 'use-debounce'
 
 const JOB_TYPES = {
-  ALL: 'all',
-  FULL_TIME: 'full-time',
-  PART_TIME: 'part-time',
-  CONTRACT: 'contract'
+  ALL: 'All',
+  FULL_TIME: 'Full-time',
+  PART_TIME: 'Part-time',
+  CONTRACT: 'Contract'
 } as const;
 
 const JOB_LEVELS = {
-  ALL: 'all',
-  ENTRY: 'entry',
-  MID: 'mid',
-  SENIOR: 'senior'
+  ALL: 'All',
+  FRESHER: 'Fresher',
+  MID: 'Mid',
+  SENIOR: 'Senior'
 } as const;
 
 export default function JobListings() {
