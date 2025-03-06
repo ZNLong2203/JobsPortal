@@ -115,9 +115,11 @@ export class AuthService {
 
   async newRefreshToken(refreshToken: string, res: Response): Promise<any> {
     try {
-      const payload = this.jwtService.verify(refreshToken);
-      const user = await this.usersService.findUserByEmail(payload.email);
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN'),
+      });
 
+      const user = await this.usersService.findUserByEmail(payload.email);
       if (!user) {
         throw new UnauthorizedException(Message.INVALID_CREDENTIALS);
       }
@@ -133,8 +135,15 @@ export class AuthService {
         company,
       };
 
+      const refreshExpire =
+        this.configService.get<string>('JWT_REFRESH_EXPIRE');
+      const newRefreshToken = this.jwtService.sign(newPayload, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN'),
+        expiresIn: refreshExpire,
+      });
+
       res.clearCookie('refreshToken');
-      res.cookie('refreshToken', refreshToken, {
+      res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
         sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
@@ -143,7 +152,7 @@ export class AuthService {
       });
 
       return {
-        access_token: this.jwtService.sign(newPayload),
+        accessToken: this.jwtService.sign(newPayload),
         userInfo: {
           _id,
           name,

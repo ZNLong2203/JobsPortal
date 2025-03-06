@@ -12,6 +12,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'JobsPortal - Your Career Starts Here',
   description: 'Find your dream job with JobsPortal. Browse thousands of job listings from top companies.',
+  icons: {
+    icon: '/favicon.ico',
+  }
 };
 
 export default function RootLayout({
