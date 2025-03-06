@@ -7,6 +7,7 @@ import { Briefcase, Users, MapPin, DollarSign } from 'lucide-react'
 import { useCompanyDetailsAndJobs } from '@/hooks/useCompanyDetailsAndJobs'
 import { LoadingSpinner } from '@/components/common/IsLoading'
 import { ErrorMessage } from '@/components/common/IsError'
+import Link from 'next/link'
 
 export default function CompanyDetailsPage() {
   const params = useParams()
@@ -17,7 +18,7 @@ export default function CompanyDetailsPage() {
   if (isError) return <ErrorMessage message={error?.message || 'An error occurred'} />
 
   const { company } = data
-  const jobsList = Array.isArray(data.jobs) ? data.jobs : []
+  const jobsList = data.jobs || []
 
   if (!company) return <ErrorMessage message="Company not found" />
 
@@ -67,11 +68,13 @@ export default function CompanyDetailsPage() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <DollarSign className="h-4 w-4" />
-                  <span>${job.salary.toLocaleString()}/year</span>
+                  <span>${job.salary?.toLocaleString() || 'N/A'}/year</span>
                 </div>
               </CardContent>
               <CardContent>
-                <Button className="w-full">Apply Now</Button>
+                <Link href={`/jobs/${job._id}`}>
+                  <Button className="w-full">Apply Now</Button>
+                </Link>
               </CardContent>
             </Card>
           ))
