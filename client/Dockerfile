@@ -16,7 +16,7 @@ RUN npm run build
 # Production image
 FROM base AS runner
 WORKDIR /app
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Copy built application
 COPY --from=builder /app/public ./public
@@ -25,6 +25,6 @@ COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 
 CMD ["node", "server.js"]
