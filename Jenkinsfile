@@ -8,6 +8,13 @@ pipeline {
             }
         }
 
+        stage('Clean Docker Resources') {
+            steps {
+                sh 'docker system prune -a --volumes -f'
+                sh 'docker builder prune -a -f'
+            }
+        }
+
         stage('Build') {
             steps {
                 sh '''
