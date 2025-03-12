@@ -48,6 +48,7 @@ import { toast } from "react-hot-toast";
 import { useResumes } from "@/hooks/useResumes";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import Link from "next/link";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -116,7 +117,11 @@ export default function JobDetailsPage() {
         <div className="mb-8 flex items-center text-sm text-gray-500">
           <span>Jobs</span>
           <ChevronRight className="h-4 w-4 mx-2" />
-          <span>{typeof job.company === "object" ? job.company.name : job.company}</span>
+          <span>
+            <Link href={`/companies/${typeof job.company === "object" ? job.company._id : job.company}`}>
+              {typeof job.company === "object" ? job.company.name : job.company}
+            </Link>
+          </span>
           <ChevronRight className="h-4 w-4 mx-2" />
           <span className="font-semibold text-gray-900">{job.name}</span>
         </div>
@@ -126,17 +131,19 @@ export default function JobDetailsPage() {
             <Card className="mb-8 overflow-hidden shadow-lg">
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-32 relative">
                 <div className="absolute bottom-0 left-6 transform translate-y-1/2 bg-white p-2 rounded-lg shadow-md">
-                  <Image
-                    src={
-                      typeof job.company === "object"
-                        ? job.company.logo || "/placeholder.svg"
-                        : "/placeholder.svg"
-                    }
-                    alt={`${typeof job.company === "object" ? job.company.name : job.company} logo`}
-                    className="w-24 h-24 object-contain"
-                    width={96}
-                    height={96}
-                  />
+                  <Link href={`/companies/${typeof job.company === "object" ? job.company._id : job.company}`}>
+                    <Image
+                      src={
+                        typeof job.company === "object"
+                          ? job.company.logo || "/placeholder.svg"
+                          : "/placeholder.svg"
+                      }
+                      alt={`${typeof job.company === "object" ? job.company.name : job.company} logo`}
+                      className="w-24 h-24 object-contain"
+                      width={96}
+                      height={96}
+                    />
+                  </Link>
                 </div>
               </div>
 
@@ -145,7 +152,9 @@ export default function JobDetailsPage() {
                   <div>
                     <CardTitle className="text-3xl font-bold mb-2">{job.name}</CardTitle>
                     <p className="text-xl text-gray-600">
-                      {typeof job.company === "object" ? job.company.name : job.company}
+                      <Link href={`/companies/${typeof job.company === "object" ? job.company._id : job.company}`}>
+                        {typeof job.company === "object" ? job.company.name : job.company}
+                      </Link>
                     </p>
                   </div>
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
