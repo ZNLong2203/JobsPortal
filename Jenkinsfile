@@ -15,7 +15,7 @@ pipeline {
             }
         }
 
-        stage('Build Project') {
+        stage('Build') {
             steps {
                 sh '''
                     docker-compose down
